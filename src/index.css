@@ -1,0 +1,8 @@
+@import "tailwindcss";
+body {
+    font-family: 'DM Sans', sans-serif;
+  }
+  
+button{
+  cursor: pointer;
+}
