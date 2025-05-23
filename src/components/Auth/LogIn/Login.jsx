@@ -5,13 +5,13 @@ import vector2 from "../../../assets/Home/Vector11.svg";
 import vector1 from "../../../assets/Home/Vector12.svg";
 
 const Login = () => {
-    const [inputEmailorMobileNumber, setEmailOrPhone] = useState("");
+    const [MobileNumber, setEmailOrPhone] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!inputEmailorMobileNumber || !password) {
+        if (!MobileNumber || !password) {
             toast("All fields are required!");
             return;
         }
@@ -24,7 +24,7 @@ const Login = () => {
                 },
                 credentials: "include", // ✅ Include cookies
                 body: JSON.stringify({
-                    inputEmailorMobileNumber,
+                    MobileNumber,
                     password,
                 }),
             });
@@ -103,7 +103,7 @@ const Login = () => {
                             <label className="block font-medium text-gray-600">Email / Phone number</label>
                             <input
                                 type="text"
-                                value={inputEmailorMobileNumber}
+                                value={MobileNumber}
                                 onChange={(e) => setEmailOrPhone(e.target.value)}
                                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="Enter Email / Phone number"

@@ -1,29 +1,22 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import vector1 from "../../../assets/Home/Vector11.svg";
-import vector2 from "../../../assets/Home/Vector12.svg";
+import image1 from "../../../assets/auth/image1.svg";
+import image2 from "../../../assets/auth/image2.svg";
 import { ToastContainer, toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    parsePhoneNumberFromString,
-    isValidPhoneNumber,
-} from "libphonenumber-js";
 
 const SignUpRequest = () => {
-    const navigate = useNavigate(); // Use navigate hook to navigate between routes
+    const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState("");
     const [middleName, setMiddleName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [resendTimer, setResendTimer] = useState(60);
-    const [emailCode, setEmailCode] = useState("");
     const [phoneCode, setPhoneCode] = useState("");
     const [password, setPassword] = useState("");
-    const [emailOTP, setEmailOTP] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [passwordStrength, setPasswordStrength] = useState("");
     const role = "Founder";
@@ -36,17 +29,8 @@ const SignUpRequest = () => {
         exit: { opacity: 0, x: -50, transition: { duration: 0.4 } },
     };
 
-    const emailValidation = () => {
-        let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) {
-            toast("Invalid email format!");
-            return false;
-        }
-        return true;
-    };
-
     const phoneValidation = () => {
-        if (phoneNumber.length != 12) {
+        if (phoneNumber.length !== 12) {
             toast("Invalid phone number!");
             return false;
         }
@@ -78,23 +62,20 @@ const SignUpRequest = () => {
     };
 
     const handleOnClickNextForFirstSection = () => {
-        if (!emailValidation()) {
-            return;
-        }
         if (!phoneValidation()) {
             return;
         }
-        if (!firstName || !lastName || !email || !phoneNumber) {
+        if (!firstName || !lastName || !phoneNumber) {
             toast("All fields are required except middle name!");
         } else {
             setStep(2);
-            sendOTP(email, phoneNumber);
+            // sendOTP(phoneNumber); // Uncomment and implement when ready
         }
     };
 
     const handleOnClickNextForSecondSection = () => {
-        if (!emailCode || !phoneCode) {
-            toast("All fields are required!");
+        if (!phoneCode) {
+            toast("Phone verification code is required!");
             return;
         }
         if (!validateOTP()) {
@@ -118,16 +99,13 @@ const SignUpRequest = () => {
 
     const handleGetStarted = () => {
         if (!passwordValidation(password)) {
-            toast(
-                "Please follow the password requirements to create a strong password!"
-            );
+            toast("Please follow the password requirements to create a strong password!");
             return;
         }
         if (password !== confirmPassword) {
             toast("Passwords do not match!");
             return;
         }
-        // Proceed with registration if password is strong
         registerUser();
     };
 
@@ -135,49 +113,14 @@ const SignUpRequest = () => {
         navigate("/login");
     };
 
-    //functions to be completed
-    const sendOTP = async (email, phoneNumber) => {
-        // API call to send OTP
-        return await fetch("http://localhost:3333/api/otp/send-otp", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email,
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    setEmailOTP(data.otp);
-                } else {
-                    toast.error(data.message);
-                }
-            });
-    };
-
     const validateOTP = () => {
-        // API call to validate OTP
-        let isValid = true;
-        //for temporary checking
-        if (emailCode === emailOTP) {
-            isValid = true;
-        } else if (emailCode !== "1234") {
-            toast("Invalid Email OTP!");
+        // Temporary check for phone OTP
+        if (phoneCode === "1234") {
+            return true;
+        } else {
+            toast("Invalid Phone OTP!");
             return false;
         }
-
-        if (phoneNumber) {
-            if (phoneCode === "1234") {
-                isValid = true;
-            } else {
-                toast("Invalid Phone OTP!");
-                return false;
-            }
-        }
-
-        return isValid;
     };
 
     const registerUser = async () => {
@@ -190,11 +133,9 @@ const SignUpRequest = () => {
                 firstName,
                 middleName,
                 lastName,
-                email,
                 phoneNumber,
                 password,
                 role,
-                emailCode,
             }),
         })
             .then((response) => response.json())
@@ -233,359 +174,219 @@ const SignUpRequest = () => {
                 {step === 1 && (
                     <motion.div
                         key="step1"
-                        className="relative flex justify-center items-center min-h-screen bg-gray-100 overflow-hidden"
+                        className="flex w-screen justify-center items-center h-screen bg-[#F6E7FF] overflow-hidden"
                         initial="initial"
                         animate="animate"
                         exit="exit"
                         variants={pageVariants}
                     >
-                        <div className="absolute flex justify-between items-center w-full">
-                            <img
-                                src={vector1}
-                                alt="Vector1"
-                                className="w-1/2 h-auto mb-[15vw]"
-                            />
-                            <img
-                                src={vector2}
-                                alt="Vector2"
-                                className="w-1/2 h-auto mb-[15vw]"
-                            />
+                        <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
+                            <div className="flex flex-col h-full gap-1 w-[50%] p-4 rounded-lg justify-center">
+                                <div className="flex flex-col mb-2 items-start gap-0.5">
+                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">Register now</p>
+                                    <h2 className="text-[48px] font-bold text-[#5E0194]"> Sign Up for Free.</h2>
+                                    <p className="text-[#786D7F] opacity-[86%] text-sm">
+                                        Already have an account?{" "}
+                                        <a href="#" className="text-[#A100FF] font-medium underline" onClick={handleLogin}>
+                                            Sign in
+                                        </a>
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">First Name</label>
+                                        <input
+                                            type="text"
+                                            className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            placeholder="Enter First Name"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Middle Name (Optional)</label>
+                                        <input
+                                            type="text"
+                                            className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            placeholder="Enter Middle Name"
+                                            value={middleName}
+                                            onChange={(e) => setMiddleName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Last Name</label>
+                                        <input
+                                            type="text"
+                                            className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            placeholder="Enter Last Name"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Phone number</label>
+                                        <PhoneInput
+                                            country={"in"}
+                                            value={phoneNumber}
+                                            onChange={setPhoneNumber}
+                                            containerClass="w-full"
+                                            inputClass="w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            buttonClass="border-gray-300 h-14 w-16"
+                                            dropdownClass="h-28"
+                                            containerStyle={{ height: "56px", width: "100%" }}
+                                            inputStyle={{ height: "43px", width: "100%" }}
+                                            buttonStyle={{
+                                                position: "absolute",
+                                                left: "5px",
+                                                top: "1px",
+                                                height: "40px",
+                                                width: "40px",
+                                                backgroundColor: "transparent",
+                                                border: "none",
+                                                outline: "none",
+                                            }}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={handleOnClickNextForFirstSection}
+                                        className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 mx-auto transition-all duration-300"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="h-full w-fit flex justify-center items-center">
+                                <img src={image1} alt="" className="h-full" />
+                            </div>
                         </div>
-                        <div className="z-10 bg-white p-8 rounded-2xl shadow-lg w-96 text-center">
-                            <h2 className="text-2xl font-bold text-blue-600">
-                                Sign Up
-                            </h2>
-                            <p className="text-gray-500 mb-6">
-                                Submit your details to proceed further
-                            </p>
-
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-1 text-gray-600">
-                                    First Name
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter First Name"
-                                    value={firstName}
-                                    onChange={(e) =>
-                                        setFirstName(e.target.value)
-                                    }
-                                />
-                            </div>
-
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-1 text-gray-600">
-                                    Middle Name
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter Middle Name"
-                                    value={middleName}
-                                    onChange={(e) =>
-                                        setMiddleName(e.target.value)
-                                    }
-                                />
-                            </div>
-
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-1 text-gray-600">
-                                    Last Name
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter Last Name"
-                                    value={lastName}
-                                    onChange={(e) =>
-                                        setLastName(e.target.value)
-                                    }
-                                />
-                            </div>
-
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-1 text-gray-600">
-                                    Email
-                                </label>
-                                <input
-                                    type="email"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter Email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-2 text-gray-700">
-                                    Phone number
-                                </label>
-                                <PhoneInput
-                                    country={"in"}
-                                    value={phoneNumber}
-                                    onChange={setPhoneNumber}
-                                    containerClass="w-full"
-                                    inputClass="w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    buttonClass="border-gray-300 h-14 w-16"
-                                    dropdownClass="h-28"
-                                    containerStyle={{
-                                        height: "56px",
-                                        width: "100%",
-                                    }}
-                                    inputStyle={{
-                                        height: "48px",
-                                        width: "100%",
-                                    }}
-                                    buttonStyle={{
-                                        position: "absolute",
-                                        left: "5px",
-                                        top: "3px",
-                                        height: "40px",
-                                        width: "40px",
-                                        backgroundColor: "transparent",
-                                        border: "none",
-                                        outline: "none",
-                                    }}
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleOnClickNextForFirstSection}
-                                className="bg-blue-600 text-white w-full p-3 rounded-lg mt-4 shadow-md hover:bg-blue-700"
-                            >
-                                Next
-                            </button>
-                            <p className="mt-4 text-gray-500 text-sm">
-                                Already have an account?{" "}
-                                <a
-                                    href="#"
-                                    className="text-blue-600 font-medium"
-                                    onClick={handleLogin}
-                                >
-                                    Log in
-                                </a>
-                            </p>
-                        </div>
-                        {/* Login Link */}
                     </motion.div>
                 )}
                 {step === 2 && (
                     <motion.div
                         key="step2"
-                        className="relative flex justify-center items-center min-h-screen bg-gray-100"
+                        className="flex w-screen justify-center items-center h-screen bg-[#F6E7FF] overflow-hidden"
                         initial="initial"
                         animate="animate"
                         exit="exit"
                         variants={pageVariants}
                     >
-                        {/* below code is for background image */}
-                        <div className="absolute flex justify-between items-center  w-full top-[-10%]">
-                            <img
-                                src={vector1}
-                                alt="Vector1 is not loading"
-                                className="w-1/2 h-auto "
-                                onContextMenu={(e) => e.preventDefault()} // Disable right-click
-                                draggable="false" // Disable dragging
-                            />
-                            <img
-                                src={vector2}
-                                alt="Vector2 is not loading"
-                                className="w-1/2 h-auto "
-                                onContextMenu={(e) => e.preventDefault()} // Disable right-click
-                                draggable="false" // Disable dragging
-                            />
-                        </div>
-                        <div className="z-10 bg-white p-8 rounded-2xl shadow-lg w-96 text-center">
-                            <h2 className="text-2xl font-bold text-blue-600">
-                                Verification
-                            </h2>
-                            <p className="text-gray-500 mb-6">
-                                Enter the code sent to proceed further
-                            </p>
-
-                            {/* Email Verification Input */}
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-1 text-gray-600">
-                                    Email Verification
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter Code"
-                                    value={emailCode}
-                                    onChange={(e) =>
-                                        setEmailCode(e.target.value)
-                                    }
-                                />
+                        <div className="flex gap-10 w-fit h-[55%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
+                            <div className="flex flex-col h-full gap-1 w-[100%] p-4 rounded-lg justify-center">
+                                <div className="flex flex-col mb-2 items-start gap-0.5">
+                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">Verification</p>
+                                    <h2 className="text-[48px] font-bold text-[#5E0194]">Verify Your Phone</h2>
+                                    <p className="text-[#786D7F] opacity-[86%] text-sm">
+                                        Enter the code sent to your phone to proceed.
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Phone Verification Code</label>
+                                        <input
+                                            type="text"
+                                            className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            placeholder="Enter Code"
+                                            value={phoneCode}
+                                            onChange={(e) => setPhoneCode(e.target.value)}
+                                        />
+                                    </div>
+                                    <p className="text-[#786D7F] opacity-[86%] text-sm">
+                                        Haven't received your code?{" "}
+                                        <button
+                                            className="text-[#A100FF] font-medium underline disabled:text-gray-400"
+                                            disabled={resendTimer > 0}
+                                        >
+                                            Send the code again ({resendTimer > 0 ? `00:${resendTimer}` : "Resend"})
+                                        </button>
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={handleOnClickPreviousForSecondSection}
+                                            className="bg-gray-400 text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-gray-500 transition-all duration-300"
+                                        >
+                                            Back
+                                        </button>
+                                        <button
+                                            onClick={handleOnClickNextForSecondSection}
+                                            className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-
-                            {/* Phone Verification Input */}
-                            <div className="text-left mb-4">
-                                <label className="block font-medium mb-1 text-gray-600">
-                                    Phone number Verification
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter Code"
-                                    value={phoneCode}
-                                    onChange={(e) =>
-                                        setPhoneCode(e.target.value)
-                                    }
-                                />
-                            </div>
-
-                            {/* Resend Code Timer */}
-                            <p className="text-gray-500 text-sm">
-                                Haven't received your code?{" "}
-                                <button
-                                    className="text-blue-600 font-medium disabled:text-gray-400"
-                                    disabled={resendTimer > 0}
-                                >
-                                    Send the code again (
-                                    {resendTimer > 0
-                                        ? `00:${resendTimer}`
-                                        : "Resend"}
-                                    )
-                                </button>
-                            </p>
-
-                            {/* Submit Button */}
-                            {/* <button
-                            onClick={handleOnClickNextForSecondSection}
-                            className="bg-blue-600 text-white w-full p-3 rounded-lg mt-4 shadow-md hover:bg-blue-700"
-                        >
-                            Next
-                        </button> */}
-                            <div className="flex justify-between gap-4 mt-4">
-                                <button
-                                    onClick={
-                                        handleOnClickPreviousForSecondSection
-                                    } // Function to go back to step 1
-                                    className="bg-gray-400 text-white w-1/2 p-3 rounded-lg shadow-md hover:bg-gray-500"
-                                >
-                                    Back
-                                </button>
-
-                                <button
-                                    onClick={handleOnClickNextForSecondSection} // Function to go to next step
-                                    className="bg-blue-600 text-white w-1/2 p-3 rounded-lg shadow-md hover:bg-blue-700"
-                                >
-                                    Next
-                                </button>
-                            </div>
-                            {/* Login Link */}
-                            <p className="mt-4 text-gray-500 text-sm">
-                                Already have an account?{" "}
-                                <a
-                                    onClick={handleLogin}
-                                    href="#"
-                                    className="text-blue-600 font-medium"
-                                >
-                                    Log in
-                                </a>
-                            </p>
+                            {/* <div className="h-full w-fit flex justify-center items-center">
+                                <img src={image1} alt="" className="h-full" />
+                            </div> */}
                         </div>
                     </motion.div>
                 )}
                 {step === 3 && (
                     <motion.div
                         key="step3"
-                        className="relative flex justify-center items-center min-h-screen bg-gray-100"
+                        className="flex w-screen justify-center items-center h-screen bg-[#F6E7FF] overflow-hidden"
                         initial="initial"
                         animate="animate"
                         exit="exit"
                         variants={pageVariants}
                     >
-                        {/* Background Images */}
-                        <div className="absolute top-[15%] flex justify-between items-center w-full">
-                            <img
-                                src={vector1}
-                                alt="Vector1 is not loading"
-                                className="w-1/2 h-auto translate-y-[-30%]"
-                                onContextMenu={(e) => e.preventDefault()} // Disable right-click
-                                draggable="false" // Disable dragging
-                            />
-                            <img
-                                src={vector2}
-                                alt="Vector2 is not loading"
-                                className="w-1/2 h-auto translate-y-[-30%]"
-                                onContextMenu={(e) => e.preventDefault()} // Disable right-click
-                                draggable="false" // Disable dragging
-                            />
-                        </div>
-
-                        {/* Form Container */}
-                        <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center relative z-10">
-                            <h2 className="text-2xl font-bold text-blue-600">
-                                Set Password
-                            </h2>
-                            <p className="text-gray-500 mb-6">
-                                Create a strong password to proceed further
-                            </p>
-
-                            {/* Password Input */}
-                            <div className="text-left mb-4">
-                                <label className="block font-medium text-gray-500 ">
-                                    Password
-                                </label>
-                                <input
-                                    type="password"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter Password"
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                        // checkPasswordStrength(e.target.value);
-                                    }}
-                                />
-                                {passwordStrength === "Strong Password" && (
-                                    <p className="text-green-600 flex items-center mt-1">
-                                        <CheckCircle
-                                            size={16}
-                                            className="mr-1"
-                                        />{" "}
-                                        {passwordStrength}
+                        <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
+                            <div className="flex flex-col h-full gap-1 w-[50%] p-4 rounded-lg justify-center">
+                                <div className="flex flex-col mb-2 items-start gap-0.5">
+                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">Set Password</p>
+                                    <h2 className="text-[48px] font-bold text-[#5E0194]">Create Your Password</h2>
+                                    <p className="text-[#786D7F] opacity-[86%] text-sm">
+                                        Set a strong password to secure your account.
                                     </p>
-                                )}
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Password</label>
+                                        <input
+                                            type="password"
+                                            className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            placeholder="Enter Password"
+                                            value={password}
+                                            onChange={(e) => {
+                                                setPassword(e.target.value);
+                                                // checkPasswordStrength(e.target.value);
+                                            }}
+                                        />
+                                        {passwordStrength === "Strong Password" && (
+                                            <p className="text-green-600 text-sm mt-1">Strong Password</p>
+                                        )}
+                                    </div>
+                                    <div className="text-left">
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Re-Enter Password</label>
+                                        <input
+                                            type="password"
+                                            className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                                            placeholder="Re-Enter Password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <button
+                                        className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 mx-auto transition-all duration-300"
+                                        onClick={handleGetStarted}
+                                    >
+                                        Get Started
+                                    </button>
+                                    <p className="text-[#786D7F] opacity-[86%] text-sm">
+                                        Already have an account?{" "}
+                                        <a
+                                            onClick={handleLogin}
+                                            href="#"
+                                            className="text-[#A100FF] font-medium underline"
+                                        >
+                                            Log in
+                                        </a>
+                                    </p>
+                                </div>
                             </div>
-
-                            {/* Confirm Password Input */}
-                            <div className="text-left mb-4">
-                                <label className="block font-medium text-gray-600">
-                                    Re-Enter Password
-                                </label>
-                                <input
-                                    type="password"
-                                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Re-Enter Password"
-                                    value={confirmPassword}
-                                    onChange={(e) =>
-                                        setConfirmPassword(e.target.value)
-                                    }
-                                />
+                            <div className="h-full w-fit flex justify-center items-center">
+                                <img src={image2} alt="" className="h-full" />
                             </div>
-
-                            {/* Submit Button */}
-                            <button
-                                className="bg-blue-600 text-white w-full p-3 rounded-lg mt-4 hover:bg-blue-700 transition"
-                                onClick={handleGetStarted}
-                            >
-                                Get Started
-                            </button>
-
-                            {/* Login Link */}
-                            <p className="mt-4 text-gray-500 text-sm">
-                                Already have an account?{" "}
-                                <a
-                                    onClick={handleLogin}
-                                    href="#"
-                                    className="text-blue-600 font-medium"
-                                >
-                                    Log in
-                                </a>
-                            </p>
                         </div>
                     </motion.div>
                 )}

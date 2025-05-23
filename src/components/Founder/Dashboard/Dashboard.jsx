@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { MdOutlineAddToPhotos } from "react-icons/md";
@@ -12,6 +12,7 @@ import { IoIdCard } from "react-icons/io5";
 import { IoLogOutOutline } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
 import { MdOutlineHistory } from "react-icons/md";
+import { HiDotsVertical } from "react-icons/hi";
 import PostNew from "./PostNew";
 import FounderPostForm from "../FounderPostForm/FounderPostForm";
 import { useNavigate } from "react-router-dom";
@@ -21,268 +22,312 @@ import { toast } from "react-toastify";
 Modal.setAppElement("#root");
 
 const Dashboard = () => {
-    const navigate = useNavigate();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [credits, setCredits] = useState(0);
-    const [filter, setFilter] = useState("All"); // New state for filter
-    const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [credits, setCredits] = useState(0);
+  const [filter, setFilter] = useState("All");
+  const [posts, setPosts] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const firstName = localStorage.getItem("firstName");
-    const middleName = localStorage.getItem("middleName");
-    const lastName = localStorage.getItem("lastName");
-    const email = localStorage.getItem("email");
+  const sidebarRef = useRef(null);
+  const hamburgerRef = useRef(null);
 
-    // console.log(firstName)
-    // console.log(lastName)
+  const firstName = localStorage.getItem("firstName");
+  const email = localStorage.getItem("email");
 
-    const fetchListings = async () => {
-        try {
-            const role = localStorage.getItem("role");
+  const fetchListings = async () => {
+    try {
+      const role = localStorage.getItem("role");
+      if (!role) {
+        console.error("User ID or role not found in localStorage");
+        return;
+      }
+      const endpoint = `http://localhost:3333/api/get-discovered/get-all-listings-by-userId`;
+      const response = await fetch(endpoint, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to fetch listings");
+      const res = await response.json();
+      const data = res.data;
+      console.log("Fetched Data:", data);
+      setPosts(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching listings:", error);
+    }
+  };
 
-            if (!role) {
-                console.error("User ID or role not found in localStorage");
-                return;
-            }
+  const logout = async () => {
+    try {
+      await fetch("http://localhost:3333/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      localStorage.clear();
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
 
-            const endpoint = `http://localhost:3333/api/get-discovered/get-all-listings-by-userId`
-                // role === "Founder"
-                //     ? `http://localhost:8000/api/get-discovered/get-all-listings-by-userId`
-                //     : `http://localhost:8000/api/founder/get-all-listings-by-userId`;
+  const fetchCredits = async () => {
+    try {
+      const response = await fetch("http://localhost:3333/api/credits/get-credits", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await response.json();
+      setCredits(data.credits);
+    } catch (error) {
+      toast.error("Error fetching credits!");
+    }
+  };
 
-            const response = await fetch(endpoint, {
-                method: "GET",
-                credentials: "include",
-            });
+  useEffect(() => {
+    fetchCredits();
+    fetchListings();
+  }, []);
 
-            if (!response.ok) throw new Error("Failed to fetch listings");
-
-            const res = await response.json();
-            const data = res.data;
-            console.log("Fetched Data:", data);
-            setPosts(Array.isArray(data) ? data : []);
-
-            //   if (data && Array.isArray(data)) {
-            //     fetchInvitationsForPosts(data, role);
-            //   }
-        } catch (error) {
-            console.error("Error fetching listings:", error);
-        }
+  // Effect to handle clicks outside the sidebar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        isSidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(event.target)
+      ) {
+        setIsSidebarOpen(false);
+      }
     };
 
-    const logout = async () => {
-        try {
-            await fetch("http://localhost:3333/api/auth/logout", {
-                method: "POST",
-                credentials: "include",
-            });
-            localStorage.removeItem("isAuthenticated");
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("firstName");
-            localStorage.removeItem("middleName");
-            localStorage.removeItem("lastName");
-            localStorage.removeItem("email");
-            localStorage.removeItem("userId");
-            localStorage.removeItem("role");
-            navigate("/");
-        } catch (err) {
-            console.error("Logout failed", err);
-        }
+    // Add event listener when sidebar is open
+    if (isSidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Clean up the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [isSidebarOpen]);
 
-    const fetchCredits = async () => {
-        try {
-            const response = await fetch(
-                "http://localhost:3333/api/credits/get-credits",
-                {
-                    method: "POST",
-                    credentials: "include",
-                }
-            );
-            const data = await response.json();
-            setCredits(data.credits);
-        } catch (error) {
-            toast.error("Error fetching credits!");
-        }
-    };
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-    useEffect(() => {
-        fetchCredits();
-        fetchListings();
-    }, []); // Fetch credits on component mount
+  const filteredPosts = filter === "All" ? posts : posts.filter((post) => post.status === filter);
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
-
-    // Filter posts based on the current filter state
-    const filteredPosts =
-        filter === "All"
-            ? posts
-            : posts.filter((post) => post.status === filter);
-
-    return (
-        <div className="flex flex-col items-center h-screen bg-gray-300">
-            {/* Navbar */}
-            <div className="w-screen h-[80px] bg-violet-100">
-                <div className="flex flex-row justify-between items-center h-full px-10">
-                    <div className="text-2xl font-bold">Klezy</div>
-                    <div className="flex flex-row gap-8 items-center justify-center">
-                        <div className="flex flex-row gap-1 items-center">
-                            <BiCoinStack className="text-3xl text-violet-800" />
-                            <h1 className="text-2xl font-medium text-violet-800">
-                                {credits}
-                            </h1>
-                        </div>
-                        <button className="bg-violet-600 px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-white">
-                            Buy Credits
-                        </button>
-                        <button
-                            onClick={openModal}
-                            className="bg-violet-600 px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-white"
-                        >
-                            <MdOutlineAddToPhotos className="text-2xl" />
-                            Add Post
-                        </button>
-                        <IoIosNotificationsOutline className="text-3xl text-violet-800" />
-                    </div>
-                </div>
-            </div>
-            {/* Main Content */}
-            <div className="flex flex-row w-full h-[92%] bg-blue-50">
-                {/* Sidebar */}
-                <div className="h-full w-[240px] bg-[#F5E3FF]">
-                    <div className="flex flex-col items-center h-full py-5 px-5 gap-6">
-                        <div className="flex gap-2 items-center">
-                            <div className="h-[40px] w-[40px] rounded-full overflow-hidden">
-                                <img
-                                    src="https://images.unsplash.com/photo-1547701787-1ad8f348080a?q=80&w=2081&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    alt=""
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <p className="text-md">
-                                    Hi, {firstName}
-                                </p>
-                                <p className="opacity-40 text-sm">{email}</p>
-                            </div>
-                        </div>
-                        <div className="h-[1px] w-full bg-black opacity-30"></div>
-                        <div className="flex flex-col w-full items-center gap-1">
-                            <button
-                                onClick={() => setFilter("All")}
-                                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md ${
-                                    filter === "All"
-                                        ? "bg-[#F4F4F4] text-violet-700"
-                                        : ""
-                                }`}
-                            >
-                                <LuGalleryVerticalEnd /> All Post
-                            </button>
-                            <button
-                                onClick={() => setFilter("Pending")}
-                                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md ${
-                                    filter === "Pending"
-                                        ? "bg-[#F4F4F4] text-violet-700"
-                                        : ""
-                                }`}
-                            >
-                                <MdOutlinePendingActions /> Pending Post
-                            </button>
-                            <button
-                                onClick={() => setFilter("Accepted")}
-                                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md ${
-                                    filter === "Accepted"
-                                        ? "bg-[#F4F4F4] text-violet-700"
-                                        : ""
-                                }`}
-                            >
-                                <FiCheckSquare /> Accepted Post
-                            </button>
-                            <button
-                                onClick={() => setFilter("Rejected")}
-                                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md ${
-                                    filter === "Rejected"
-                                        ? "bg-[#F4F4F4] text-violet-700"
-                                        : ""
-                                }`}
-                            >
-                                <IoTrashBinOutline /> Rejected Post
-                            </button>
-                        </div>
-                        <div className="h-[1px] w-full bg-black opacity-30"></div>
-                        <div className="flex flex-col w-full items-center gap-1">
-                            <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md">
-                                <BsBookmarkStar /> Favourite Post
-                            </button>
-                            <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md">
-                                <IoIdCard /> Purchased Post
-                            </button>
-                            <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md">
-                                <MdOutlineHistory /> Purchase History
-                            </button>
-                        </div>
-                        <div className="h-[1px] w-full bg-black opacity-30"></div>
-                        <div className="flex flex-col justify-end h-full w-full gap-1">
-                            <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md">
-                                <IoMdSettings /> Account Setting
-                            </button>
-                            <button
-                                onClick={logout}
-                                className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-5 px-4 py-2 w-full rounded-md"
-                            >
-                                <IoLogOutOutline /> Logout
-                            </button>
-                            <div className="flex flex-col gap-0">
-                                <p className="text-black opacity-30">
-                                    Feedback
-                                </p>
-                                <p className="text-black opacity-30">
-                                    Terms and Conditions
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {/* Main Content */}
-                <div className="grid grid-cols-4 w-full h-full overflow-y-scroll gap-5 px-5 py-5">
-                    {filteredPosts.map((post, index) => (
-                        <PostNew
-                            key={index}
-                            post ={post}
-                        />
-                    ))}
-                </div>
-            </div>
-            {/* Modal */}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                style={{
-                    content: {
-                        top: "50%",
-                        left: "50%",
-                        right: "auto",
-                        bottom: "auto",
-                        marginRight: "-50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "90%",
-                        maxWidth: "800px",
-                        maxHeight: "80vh",
-                        overflowY: "auto",
-                        padding: "4px",
-                        borderRadius: "16px",
-                        backgroundColor: "#ffffff",
-                        border: "none",
-                    },
-                    overlay: {
-                        backgroundColor: "rgba(0, 0, 0, 0.6)",
-                        zIndex: 1000,
-                    },
-                }}
+  return (
+    <div className="flex flex-col min-h-screen bg-gray-300">
+      {/* Navbar - Fixed at the top */}
+      <div className="fixed top-0 left-0 w-full h-16 bg-violet-100 flex items-center justify-between px-3 xs:px-3 sm:px-6 md:px-10 z-30">
+        <div className="text-lg xs:text-lg sm:text-xl md:text-2xl font-bold">Klezy</div>
+        <div className="flex items-center gap-2 xs:gap-2 sm:gap-4 md:gap-8">
+          <div className="flex items-center gap-1">
+            <BiCoinStack className="text-xl xs:text-xl sm:text-2xl md:text-3xl text-violet-800" />
+            <h1 className="text-base xs:text-base sm:text-lg md:text-2xl font-medium text-violet-800">{credits}</h1>
+          </div>
+          {/* Show buttons only at lg (992px) and above */}
+          <div className="hidden lg:flex items-center gap-2 xs:gap-2 sm:gap-4">
+            <button className="bg-violet-600 px-2 py-1 xs:px-2 sm:px-3 md:px-4 xs:py-1 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 xs:gap-1 sm:gap-2 text-white text-xs xs:text-xs sm:text-sm md:text-base">
+              Buy Credits
+            </button>
+            <button
+              onClick={openModal}
+              className="bg-violet-600 px-2 py-1 xs:px-2 sm:px-3 md:px-4 xs:py-1 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 xs:gap-1 sm:gap-2 text-white text-xs xs:text-xs sm:text-sm md:text-base"
             >
-                <FounderPostForm onClose={closeModal} />
-            </Modal>
+              <MdOutlineAddToPhotos className="text-lg xs:text-lg sm:text-xl md:text-2xl" />
+              Add Post
+            </button>
+          </div>
+          {/* Three dots icon and dropdown for below lg (992px) */}
+          <div className="relative lg:hidden">
+            <button onClick={toggleDropdown} className="text-xl xs:text-xl sm:text-2xl text-violet-800">
+              <HiDotsVertical />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 xs:w-40 sm:w-48 bg-white rounded-md shadow-lg z-10">
+                <button
+                  className="block w-full text-left px-3 py-2 text-xs xs:text-xs sm:text-sm text-gray-700 hover:bg-violet-100 hover:text-violet-700"
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Buy Credits
+                </button>
+                <button
+                  className="block w-full text-left px-3 py-2 text-xs xs:text-xs sm:text-sm text-gray-700 hover:bg-violet-100 hover:text-violet-700"
+                  onClick={() => {
+                    openModal();
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  Add Post
+                </button>
+              </div>
+            )}
+          </div>
+          <button
+            ref={hamburgerRef}
+            onClick={toggleSidebar}
+            className="md:hidden bg-violet-600 p-2 rounded-lg text-white"
+          >
+            <svg
+              className="w-5 h-5 xs:w-5 sm:w-6 sm:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              ></path>
+            </svg>
+          </button>
+          <IoIosNotificationsOutline className="text-xl xs:text-xl sm:text-2xl md:text-3xl text-violet-800" />
         </div>
-    );
+      </div>
+      {/* Main Content - Adjusted for fixed navbar */}
+      <div className="flex w-full bg-blue-50 pt-16 h-screen">
+        {/* Sidebar */}
+        <div
+          ref={sidebarRef}
+          className={`fixed md:static top-16 md:top-0 left-0 h-[calc(100vh-4rem)] md:h-full w-56 xs:w-56 sm:w-64 bg-[#F5E3FF] transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 transition-transform duration-300 z-20`}
+        >
+          <div className="flex flex-col items-center h-full py-4 xs:py-4 sm:py-5 px-4 xs:px-4 sm:px-5 gap-3 xs:gap-3 sm:gap-4 md:gap-6 overflow-y-auto">
+            <div className="flex gap-2 items-center w-full">
+              <div className="h-8 xs:h-8 sm:h-10 sm:w-10 rounded-full overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1547701787-1ad8f348080a"
+                  alt="Profile"
+                />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-xs xs:text-xs sm:text-sm md:text-md">Hi, {firstName}</p>
+                <p className="opacity-40 text-xs xs:text-xs sm:text-sm">{email}</p>
+              </div>
+            </div>
+            <div className="h-[1px] w-full bg-black opacity-30"></div>
+            <div className="flex flex-col w-full items-center gap-1">
+              <button
+                onClick={() => setFilter("All")}
+                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
+                  filter === "All" ? "bg-[#F4F4F4] text-violet-700" : ""
+                }`}
+              >
+                <LuGalleryVerticalEnd /> All Post
+              </button>
+              <button
+                onClick={() => setFilter("Pending")}
+                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
+                  filter === "Pending" ? "bg-[#F4F4F4] text-violet-700" : ""
+                }`}
+              >
+                <MdOutlinePendingActions /> Pending Post
+              </button>
+              <button
+                onClick={() => setFilter("Accepted")}
+                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
+                  filter === "Accepted" ? "bg-[#F4F4F4] text-violet-700" : ""
+                }`}
+              >
+                <FiCheckSquare /> Accepted Post
+              </button>
+              <button
+                onClick={() => setFilter("Rejected")}
+                className={`bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
+                  filter === "Rejected" ? "bg-[#F4F4F4] text-violet-700" : ""
+                }`}
+              >
+                <IoTrashBinOutline /> Rejected Post
+              </button>
+            </div>
+            <div className="h-[1px] w-full bg-black opacity-30"></div>
+            <div className="flex flex-col w-full items-center gap-1">
+              <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base">
+                <BsBookmarkStar /> Favourite Post
+              </button>
+              <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base">
+                <IoIdCard /> Purchased Post
+              </button>
+              <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base">
+                <MdOutlineHistory /> Purchase History
+              </button>
+            </div>
+            <div className="h-[1px] w-full bg-black opacity-30"></div>
+            <div className="flex flex-col justify-end h-full w-full gap-1">
+              <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base">
+                <IoMdSettings /> Account Setting
+              </button>
+              <button
+                onClick={logout}
+                className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base"
+              >
+                <IoLogOutOutline /> Logout
+              </button>
+              <div className="flex flex-col gap-0 text-xs xs:text-xs sm:text-sm">
+                <p className="text-black opacity-30">Feedback</p>
+                <p className="text-black opacity-30">Terms and Conditions</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Cards Section - Scrollable */}
+        <div className="flex-1 flex justify-center p-3 xs:p-3 sm:p-4 md:p-5 overflow-y-auto h-full">
+          <div className="flex flex-col items-center  gap-3 xs:gap-3 sm:grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4 md:gap-5 sm:items-start w-full max-w-[16rem] xs:max-w-[16rem] sm:max-w-none">
+            {filteredPosts.map((post, index) => (
+              <div key={index} className="w-full max-w-[16rem] xs:max-w-[16rem] sm:max-w-none">
+                <PostNew post={post} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        style={{
+          content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            width: "90%",
+            maxWidth: "320px", // 320-576px
+            xs: { maxWidth: "320px" }, // 320-576px
+            sm: { maxWidth: "600px" }, // 576-768px
+            md: { maxWidth: "700px" }, // 768-992px
+            lg: { maxWidth: "800px" }, // 992-1280px
+            xl: { maxWidth: "800px" }, // 1280-2400px
+            maxHeight: "80vh",
+            overflowY: "auto",
+            padding: "2px xs:2px sm:4px",
+            borderRadius: "12px xs:12px sm:16px",
+            backgroundColor: "#ffffff",
+            border: "none",
+          },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            zIndex: 1000,
+          },
+        }}
+      >
+        <FounderPostForm onClose={closeModal} />
+      </Modal>
+    </div>
+  );
 };
 
 export default Dashboard;
