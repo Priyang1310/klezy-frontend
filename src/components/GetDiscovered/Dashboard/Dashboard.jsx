@@ -36,7 +36,7 @@ const Dashboard = () => {
   const firstName = localStorage.getItem("firstName");
   const middleName = localStorage.getItem("middleName");
   const lastName = localStorage.getItem("lastName");
-  const email = localStorage.getItem("email");
+  const phoneNumber = localStorage.getItem("email");
 
   const fetchListings = async () => {
     try {
@@ -219,10 +219,10 @@ const Dashboard = () => {
                 <p className="text-xs xs:text-xs sm:text-sm md:text-md">
                   Hi, {firstName}
                 </p>
-                <p className="opacity-40 text-xs xs:text-xs sm:text-sm">{email}</p>
+                <p className="opacity-40 text-xs xs:text-xs sm:text-sm">Good to see you again!</p>
               </div>
             </div>
-            <div className="h-[1px] w-full bg-black opacity-30"></div>
+            {/* <div className="h-[1px] w-full bg-black opacity-30"></div> */}
             <div className="flex flex-col w-full items-center gap-1">
               <button
                 onClick={() => setFilter("All")}
@@ -257,7 +257,7 @@ const Dashboard = () => {
                 <IoTrashBinOutline /> Rejected Post
               </button>
             </div>
-            <div className="h-[1px] w-full bg-black opacity-30"></div>
+            {/* <div className="h-[1px] w-full bg-black opacity-30"></div> */}
             <div className="flex flex-col w-full items-center gap-1">
               <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base">
                 <BsBookmarkStar /> Favourite Post
@@ -269,7 +269,7 @@ const Dashboard = () => {
                 <MdOutlineHistory /> Purchase History
               </button>
             </div>
-            <div className="h-[1px] w-full bg-black opacity-30"></div>
+            {/* <div className="h-[1px] w-full bg-black opacity-30"></div> */}
             <div className="flex flex-col justify-end h-full w-full gap-1">
               <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base">
                 <IoMdSettings /> Account Setting
@@ -280,10 +280,18 @@ const Dashboard = () => {
               >
                 <IoLogOutOutline /> Logout
               </button>
-              <div className="flex flex-col gap-0 text-xs xs:text-xs sm:text-sm">
-                <p className="text-black opacity-30">Feedback</p>
-                <p className="text-black opacity-30">Terms and Conditions</p>
-              </div>
+            </div>
+            {/* <div className="h-[1px] w-full bg-black opacity-30"></div> */}
+            <div className="flex flex-col justify-end h-full w-full gap-1">
+              <button className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-sm xs:text-sm sm:text-sm md:text-sm">
+                <img src="../../../assets/material-symbols-light_feedback-outline-sharp.svg"/> Feedback
+              </button>
+              <button
+                onClick={logout}
+                className="bg-white hover:bg-[#F4F4F4] hover:text-violet-700 transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-sm sm:text-sm md:text-sm"
+              >
+                <IoLogOutOutline /> Terms & Conditions
+              </button>
             </div>
           </div>
         </div>
