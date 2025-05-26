@@ -125,7 +125,7 @@ const SignUpRequest = () => {
 
     const registerUser = async () => {
         // console.log(import.meta.env.VITE_API_URL);
-        return await fetch("http://po004oocgkg4gsg8s8w4o8cc.62.72.13.232.sslip.io/api/auth/signup", {
+        return await fetch("http://62.72.13.232:3333/api/auth/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
