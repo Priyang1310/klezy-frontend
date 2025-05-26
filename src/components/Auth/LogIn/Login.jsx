@@ -15,7 +15,7 @@ const Login = () => {
         }
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/signin`, {
+            const response = await fetch(`http://po004oocgkg4gsg8s8w4o8cc.62.72.13.232.sslip.io/api/auth/signin`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
