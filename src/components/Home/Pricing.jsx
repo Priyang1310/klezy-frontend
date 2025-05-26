@@ -1,8 +1,4 @@
 import React from "react";
-import crown from "../../assets/Home/crown.svg";
-import lovely from "../../assets/Home/lovely.svg";
-import share from "../../assets/Home/share.svg";
-import tick from "../../assets/Home/tick-circle.svg";
 
 const Pricing = () => {
   return (
@@ -90,7 +86,7 @@ const Pricing = () => {
         <div className="flex flex-col md:flex-row gap-[24px] justify-center items-center mt-10 z-10">
           <div className="bg-white rounded-[1.5vw] shadow-xl px-8 py-7 w-[384px] h-[470px] flex flex-col items-start justify-between hover:scale-105 transition-all duration-300">
             <div className="flex items-center gap-2">
-              <img src={lovely} alt="" />
+              <img src="./lovely.svg" alt="" />
               <h1 className="text-[2.4vw] font-medium">Free</h1>
             </div>
             <p className="text-base text-[#596780] font-light">
@@ -109,7 +105,7 @@ const Pricing = () => {
               Get Started with Your First Match!
             </p>
             <div className="flex items-center gap-2 py-10">
-              <img src={tick} alt="" />
+              <img src="./tick-circle.svg" alt="" />
               <h1 className="text-xl font-medium">1 Connection</h1>
             </div>
             <button className="w-[320px] h-[52px] bg-[#7C5CFC] rounded-full text-white font-medium text-base">
@@ -119,7 +115,7 @@ const Pricing = () => {
           <div className="bg-white rounded-[1.5vw] shadow-xl px-8 py-6 w-[384px] h-[470px] flex flex-col items-start justify-between hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between w-full">
               <div className="flex gap-3">
-                <img src={crown} alt="" />
+                <img src="./crown.svg" alt="" />
                 <h1 className="text-[2.4vw] font-medium">Pro</h1>
               </div>
               <div className="bg-black text-white rounded-full text-md font-light text-center py-1.5 px-4">
@@ -142,7 +138,7 @@ const Pricing = () => {
               Save 30% vs. Single Purchase
             </p>
             <div className="flex items-center gap-2 py-10">
-              <img src={tick} alt="" />
+              <img src="./tick-circle.svg" alt="" />
               <h1 className="text-xl font-medium">5 Connection</h1>
             </div>
             <button className="w-[320px] h-[52px] bg-[#7C5CFC] rounded-full text-white font-medium text-base">
@@ -152,7 +148,7 @@ const Pricing = () => {
           <div className="bg-white rounded-[1.5vw] shadow-xl px-8 py-6 w-[384px] h-[470px] flex flex-col items-start justify-between hover:scale-105 transition-all duration-300">
             <div className="flex items-center justify-between w-full">
               <div className="flex gap-3">
-                <img src={share} alt="" />
+                <img src="./share.svg" alt="" />
                 <h1 className="text-[2.4vw] font-medium">Ultimate</h1>
               </div>
               <div className="bg-black text-white rounded-full text-md font-light text-center py-1.5 px-4">
@@ -173,7 +169,7 @@ const Pricing = () => {
             </p>
             <p className="text-base font-medium">Best Value!</p>
             <div className="flex items-center gap-2 py-10">
-              <img src={tick} alt="" />
+              <img src="./tick-circle.svg" alt="" />
               <h1 className="text-xl font-medium">10 Connection</h1>
             </div>
             <button className="w-[320px] h-[52px] bg-[#7C5CFC] rounded-full text-white font-medium text-base">
@@ -188,19 +184,19 @@ const Pricing = () => {
       {/* Below is 3 divs which I don't know why exists ? */}
       <div className="flex flex-wrap items-stretch justify-center gap-10 py-10 mx-10 z-10">
         <div className="flex items-center bg-white px-4 py-8 w-[37%] gap-5 rounded-3xl shadow-blue-100 shadow-2xl" style={{border: "2px solid rgba(0, 0, 0, 0.05)"}}>
-          <img src={tick} alt="" className="w-8 h-8" />
+          <img src="./tick-circle.svg" alt="" className="w-8 h-8" />
           <p className="text-lg font-medium">
             No Monthly Fees – Don’t waste money when you don’t need connections.
           </p>
         </div>
         <div className="flex items-center bg-white px-4 py-8 w-[37%] gap-5 rounded-3xl shadow-blue-100 shadow-2xl" style={{border: "2px solid rgba(0, 0, 0, 0.05)"}}>
-          <img src={tick} alt="" className="w-8 h-8" />
+          <img src="./tick-circle.svg" alt="" className="w-8 h-8" />
           <p className="text-lg font-medium">
             Only Pay for What You Use – Your credits never expire!
           </p>
         </div>
         <div className="flex items-center bg-white px-4 py-8 w-[37%] gap-5 rounded-3xl shadow-blue-100 shadow-2xl" style={{border: "2px solid rgba(0, 0, 0, 0.05)"}}>
-          <img src={tick} alt="" className="w-8 h-8" />
+          <img src="./tick-circle.svg" alt="" className="w-8 h-8" />
           <p className="text-lg font-medium">
             100% Transparency – No hidden costs, no premium tiers just straightforward pricing.
           </p>

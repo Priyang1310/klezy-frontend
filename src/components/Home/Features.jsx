@@ -1,8 +1,4 @@
 // import React from 'react'
-import v1 from "../../assets/Home/SuccessStories1.svg"
-import v2 from "../../assets/Home/SuccessStories2.svg"
-import v3 from "../../assets/Home/SuccessStories3.svg"
-import v4 from "../../assets/Home/SuccessStories4.svg"
 
 const Features = () => {
   return (
@@ -39,12 +35,12 @@ const Features = () => {
                 Find the Right People Instantly!</h1>
                 <p className='text-[1.5vw] text-[#596780]'>Stop wasting time messaging back and forth to ask about skills, roles, or work preferences. Whether you're looking for talent to build with or want to get discovered for your expertise, our platform provides all the details upfront. Connect instantly with people who align with your vision—effortlessly and meaningfully!</p>
             </div>
-            <img src={v1} alt="" className='scale-110' />
+            <img src="./SuccessStories1.svg" alt="" className='scale-110' />
         </div>
 {/* ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
         {/* Below is 2nd section */}
         <div className='flex items-center justify-evenly py-15'>
-            <img src={v2} alt="" className='scale-110' />
+            <img src="./SuccessStories2.svg" alt="" className='scale-110' />
             <div className='flex flex-col items-center justify-center w-[40%] gap-8'>
                 <h1 className='text-black font-bold text-[2.7vw] leading-15'>Find People Who Work on the Same Terms as You!</h1>
                 <p className='text-[1.5vw] text-[#596780]'>Looking for talent that fits your work conditions? Whether it’s stipend, salary, partnership, equity, or remote work, filter and connect only with those who match your terms. No more back-and-forth—just the right opportunities with the right people!`</p>
@@ -58,12 +54,12 @@ const Features = () => {
                 with the Right Opportunities!</h1>
                 <p className='text-[1.5vw] text-[#596780]'>Want to work on your terms? Whether you're seeking an equity-based role, a partnership, an internship, or full-time work, get discovered by people who align with your vision. No endless messages—just meaningful connections that fit your goals!</p>
             </div>
-            <img src={v3} alt="" className='scale-110' />
+            <img src="./SuccessStories3.svg" alt="" className='scale-110' />
         </div>
 {/* ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
         {/* Below is 4th section */}
         <div className='flex items-center justify-evenly py-15'>
-            <img src={v4} alt="" className='scale-110' />
+            <img src="./SuccessStories4.svg" alt="" className='scale-110' />
             <div className='flex flex-col items-center justify-center w-[40%] gap-8'>
                 <h1 className='text-black font-bold text-[2.7vw] leading-15'>Verified Profiles, Genuine 
                 Connections!</h1>

@@ -1,7 +1,4 @@
 // import React from "react";
-import v1 from "../../assets/Home/F1.svg";
-import v2 from "../../assets/Home/F2.svg";
-import v3 from "../../assets/Home/F3.svg";
 
 const FindRightPeople = () => {
   return (
@@ -46,7 +43,7 @@ const FindRightPeople = () => {
         <div className="flex flex-col items-center justify-center text-center w-1/3">
           {/* image section of first image */}
           <div className="relative">
-            <img src={v1} alt="" />
+            <img src="./F1.svg" alt="" />
             <div className="w-15 h-15 text-2xl font-medium rounded-full border-5 border-[#E7E1FF] flex items-center justify-center text-white bg-[#7C5CFC] top-0 left-2 absolute -translate-x-1/2 -translate-y-1/2">
               1
             </div>
@@ -65,7 +62,7 @@ const FindRightPeople = () => {
         <div className="flex flex-col items-center justify-center text-center w-1/3">
           {/* image section of second image */}
           <div className="relative">
-            <img src={v2} alt="" />
+            <img src="./F2.svg" alt="" />
             <div className="w-15 h-15 text-2xl font-medium rounded-full border-5 border-[#E7E1FF] flex items-center justify-center text-white bg-[#7C5CFC] top-0 left-2 absolute -translate-x-1/2 -translate-y-1/2">
               2
             </div>
@@ -81,7 +78,7 @@ const FindRightPeople = () => {
         <div className="flex flex-col items-center justify-center text-center w-1/3">
           {/* image section of third image */}
           <div className="relative">
-            <img src={v3} alt="" />
+            <img src="./F3.svg" alt="" />
             <div className="w-15 h-15 text-2xl font-medium rounded-full border-5 border-[#E7E1FF] flex items-center justify-center text-white bg-[#7C5CFC] top-0 left-2 absolute -translate-x-1/2 -translate-y-1/2">
               3
             </div>

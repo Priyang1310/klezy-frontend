@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import image1 from "../../../assets/auth/image1.svg";
-import image2 from "../../../assets/auth/image2.svg";
 import { ToastContainer, toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -256,7 +254,7 @@ const SignUpRequest = () => {
                                 </div>
                             </div>
                             <div className="h-full w-fit flex justify-center items-center">
-                                <img src={image1} alt="" className="h-full" />
+                                <img src="./image1.svg" alt="" className="h-full" />
                             </div>
                         </div>
                     </motion.div>
@@ -385,7 +383,7 @@ const SignUpRequest = () => {
                                 </div>
                             </div>
                             <div className="h-full w-fit flex justify-center items-center">
-                                <img src={image2} alt="" className="h-full" />
+                                <img src="./image2.svg" alt="" className="h-full" />
                             </div>
                         </div>
                     </motion.div>

@@ -1,9 +1,4 @@
 // import React from "react";
-import v1 from "../../assets/Home/Vector11.svg";
-import Logo from "../../assets/Home/Logo1.svg";
-import v2 from "../../assets/Home/Vector12.svg";
-import f1 from "../../assets/Home/Frame1.svg";
-import f2 from "../../assets/Home/Frame2.svg";
 
 const FindAndGet = () => {
   return (
@@ -38,7 +33,7 @@ const FindAndGet = () => {
           className="rounded-3xl z-10 w-[376px] h-[214px] bg-white shadow-xl shadow-blue-100 flex flex-col items-center justify-center"
           style={{ border: "2px solid rgba(0, 0, 0, 0.05)" }}
         >
-          <img src={f1} alt="Frame1 is not loading" className="scale-105" />
+          <img src="./Frame1.svg" alt="Frame1 is not loading" className="scale-105" />
           <h1 className="text-[#7C5CFC] font-semibold text-2xl mb-4">
             Looking for talent?
           </h1>
@@ -47,13 +42,13 @@ const FindAndGet = () => {
           </p>
         </div>
         <img
-          src={v1}
+          src="./Vector11.svg"
           alt="Vector1 is not loading"
           className="absolute scale-75 left-[21%] top-[24%] w-1/3 h-auto"
         />
-        <img src={Logo} alt="Logo" className="z-10 w-25 h-25" />
+        <img src="./Logo1.svg" alt="Logo" className="z-10 w-25 h-25" />
         <img
-          src={v2}
+          src="./Vector12.svg"
           alt="Vector2 is not loading"
           className="absolute scale-75 right-[21%] top-[25%]  w-1/3 h-auto"
         />
@@ -61,7 +56,7 @@ const FindAndGet = () => {
           className="rounded-3xl z-10 w-[376px] h-[214px] bg-white shadow-xl shadow-blue-100 flex flex-col items-center justify-center"
           style={{ border: "2px solid rgba(0, 0, 0, 0.05)" }}
         >
-          <img src={f2} alt="Frame2 is not loading" className="scale-105" />
+          <img src="./Frame2.svg" alt="Frame2 is not loading" className="scale-105" />
           <h1 className="text-[#7C5CFC] font-semibold text-2xl mb-4">
             Want to be discovered?
           </h1>

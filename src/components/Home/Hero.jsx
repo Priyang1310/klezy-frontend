@@ -1,6 +1,3 @@
-import vector2 from "../../assets/Home/Vector12.svg";
-import vector1 from "../../assets/Home/Vector11.svg";
-import Logo from "../../assets/Home/Logo1.svg";
 
 const img1 =
   "https://i.pinimg.com/736x/44/f2/c2/44f2c2b7f53a2f83d0ade6f95ea5a960.jpg";
@@ -52,7 +49,7 @@ function Hero() {
       <div className="relative flex justify-center items-center w-full py-40">
         <div>
           <img
-            src={vector1}
+            src="./Vector11.svg"
             alt="Vector1 is not loading"
             className="absolute left-[17%] top-[22%] w-1/3 h-auto"
           />
@@ -72,10 +69,10 @@ function Hero() {
             className="absolute left-[22%] bottom-[15%] -rotate-12 w-22 h-30 object-cover object-top rounded-xl"
           />
         </div>
-        <img src={Logo} alt="Logo" className="z-10 w-25 h-25" />
+        <img src="./Logo1.svg" alt="Logo" className="z-10 w-25 h-25" />
         <div>
           <img
-            src={vector2}
+            src="./Vector12.svg"
             alt="Vector2 is not loading"
             className="absolute right-[17%] top-[23%]  w-1/3 h-auto"
           />

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import vector2 from "../../../assets/Home/Vector11.svg";
-import vector1 from "../../../assets/Home/Vector12.svg";
 
 const Login = () => {
     const [MobileNumber, setEmailOrPhone] = useState("");
@@ -90,8 +88,8 @@ const Login = () => {
 
             <div className="flex justify-center items-center min-h-screen bg-gray-100 relative overflow-hidden">
                 <div className="absolute top-[15%] flex justify-between items-center w-full">
-                    <img src={vector1} alt="Vector1" className="w-1/2 h-auto translate-y-[-30%]" draggable="false" onContextMenu={(e) => e.preventDefault()} />
-                    <img src={vector2} alt="Vector2" className="w-1/2 h-auto translate-y-[-30%]" draggable="false" onContextMenu={(e) => e.preventDefault()} />
+                    <img src="./Vector12.svg" alt="Vector1" className="w-1/2 h-auto translate-y-[-30%]" draggable="false" onContextMenu={(e) => e.preventDefault()} />
+                    <img src="./Vector11.svg" alt="Vector2" className="w-1/2 h-auto translate-y-[-30%]" draggable="false" onContextMenu={(e) => e.preventDefault()} />
                 </div>
 
                 <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center relative z-10">

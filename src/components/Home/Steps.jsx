@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { PiNumberOneBold, PiNumberTwoBold, PiNumberThreeBold  } from "react-icons/pi";
-import user from "../../assets/Home/user.svg";
-import tick from "../../assets/Home/tick.svg";
-
 const steps = [
   {
     id: 1,
@@ -114,7 +111,7 @@ export default function Steps() {
                   }`}
                 >{step.number}</span> */}
                 <div className="flex items-center gap-4">
-                <img src={user} alt="" />
+                <img src="./user.svg" alt="" />
                   <h3
                     className={`font-semibold text-[1.4vw] ${
                       selected === step.id ? "text-[#7C5CFC]" : "text-black"
@@ -131,15 +128,15 @@ export default function Steps() {
       </div>
       <div className="flex flex-wrap items-stretch justify-center gap-10 py-10 z-10">
         <div className="flex items-center bg-white px-4 py-7 w-[37%] gap-3 rounded-3xl shadow-2xl tracking-tighter" style={{border: "2px solid rgba(0, 0, 0, 0.05)"}}>
-          <img src={tick} alt="" className="w-8 h-8" />
+          <img src="./tick.svg" alt="" className="w-8 h-8" />
           <p className="text-xl font-semibold">No subscription fees – pay only for the connections you need</p>
         </div>
         <div className="flex items-center bg-white px-4 py-7 w-[37%] gap-3 rounded-3xl shadow-2xl tracking-tighter" style={{border: "2px solid rgba(0, 0, 0, 0.05)"}}>
-          <img src={tick} alt="" className="w-8 h-8" />
+          <img src="./tick.svg" alt="" className="w-8 h-8" />
           <p className="text-xl font-semibold">Verified profiles for genuine collaborations</p>
         </div>
         <div className="flex items-center bg-white px-4 py-7 w-[37%] gap-3 rounded-3xl shadow-2xl tracking-tighter" style={{border: "2px solid rgba(0, 0, 0, 0.05)"}}>
-          <img src={tick} alt="" className="w-8 h-8" />
+          <img src="./tick.svg" alt="" className="w-8 h-8" />
           <p className="text-xl font-semibold">Perfect for startups, businesses, and individuals looking to grow</p>
         </div>
       </div>
