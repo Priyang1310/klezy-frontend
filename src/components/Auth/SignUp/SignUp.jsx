@@ -97,7 +97,9 @@ const SignUpRequest = () => {
 
     const handleGetStarted = () => {
         if (!passwordValidation(password)) {
-            toast("Please follow the password requirements to create a strong password!");
+            toast(
+                "Please follow the password requirements to create a strong password!"
+            );
             return;
         }
         if (password !== confirmPassword) {
@@ -122,6 +124,7 @@ const SignUpRequest = () => {
     };
 
     const registerUser = async () => {
+        console.log(import.meta.env.VITE_API_URL);
         return await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
             method: "POST",
             headers: {
@@ -181,48 +184,71 @@ const SignUpRequest = () => {
                         <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
                             <div className="flex flex-col h-full gap-1 w-[50%] p-4 rounded-lg justify-center">
                                 <div className="flex flex-col mb-2 items-start gap-0.5">
-                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">Register now</p>
-                                    <h2 className="text-[48px] font-bold text-[#5E0194]"> Sign Up for Free.</h2>
+                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">
+                                        Register now
+                                    </p>
+                                    <h2 className="text-[48px] font-bold text-[#5E0194]">
+                                        {" "}
+                                        Sign Up for Free.
+                                    </h2>
                                     <p className="text-[#786D7F] opacity-[86%] text-sm">
                                         Already have an account?{" "}
-                                        <a href="#" className="text-[#A100FF] font-medium underline" onClick={handleLogin}>
+                                        <a
+                                            href="#"
+                                            className="text-[#A100FF] font-medium underline"
+                                            onClick={handleLogin}
+                                        >
                                             Sign in
                                         </a>
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">First Name</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            First Name
+                                        </label>
                                         <input
                                             type="text"
                                             className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                                             placeholder="Enter First Name"
                                             value={firstName}
-                                            onChange={(e) => setFirstName(e.target.value)}
+                                            onChange={(e) =>
+                                                setFirstName(e.target.value)
+                                            }
                                         />
                                     </div>
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Middle Name (Optional)</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            Middle Name (Optional)
+                                        </label>
                                         <input
                                             type="text"
                                             className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                                             placeholder="Enter Middle Name"
                                             value={middleName}
-                                            onChange={(e) => setMiddleName(e.target.value)}
+                                            onChange={(e) =>
+                                                setMiddleName(e.target.value)
+                                            }
                                         />
                                     </div>
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Last Name</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            Last Name
+                                        </label>
                                         <input
                                             type="text"
                                             className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                                             placeholder="Enter Last Name"
                                             value={lastName}
-                                            onChange={(e) => setLastName(e.target.value)}
+                                            onChange={(e) =>
+                                                setLastName(e.target.value)
+                                            }
                                         />
                                     </div>
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Phone number</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            Phone number
+                                        </label>
                                         <PhoneInput
                                             country={"in"}
                                             value={phoneNumber}
@@ -231,8 +257,14 @@ const SignUpRequest = () => {
                                             inputClass="w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                                             buttonClass="border-gray-300 h-14 w-16"
                                             dropdownClass="h-28"
-                                            containerStyle={{ height: "56px", width: "100%" }}
-                                            inputStyle={{ height: "43px", width: "100%" }}
+                                            containerStyle={{
+                                                height: "56px",
+                                                width: "100%",
+                                            }}
+                                            inputStyle={{
+                                                height: "43px",
+                                                width: "100%",
+                                            }}
                                             buttonStyle={{
                                                 position: "absolute",
                                                 left: "5px",
@@ -246,7 +278,9 @@ const SignUpRequest = () => {
                                         />
                                     </div>
                                     <button
-                                        onClick={handleOnClickNextForFirstSection}
+                                        onClick={
+                                            handleOnClickNextForFirstSection
+                                        }
                                         className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 mx-auto transition-all duration-300"
                                     >
                                         Next
@@ -254,7 +288,11 @@ const SignUpRequest = () => {
                                 </div>
                             </div>
                             <div className="h-full w-fit flex justify-center items-center">
-                                <img src="./image1.svg" alt="" className="h-full" />
+                                <img
+                                    src="./image1.svg"
+                                    alt=""
+                                    className="h-full"
+                                />
                             </div>
                         </div>
                     </motion.div>
@@ -271,21 +309,30 @@ const SignUpRequest = () => {
                         <div className="flex gap-10 w-fit h-[55%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
                             <div className="flex flex-col h-full gap-1 w-[100%] p-4 rounded-lg justify-center">
                                 <div className="flex flex-col mb-2 items-start gap-0.5">
-                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">Verification</p>
-                                    <h2 className="text-[48px] font-bold text-[#5E0194]">Verify Your Phone</h2>
+                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">
+                                        Verification
+                                    </p>
+                                    <h2 className="text-[48px] font-bold text-[#5E0194]">
+                                        Verify Your Phone
+                                    </h2>
                                     <p className="text-[#786D7F] opacity-[86%] text-sm">
-                                        Enter the code sent to your phone to proceed.
+                                        Enter the code sent to your phone to
+                                        proceed.
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Phone Verification Code</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            Phone Verification Code
+                                        </label>
                                         <input
                                             type="text"
                                             className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                                             placeholder="Enter Code"
                                             value={phoneCode}
-                                            onChange={(e) => setPhoneCode(e.target.value)}
+                                            onChange={(e) =>
+                                                setPhoneCode(e.target.value)
+                                            }
                                         />
                                     </div>
                                     <p className="text-[#786D7F] opacity-[86%] text-sm">
@@ -294,18 +341,26 @@ const SignUpRequest = () => {
                                             className="text-[#A100FF] font-medium underline disabled:text-gray-400"
                                             disabled={resendTimer > 0}
                                         >
-                                            Send the code again ({resendTimer > 0 ? `00:${resendTimer}` : "Resend"})
+                                            Send the code again (
+                                            {resendTimer > 0
+                                                ? `00:${resendTimer}`
+                                                : "Resend"}
+                                            )
                                         </button>
                                     </p>
                                     <div className="flex gap-3">
                                         <button
-                                            onClick={handleOnClickPreviousForSecondSection}
+                                            onClick={
+                                                handleOnClickPreviousForSecondSection
+                                            }
                                             className="bg-gray-400 text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-gray-500 transition-all duration-300"
                                         >
                                             Back
                                         </button>
                                         <button
-                                            onClick={handleOnClickNextForSecondSection}
+                                            onClick={
+                                                handleOnClickNextForSecondSection
+                                            }
                                             className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300"
                                         >
                                             Next
@@ -331,15 +386,22 @@ const SignUpRequest = () => {
                         <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
                             <div className="flex flex-col h-full gap-1 w-[50%] p-4 rounded-lg justify-center">
                                 <div className="flex flex-col mb-2 items-start gap-0.5">
-                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">Set Password</p>
-                                    <h2 className="text-[48px] font-bold text-[#5E0194]">Create Your Password</h2>
+                                    <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">
+                                        Set Password
+                                    </p>
+                                    <h2 className="text-[48px] font-bold text-[#5E0194]">
+                                        Create Your Password
+                                    </h2>
                                     <p className="text-[#786D7F] opacity-[86%] text-sm">
-                                        Set a strong password to secure your account.
+                                        Set a strong password to secure your
+                                        account.
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-3">
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Password</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            Password
+                                        </label>
                                         <input
                                             type="password"
                                             className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
@@ -350,18 +412,27 @@ const SignUpRequest = () => {
                                                 // checkPasswordStrength(e.target.value);
                                             }}
                                         />
-                                        {passwordStrength === "Strong Password" && (
-                                            <p className="text-green-600 text-sm mt-1">Strong Password</p>
+                                        {passwordStrength ===
+                                            "Strong Password" && (
+                                            <p className="text-green-600 text-sm mt-1">
+                                                Strong Password
+                                            </p>
                                         )}
                                     </div>
                                     <div className="text-left">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]">Re-Enter Password</label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                            Re-Enter Password
+                                        </label>
                                         <input
                                             type="password"
                                             className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                                             placeholder="Re-Enter Password"
                                             value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            onChange={(e) =>
+                                                setConfirmPassword(
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     </div>
                                     <button
@@ -383,7 +454,11 @@ const SignUpRequest = () => {
                                 </div>
                             </div>
                             <div className="h-full w-fit flex justify-center items-center">
-                                <img src="./image2.svg" alt="" className="h-full" />
+                                <img
+                                    src="./image2.svg"
+                                    alt=""
+                                    className="h-full"
+                                />
                             </div>
                         </div>
                     </motion.div>
