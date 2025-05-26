@@ -64,7 +64,7 @@ function FounderPostForm({ onClose }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/category/get-all-categories`);
+        const response = await fetch(`http://po004oocgkg4gsg8s8w4o8cc.62.72.13.232.sslip.io/api/category/get-all-categories`);
         if (!response.ok) throw new Error('Failed to fetch categories');
         const data = await response.json();
         const sortedCategories = (data.categories || []).sort((a, b) =>
@@ -91,7 +91,7 @@ function FounderPostForm({ onClose }) {
       if (formData.category) {
         try {
           const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/skills/?categoryId=${formData.category}`
+            `http://po004oocgkg4gsg8s8w4o8cc.62.72.13.232.sslip.io/api/skills/?categoryId=${formData.category}`
           );
           if (!response.ok) throw new Error('Failed to fetch skills');
           const data = await response.json();
@@ -314,7 +314,7 @@ function FounderPostForm({ onClose }) {
     e.preventDefault();
     if (validateStep2()) {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+        const response = await fetch(`http://po004oocgkg4gsg8s8w4o8cc.62.72.13.232.sslip.io/api/posts`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
