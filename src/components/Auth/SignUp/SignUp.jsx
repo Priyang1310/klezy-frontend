@@ -122,7 +122,7 @@ const SignUpRequest = () => {
     };
 
     const registerUser = async () => {
-        return await fetch("http://localhost:3333/api/auth/signup", {
+        return await fetch(`${process.env.API_URL}/auth/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

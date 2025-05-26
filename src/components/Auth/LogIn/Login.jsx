@@ -15,7 +15,7 @@ const Login = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:3333/api/auth/signin", {
+            const response = await fetch(`${process.env.API_URL}/auth/signin`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
