@@ -43,7 +43,7 @@ const Dashboard = () => {
         console.error("User ID or role not found in localStorage");
         return;
       }
-      const endpoint = `${process.env.API_URL}/get-discovered/get-all-listings-by-userId`;
+      const endpoint = `${import.meta.env.VITE_API_URL}/get-discovered/get-all-listings-by-userId`;
       const response = await fetch(endpoint, {
         method: "GET",
         credentials: "include",
@@ -60,7 +60,7 @@ const Dashboard = () => {
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.API_URL}/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -73,7 +73,7 @@ const Dashboard = () => {
 
   const fetchCredits = async () => {
     try {
-      const response = await fetch(`${process.env.API_URL}/credits/get-credits`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/credits/get-credits`, {
         method: "POST",
         credentials: "include",
       });

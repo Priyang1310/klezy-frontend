@@ -64,7 +64,7 @@ function FounderPostForm({ onClose }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${process.env.API_URL}/category/get-all-categories`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/category/get-all-categories`);
         if (!response.ok) throw new Error('Failed to fetch categories');
         const data = await response.json();
         const sortedCategories = (data.categories || []).sort((a, b) =>
@@ -91,7 +91,7 @@ function FounderPostForm({ onClose }) {
       if (formData.category) {
         try {
           const response = await fetch(
-            `${process.env.API_URL}/skills/?categoryId=${formData.category}`
+            `${import.meta.env.VITE_API_URL}/skills/?categoryId=${formData.category}`
           );
           if (!response.ok) throw new Error('Failed to fetch skills');
           const data = await response.json();
@@ -314,7 +314,7 @@ function FounderPostForm({ onClose }) {
     e.preventDefault();
     if (validateStep2()) {
       try {
-        const response = await fetch(`${process.env.API_URL}/posts`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),

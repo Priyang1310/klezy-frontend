@@ -122,7 +122,7 @@ const SignUpRequest = () => {
     };
 
     const registerUser = async () => {
-        return await fetch(`${process.env.API_URL}/auth/signup`, {
+        return await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
