@@ -3,117 +3,124 @@ import React, { useState, useEffect } from 'react';
 function FounderPostForm({ onClose }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    pronouns: '',
-    headline: '',
-    occupation: '',
-    aboutYourself: '',
-    companyName: '',
-    aboutCompany: '',
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    pronounce: '',
+    userType: '',
+    otherUserType: '',
+    requirementType: '',
+    otherRequirementType: '',
+    startUpName: '',
+    aboutEntity: '',
+    websiteOfStartupLink: '',
+    linkedin: '',
+    instagram: '',
+    city: '',
+    state: '',
+    country: '',
     email: '',
-    mobile: '',
-    contactMethods: {
-      WhatsApp: { selected: false, value: '' },
-      LinkedIn: { selected: false, value: '' },
-      Twitter: { selected: false, value: '' },
-      Discord: { selected: false, value: '' },
-      Instagram: { selected: false, value: '' },
+    whatsapp: '',
+    contact_methods: {
+      email: { selected: false, value: '' },
+      whatsapp: { selected: false, value: '' },
+      call: { selected: false, value: '' },
+      instagram: { selected: false, value: '' },
     },
-    category: '',
+    headline: '',
+    domainName: '',
+    roleUnderDomain: '',
     skills: [],
-    experienceType: 'Fresher',
-    experienceYears: '',
-    experienceMonths: '',
-    experienceDays: '',
+    workBasis: {
+      Partnership: false,
+      Collaboration: false,
+      Internship: false,
+      Job: false,
+      Freelance: false,
+      ProjectBasis: false,
+      PercentageBasis: false,
+      Other: false,
+    },
+    otherWorkBasis: '',
+    compensationDetails: '',
     workMode: '',
-    workLocation: '',
-    workType: '',
-    equityPercentage: '', // For Partnership
-    // Contract Basis
-    contractDuration: { years: '', months: '', days: '' },
-    scopeOfWork: '',
-    // Project Basis
-    projectDescription: '',
-    projectTimeline: { years: '', months: '', days: '' },
-    projectPaymentAmount: '',
-    // Internship
-    internshipType: '',
-    internshipMonths: '',
-    internshipPayment: 'Paid',
-    internshipPaymentAmount: '',
-    // Job
-    jobType: '',
-    jobPayment: 'Paid',
-    jobPaymentAmount: '',
-    // Freelance
-    freelancePaymentRange: '',
-    aboutWork: '',
+    experienceLevel: '',
+    startDate: '',
+    projectDuration: '',
+    timeCommitment: '',
+    aboutOpportunity: '',
+    responsibilities: '',
+    whyShouldJoin: '',
+    anyOtherInfo: '',
+    profile_pic: '',
   });
 
   const [errors, setErrors] = useState({});
-  const [categories, setCategories] = useState([]);
+  const [domains, setDomains] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [skills, setSkills] = useState([]);
   const [filteredSkills, setFilteredSkills] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingDomains, setLoadingDomains] = useState(true);
 
-  // Fetch categories on component mount
+  // Fetch domains on component mount
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchDomains = async () => {
       try {
-        const response = await fetch(`http://62.72.13.232:3333/api/category/get-all-categories`);
-        if (!response.ok) throw new Error('Failed to fetch categories');
+        const response = await fetch('http://62.72.13.232:3333/api/category/get-all-categories');
+        if (!response.ok) throw new Error('Failed to fetch domains');
         const data = await response.json();
-        const sortedCategories = (data.categories || []).sort((a, b) =>
+        const sortedDomains = (data.categories || []).sort((a, b) =>
           a.name.localeCompare(b.name)
         );
-        setCategories(sortedCategories);
+        setDomains(sortedDomains);
       } catch (error) {
-        console.error('Error fetching categories:', error);
-        setCategories([]);
+        console.error('Error fetching domains:', error);
+        setDomains([]);
       } finally {
-        setLoadingCategories(false);
+        setLoadingDomains(false);
       }
     };
-    fetchCategories();
+    fetchDomains();
   }, []);
 
-  // Fetch skills when category changes and reset skills
+  // Fetch roles and skills when domainName changes
   useEffect(() => {
-    setFormData((prev) => ({ ...prev, skills: [] }));
+    setFormData((prev) => ({ ...prev, skills: [], roleUnderDomain: '' }));
     setSearchText('');
     setShowSuggestions(false);
 
-    const fetchSkills = async () => {
-      if (formData.category) {
+    const fetchRolesAndSkills = async () => {
+      if (formData.domainName) {
         try {
-          const response = await fetch(
-            `http://62.72.13.232:3333/api/skills/?categoryId=${formData.category}`
-          );
-          if (!response.ok) throw new Error('Failed to fetch skills');
-          const data = await response.json();
-          const skillsArray = Array.isArray(data.skills)
-            ? data.skills
-            : data.skills
-            ? [data.skills]
-            : [];
-          setSkills(skillsArray);
-          setFilteredSkills(skillsArray);
+          const [rolesResponse, skillsResponse] = await Promise.all([
+            fetch(`http://62.72.13.232:3333/api/roles/?categoryId=${formData.domainName}`),
+            fetch(`http://62.72.13.232:3333/api/skills/?categoryId=${formData.domainName}`),
+          ]);
+          if (!rolesResponse.ok) throw new Error('Failed to fetch roles');
+          if (!skillsResponse.ok) throw new Error('Failed to fetch skills');
+
+          const rolesData = await rolesResponse.json();
+          const skillsData = await skillsResponse.json();
+
+          setRoles(Array.isArray(rolesData.roles) ? rolesData.roles : []);
+          setSkills(Array.isArray(skillsData.skills) ? skillsData.skills : []);
+          setFilteredSkills(Array.isArray(skillsData.skills) ? skillsData.skills : []);
         } catch (error) {
-          console.error('Error fetching skills:', error);
+          console.error('Error fetching roles or skills:', error);
+          setRoles([]);
           setSkills([]);
           setFilteredSkills([]);
         }
       } else {
+        setRoles([]);
         setSkills([]);
         setFilteredSkills([]);
       }
     };
-    fetchSkills();
-  }, [formData.category]);
+    fetchRolesAndSkills();
+  }, [formData.domainName]);
 
   // Filter skills based on search input
   useEffect(() => {
@@ -134,44 +141,52 @@ function FounderPostForm({ onClose }) {
     setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  const handleNestedChange = (field, subField, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: {
-        ...prev[field],
-        [subField]: value,
-      },
-    }));
-    setErrors((prev) => ({ ...prev, [field]: '' }));
-  };
-
   const handleContactMethodChange = (method) => {
     setFormData((prev) => ({
       ...prev,
-      contactMethods: {
-        ...prev.contactMethods,
+      contact_methods: {
+        ...prev.contact_methods,
         [method]: {
-          ...prev.contactMethods[method],
-          selected: !prev.contactMethods[method].selected,
-          value: prev.contactMethods[method].selected ? '' : prev.contactMethods[method].value,
+          ...prev.contact_methods[method],
+          selected: !prev.contact_methods[method].selected,
+          value: prev.contact_methods[method].selected ? '' : prev.contact_methods[method].value,
         },
       },
+      // Update direct fields for backend compatibility
+      ...(method === 'email' && { email: !prev.contact_methods[method].selected ? prev.contact_methods[method].value : '' }),
+      ...(method === 'whatsapp' && { whatsapp: !prev.contact_methods[method].selected ? prev.contact_methods[method].value : '' }),
+      ...(method === 'instagram' && { instagram: !prev.contact_methods[method].selected ? prev.contact_methods[method].value : '' }),
     }));
-    setErrors((prev) => ({ ...prev, contactMethods: '' }));
+    setErrors((prev) => ({ ...prev, contact_methods: '', [`${method}Value`]: '' }));
   };
 
   const handleContactValueChange = (method, value) => {
     setFormData((prev) => ({
       ...prev,
-      contactMethods: {
-        ...prev.contactMethods,
+      contact_methods: {
+        ...prev.contact_methods,
         [method]: {
-          ...prev.contactMethods[method],
+          ...prev.contact_methods[method],
           value,
         },
       },
+      // Update direct fields for backend compatibility
+      ...(method === 'email' && { email: value }),
+      ...(method === 'whatsapp' && { whatsapp: value }),
+      ...(method === 'instagram' && { instagram: value }),
     }));
     setErrors((prev) => ({ ...prev, [`${method}Value`]: '' }));
+  };
+
+  const handleWorkBasisChange = (basis) => {
+    setFormData((prev) => ({
+      ...prev,
+      workBasis: {
+        ...prev.workBasis,
+        [basis]: !prev.workBasis[basis],
+      },
+    }));
+    setErrors((prev) => ({ ...prev, workBasis: '' }));
   };
 
   const handleSkillInput = (e) => {
@@ -200,27 +215,36 @@ function FounderPostForm({ onClose }) {
 
   const validateStep1 = () => {
     const newErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First Name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last Name is required';
-    if (!formData.pronouns) newErrors.pronouns = 'Pronouns are required';
-    if (!formData.headline.trim()) newErrors.headline = 'Headline is required';
-    if (!formData.occupation.trim()) newErrors.occupation = 'Occupation / Position is required';
-    if (!formData.companyName.trim()) newErrors.companyName = 'Company Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    if (!formData.first_name.trim()) newErrors.first_name = 'First Name is required';
+    if (!formData.last_name.trim()) newErrors.last_name = 'Last Name is required';
+    if (!formData.pronounce) newErrors.pronounce = 'Pronouns are required';
+    if (!formData.userType) newErrors.userType = 'User type is required';
+    if (formData.userType === 'Other' && !formData.otherUserType.trim())
+      newErrors.otherUserType = 'Please specify user type';
+    if (!formData.requirementType) newErrors.requirementType = 'Requirement type is required';
+    if (formData.requirementType === 'Other' && !formData.otherRequirementType.trim())
+      newErrors.otherRequirementType = 'Please specify requirement type';
+    if (['Startup', 'Business'].includes(formData.requirementType) && !formData.startUpName.trim())
+      newErrors.startUpName = 'Business/Startup Name is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.country.trim()) newErrors.country = 'Country is required';
+    if (!formData.profile_pic.trim()) newErrors.profile_pic = 'Profile picture URL is required';
 
-    const anyContactSelected = Object.values(formData.contactMethods).some(
+    const anyContactSelected = Object.values(formData.contact_methods).some(
       (method) => method.selected
     );
     if (!anyContactSelected) {
-      newErrors.contactMethods = 'Please select at least one contact method';
+      newErrors.contact_methods = 'Please select at least one contact method';
     }
 
-    Object.entries(formData.contactMethods).forEach(([method, { selected, value }]) => {
+    Object.entries(formData.contact_methods).forEach(([method, { selected, value }]) => {
       if (selected && !value.trim()) {
-        newErrors[`${method}Value`] = `Please provide your ${method} ${method === 'WhatsApp' ? 'number' : 'URL'}`;
+        newErrors[`${method}Value`] = `Please provide your ${method} ${method === 'whatsapp' || method === 'call' ? 'number' : 'details'}`;
       }
     });
+
+    if (formData.contact_methods.email.selected && !/\S+@\S+\.\S+/.test(formData.contact_methods.email.value))
+      newErrors.emailValue = 'Email is invalid';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -228,81 +252,38 @@ function FounderPostForm({ onClose }) {
 
   const validateStep2 = () => {
     const newErrors = {};
-    if (!formData.category) newErrors.category = 'Category is required';
+    if (!formData.headline.trim()) newErrors.headline = 'Headline is required';
+    if (!formData.domainName) newErrors.domainName = 'Domain is required';
+    if (!formData.roleUnderDomain) newErrors.roleUnderDomain = 'Role is required';
     if (formData.skills.length === 0) newErrors.skills = 'At least one skill is required';
-    if (!formData.experienceType) newErrors.experienceType = 'Experience type is required';
-    if (
-      formData.experienceType === 'Experienced' &&
-      !formData.experienceYears &&
-      !formData.experienceMonths &&
-      !formData.experienceDays
-    )
-      newErrors.experienceDuration = 'At least one duration field is required';
+    if (!Object.values(formData.workBasis).some((selected) => selected))
+      newErrors.workBasis = 'At least one work basis is required';
+    if (formData.workBasis.Other && !formData.otherWorkBasis.trim())
+      newErrors.otherWorkBasis = 'Please specify work basis';
     if (!formData.workMode) newErrors.workMode = 'Work mode is required';
-    if (
-      (formData.workMode === 'Hybrid' || formData.workMode === 'On-site') &&
-      !formData.workLocation.trim()
-    )
-      newErrors.workLocation = 'Work location is required';
-    if (!formData.workType) newErrors.workType = 'Work type is required';
-
-    // Validate based on workType
-    if (formData.workType === 'Partnership') {
-      if (!formData.equityPercentage.trim())
-        newErrors.equityPercentage = 'Equity percentage is required';
-    }
-
-    if (formData.workType === 'Contract Basis') {
-      if (
-        !formData.contractDuration.years &&
-        !formData.contractDuration.months &&
-        !formData.contractDuration.days
-      )
-        newErrors.contractDuration = 'At least one duration field is required';
-      if (!formData.scopeOfWork.trim())
-        newErrors.scopeOfWork = 'Scope of work is required';
-    }
-
-    if (formData.workType === 'Project Basis') {
-      if (!formData.projectDescription.trim())
-        newErrors.projectDescription = 'Project description is required';
-      if (
-        !formData.projectTimeline.years &&
-        !formData.projectTimeline.months &&
-        !formData.projectTimeline.days
-      )
-        newErrors.projectTimeline = 'At least one timeline field is required';
-    }
-
-    if (formData.workType === 'Internship') {
-      if (!formData.internshipType) newErrors.internshipType = 'Please select internship type';
-      if (!formData.internshipMonths)
-        newErrors.internshipMonths = 'Number of months is required';
-      if (!formData.internshipPayment)
-        newErrors.internshipPayment = 'Payment selection is required';
-      if (formData.internshipPayment === 'Paid' && !formData.internshipPaymentAmount.trim())
-        newErrors.internshipPaymentAmount = 'Payment amount is required';
-    }
-
-    if (formData.workType === 'Job') {
-      if (!formData.jobType) newErrors.jobType = 'Please select job type';
-      if (!formData.jobPayment) newErrors.jobPayment = 'Payment selection is required';
-      if (formData.jobPayment === 'Paid' && !formData.jobPaymentAmount.trim())
-        newErrors.jobPaymentAmount = 'Payment amount is required';
-    }
-
-    if (formData.workType === 'Freelance') {
-      if (!formData.freelancePaymentRange.trim())
-        newErrors.freelancePaymentRange = 'Payment range is required';
-    }
+    if (!formData.experienceLevel) newErrors.experienceLevel = 'Experience level is required';
+    if (!formData.startDate) newErrors.startDate = 'Start date is required';
+    if (!formData.projectDuration.trim()) newErrors.projectDuration = 'Duration is required';
+    if (!formData.timeCommitment.trim()) newErrors.timeCommitment = 'Time commitment is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateStep3 = () => {
+    const newErrors = {};
+    if (!formData.aboutOpportunity.trim()) newErrors.aboutOpportunity = 'About the opportunity is required';
+    if (!formData.responsibilities.trim()) newErrors.responsibilities = 'Responsibilities are required';
+    if (!formData.whyShouldJoin.trim()) newErrors.whyShouldJoin = 'Value proposition is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleNext = () => {
-    if (validateStep1()) {
-      setStep(step + 1);
+    if (step === 1 && validateStep1()) {
+      setStep(2);
+    } else if (step === 2 && validateStep2()) {
+      setStep(3);
     }
   };
 
@@ -312,16 +293,22 @@ function FounderPostForm({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep2()) {
+    if (validateStep3()) {
       try {
-        const response = await fetch(`http://62.72.13.232:3333/api/posts`, {
+        // Prepare data for backend, mapping skills to array of names
+        const submitData = {
+          ...formData,
+          skills: formData.skills.map((skill) => skill.name),
+          workBasis: Object.keys(formData.workBasis).find((key) => formData.workBasis[key]) || '',
+        };
+        const response = await fetch('http://62.72.13.232:3333/api/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(submitData),
           credentials: 'include',
         });
         if (response.ok) {
-          console.log('Form submitted:', formData);
+          console.log('Form submitted:', submitData);
           onClose();
         } else {
           console.error('Submission failed');
@@ -336,48 +323,56 @@ function FounderPostForm({ onClose }) {
 
   const handleCancel = () => {
     setFormData({
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      pronouns: '',
-      headline: '',
-      occupation: '',
-      aboutYourself: '',
-      companyName: '',
-      aboutCompany: '',
+      first_name: '',
+      middle_name: '',
+      last_name: '',
+      pronounce: '',
+      userType: '',
+      otherUserType: '',
+      requirementType: '',
+      otherRequirementType: '',
+      startUpName: '',
+      aboutEntity: '',
+      websiteOfStartupLink: '',
+      linkedin: '',
+      instagram: '',
+      city: '',
+      state: '',
+      country: '',
       email: '',
-      mobile: '',
-      contactMethods: {
-        WhatsApp: { selected: false, value: '' },
-        LinkedIn: { selected: false, value: '' },
-        Twitter: { selected: false, value: '' },
-        Discord: { selected: false, value: '' },
-        Instagram: { selected: false, value: '' },
+      whatsapp: '',
+      contact_methods: {
+        email: { selected: false, value: '' },
+        whatsapp: { selected: false, value: '' },
+        call: { selected: false, value: '' },
+        instagram: { selected: false, value: '' },
       },
-      category: '',
+      headline: '',
+      domainName: '',
+      roleUnderDomain: '',
       skills: [],
-      experienceType: 'Fresher',
-      experienceYears: '',
-      experienceMonths: '',
-      experienceDays: '',
+      workBasis: {
+        Partnership: false,
+        Collaboration: false,
+        Internship: false,
+        Job: false,
+        Freelance: false,
+        ProjectBasis: false,
+        PercentageBasis: false,
+        Other: false,
+      },
+      otherWorkBasis: '',
+      compensationDetails: '',
       workMode: '',
-      workLocation: '',
-      workType: '',
-      equityPercentage: '',
-      contractDuration: { years: '', months: '', days: '' },
-      scopeOfWork: '',
-      projectDescription: '',
-      projectTimeline: { years: '', months: '', days: '' },
-      projectPaymentAmount: '',
-      internshipType: '',
-      internshipMonths: '',
-      internshipPayment: 'Paid',
-      internshipPaymentAmount: '',
-      jobType: '',
-      jobPayment: 'Paid',
-      jobPaymentAmount: '',
-      freelancePaymentRange: '',
-      aboutWork: '',
+      experienceLevel: '',
+      startDate: '',
+      projectDuration: '',
+      timeCommitment: '',
+      aboutOpportunity: '',
+      responsibilities: '',
+      whyShouldJoin: '',
+      anyOtherInfo: '',
+      profile_pic: '',
     });
     setStep(1);
     setErrors({});
@@ -390,35 +385,39 @@ function FounderPostForm({ onClose }) {
         Create Post
       </h2>
 
-      {/* Step 1 */}
+      {/* Step 1: Who's Reaching Out */}
       {step === 1 && (
         <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <h3 className="col-span-2 text-xl font-semibold text-gray-800 mb-4">
+            Let’s introduce you to the world.
+          </h3>
+
           <div className="relative">
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
               First Name <span className="text-red-500">*</span>
             </label>
             <input
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
+              id="first_name"
+              name="first_name"
+              value={formData.first_name}
               onChange={handleChange}
               type="text"
               placeholder="Enter your first name"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.firstName ? 'border-red-500' : 'border-gray-300'
+                errors.first_name ? 'border-red-500' : 'border-gray-300'
               }`}
             />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+            {errors.first_name && <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>}
           </div>
 
           <div className="relative">
-            <label htmlFor="middleName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="middle_name" className="block text-sm font-medium text-gray-700 mb-1">
               Middle Name
             </label>
             <input
-              id="middleName"
-              name="middleName"
-              value={formData.middleName}
+              id="middle_name"
+              name="middle_name"
+              value={formData.middle_name}
               onChange={handleChange}
               type="text"
               placeholder="Enter your middle name"
@@ -427,170 +426,286 @@ function FounderPostForm({ onClose }) {
           </div>
 
           <div className="relative">
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
               Last Name <span className="text-red-500">*</span>
             </label>
             <input
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
+              id="last_name"
+              name="last_name"
+              value={formData.last_name}
               onChange={handleChange}
               type="text"
               placeholder="Enter your last name"
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.lastName ? 'border-red-500' : 'border-gray-300'
+                errors.last_name ? 'border-red-500' : 'border-gray-300'
               }`}
             />
-            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+            {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>}
           </div>
 
           <div className="relative">
-            <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="pronounce" className="block text-sm font-medium text-gray-700 mb-1">
               Pronouns <span className="text-red-500">*</span>
             </label>
             <select
-              id="pronouns"
-              name="pronouns"
-              value={formData.pronouns}
+              id="pronounce"
+              name="pronounce"
+              value={formData.pronounce}
               onChange={handleChange}
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.pronouns ? 'border-red-500' : 'border-gray-300'
+                errors.pronounce ? 'border-red-500' : 'border-gray-300'
               }`}
             >
               <option value="">Select Pronouns</option>
               <option value="He/Him">He/Him</option>
               <option value="She/Her">She/Her</option>
               <option value="They/Them">They/Them</option>
-              <option value="Other">Other</option>
             </select>
-            {errors.pronouns && <p className="text-red-500 text-sm mt-1">{errors.pronouns}</p>}
-          </div>
-
-          <div className="relative col-span-2">
-            <label htmlFor="headline" className="block text-sm font-medium text-gray-700 mb-1">
-              Headline (max 80 characters) <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="headline"
-              name="headline"
-              value={formData.headline}
-              onChange={handleChange}
-              maxLength={80}
-              placeholder="Enter a catchy headline"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.headline ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.headline && <p className="text-red-500 text-sm mt-1">{errors.headline}</p>}
-          </div>
-
-          <div className="relative col-span-2">
-            <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 mb-1">
-              Occupation / Position <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="occupation"
-              name="occupation"
-              value={formData.occupation}
-              onChange={handleChange}
-              placeholder="Enter your occupation or position"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.occupation ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.occupation && <p className="text-red-500 text-sm mt-1">{errors.occupation}</p>}
-          </div>
-
-          <div className="relative col-span-2">
-            <label htmlFor="aboutYourself" className="block text-sm font-medium text-gray-700 mb-1">
-              About Yourself (max 300 characters)
-            </label>
-            <textarea
-              id="aboutYourself"
-              name="aboutYourself"
-              value={formData.aboutYourself}
-              onChange={handleChange}
-              maxLength={300}
-              placeholder="Briefly describe yourself"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-            />
-          </div>
-
-          <div className="relative col-span-2">
-            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
-              Company / Institution / Startup Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="companyName"
-              name="companyName"
-              value={formData.companyName}
-              onChange={handleChange}
-              placeholder="Enter company name"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.companyName ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.companyName && <p className="text-red-500 text-sm mt-1">{errors.companyName}</p>}
-          </div>
-
-          <div className="relative col-span-2">
-            <label htmlFor="aboutCompany" className="block text-sm font-medium text-gray-700 mb-1">
-              About Company (Optional)
-            </label>
-            <textarea
-              id="aboutCompany"
-              name="aboutCompany"
-              value={formData.aboutCompany}
-              onChange={handleChange}
-              placeholder="Briefly describe your company"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-            />
-          </div>
-
-          <div className="relative">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              type="email"
-              placeholder="Enter your email"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-          </div>
-
-          <div className="relative">
-            <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
-              Mobile Number
-            </label>
-            <input
-              id="mobile"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              type="tel"
-              placeholder="Enter your mobile number"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-            />
+            {errors.pronounce && <p className="text-red-500 text-sm mt-1">{errors.pronounce}</p>}
           </div>
 
           <div className="relative col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              How do you want to get connected? <span className="text-red-500">*</span>
+              You are a <span className="text-red-500">*</span>
             </label>
             <div className="flex flex-wrap gap-4">
-              {['WhatsApp', 'LinkedIn', 'Twitter', 'Discord', 'Instagram'].map((method) => (
+              {['Business Owner', 'Student', 'Working Professional', 'Startup Founder', 'Freelancer', 'Other'].map((type) => (
+                <label key={type} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value={type}
+                    checked={formData.userType === type}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="ml-2 text-gray-700">{type}</span>
+                </label>
+              ))}
+            </div>
+            {errors.userType && <p className="text-red-500 text-sm mt-1">{errors.userType}</p>}
+            {formData.userType === 'Other' && (
+              <div className="mt-4">
+                <label htmlFor="otherUserType" className="block text-sm font-medium text-gray-700 mb-1">
+                  Specify User Type <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="otherUserType"
+                  name="otherUserType"
+                  value={formData.otherUserType}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Specify your user type"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                    errors.otherUserType ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.otherUserType && <p className="text-red-500 text-sm mt-1">{errors.otherUserType}</p>}
+              </div>
+            )}
+          </div>
+
+          <div className="relative col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              This requirement is for a <span className="text-red-500">*</span>
+            </label>
+            <div className="flex flex-wrap gap-4">
+              {['Business', 'Side Project', 'NGO', 'Startup', 'Personal Need', 'Other'].map((type) => (
+                <label key={type} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="requirementType"
+                    value={type}
+                    checked={formData.requirementType === type}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="ml-2 text-gray-700">{type}</span>
+                </label>
+              ))}
+            </div>
+            {errors.requirementType && <p className="text-red-500 text-sm mt-1">{errors.requirementType}</p>}
+            {formData.requirementType === 'Other' && (
+              <div className="mt-4">
+                <label htmlFor="otherRequirementType" className="block text-sm font-medium text-gray-700 mb-1">
+                  Specify Requirement Type <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="otherRequirementType"
+                  name="otherRequirementType"
+                  value={formData.otherRequirementType}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Specify requirement type"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                    errors.otherRequirementType ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.otherRequirementType && <p className="text-red-500 text-sm mt-1">{errors.otherRequirementType}</p>}
+              </div>
+            )}
+          </div>
+
+          {['Startup', 'Business'].includes(formData.requirementType) && (
+            <div className="relative col-span-2">
+              <label htmlFor="startUpName" className="block text-sm font-medium text-gray-700 mb-1">
+                Business/Startup Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="startUpName"
+                name="startUpName"
+                value={formData.startUpName}
+                onChange={handleChange}
+                type="text"
+                placeholder="Enter business/startup name"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                  errors.startUpName ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.startUpName && <p className="text-red-500 text-sm mt-1">{errors.startUpName}</p>}
+            </div>
+          )}
+
+          <div className="relative col-span-2">
+            <label htmlFor="aboutEntity" className="block text-sm font-medium text-gray-700 mb-1">
+              About the Business/Project/Startup
+            </label>
+            <textarea
+              id="aboutEntity"
+              name="aboutEntity"
+              value={formData.aboutEntity}
+              onChange={handleChange}
+              maxLength={300}
+              placeholder="Briefly describe your business/project/startup"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
+            />
+          </div>
+
+          <div className="relative">
+            <label htmlFor="websiteOfStartupLink" className="block text-sm font-medium text-gray-700 mb-1">
+              Website
+            </label>
+            <input
+              id="websiteOfStartupLink"
+              name="websiteOfStartupLink"
+              value={formData.websiteOfStartupLink}
+              onChange={handleChange}
+              type="url"
+              placeholder="Enter website URL"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+            />
+          </div>
+
+          <div className="relative">
+            <label htmlFor="linkedin" className="block text-sm font-medium text-gray-700 mb-1">
+              LinkedIn
+            </label>
+            <input
+              id="linkedin"
+              name="linkedin"
+              value={formData.linkedin}
+              onChange={handleChange}
+              type="url"
+              placeholder="Enter LinkedIn URL"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+            />
+          </div>
+
+          <div className="relative">
+            <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-1">
+              Instagram
+            </label>
+            <input
+              id="instagram"
+              name="instagram"
+              value={formData.instagram}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter Instagram handle"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+            />
+          </div>
+
+          <div className="relative">
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+              City <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter city"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.city ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+          </div>
+
+          <div className="relative">
+            <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+              State
+            </label>
+            <input
+              id="state"
+              name="state"
+              value={formData.state}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter state"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+            />
+          </div>
+
+          <div className="relative">
+            <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+              Country <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter country"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.country ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
+          </div>
+
+          <div className="relative">
+            <label htmlFor="profile_pic" className="block text-sm font-medium text-gray-700 mb-1">
+              Profile Picture URL <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="profile_pic"
+              name="profile_pic"
+              value={formData.profile_pic}
+              onChange={handleChange}
+              type="url"
+              placeholder="Enter profile picture URL"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.profile_pic ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.profile_pic && <p className="text-red-500 text-sm mt-1">{errors.profile_pic}</p>}
+          </div>
+
+          <div className="relative col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              How people can reach out to you <span className="text-red-500">*</span>
+            </label>
+            <div className="flex flex-wrap gap-4">
+              {['email', 'whatsapp', 'call', 'instagram'].map((method) => (
                 <div key={method} className="flex items-center">
                   <input
                     type="checkbox"
                     id={method}
-                    checked={formData.contactMethods[method].selected}
+                    checked={formData.contact_methods[method].selected}
                     onChange={() => handleContactMethodChange(method)}
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                   />
@@ -598,26 +713,26 @@ function FounderPostForm({ onClose }) {
                 </div>
               ))}
             </div>
-            {errors.contactMethods && (
-              <p className="text-red-500 text-sm mt-1">{errors.contactMethods}</p>
+            {errors.contact_methods && (
+              <p className="text-red-500 text-sm mt-1">{errors.contact_methods}</p>
             )}
 
             <div className="mt-4 space-y-4">
-              {Object.entries(formData.contactMethods).map(([method, { selected, value }]) => (
+              {Object.entries(formData.contact_methods).map(([method, { selected, value }]) => (
                 selected && (
                   <div key={method} className="relative">
                     <label
                       htmlFor={`${method}Value`}
                       className="block text-sm font-medium text-gray-700 mb-1"
                     >
-                      {method} {method === 'WhatsApp' ? 'Number' : 'URL'} <span className="text-red-500">*</span>
+                      {method} {method === 'whatsapp' || method === 'call' ? 'Number' : 'Details'} <span className="text-red-500">*</span>
                     </label>
                     <input
                       id={`${method}Value`}
-                      type={method === 'WhatsApp' ? 'tel' : 'url'}
+                      type={method === 'whatsapp' || method === 'call' ? 'tel' : method === 'email' ? 'email' : 'text'}
                       value={value}
                       onChange={(e) => handleContactValueChange(method, e.target.value)}
-                      placeholder={`Enter your ${method} ${method === 'WhatsApp' ? 'number' : 'URL'}`}
+                      placeholder={`Enter your ${method} ${method === 'whatsapp' || method === 'call' ? 'number' : 'details'}`}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                         errors[`${method}Value`] ? 'border-red-500' : 'border-gray-300'
                       }`}
@@ -650,39 +765,82 @@ function FounderPostForm({ onClose }) {
         </form>
       )}
 
-      {/* Step 2 */}
+      {/* Step 2: Who are you looking for? */}
       {step === 2 && (
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {/* Category of Skills */}
+        <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <h3 className="col-span-2 text-xl font-semibold text-gray-800 mb-4">
+            Your dream teammate, freelancer, or hire — describe them here.
+          </h3>
+
           <div className="relative col-span-2">
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-              Category of Skills <span className="text-red-500">*</span>
+            <label htmlFor="headline" className="block text-sm font-medium text-gray-700 mb-1">
+              Headline (e.g., I am looking for...) <span className="text-red-500">*</span>
             </label>
-            {loadingCategories ? (
-              <p className="text-gray-500">Loading categories...</p>
+            <input
+              id="headline"
+              name="headline"
+              value={formData.headline}
+              onChange={handleChange}
+              maxLength={80}
+              placeholder="Enter a catchy headline"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.headline ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.headline && <p className="text-red-500 text-sm mt-1">{errors.headline}</p>}
+          </div>
+
+          <div className="relative">
+            <label htmlFor="domainName" className="block text-sm font-medium text-gray-700 mb-1">
+              Domain of the Person Needed <span className="text-red-500">*</span>
+            </label>
+            {loadingDomains ? (
+              <p className="text-gray-500">Loading domains...</p>
             ) : (
               <select
-                id="category"
-                name="category"
-                value={formData.category}
+                id="domainName"
+                name="domainName"
+                value={formData.domainName}
                 onChange={handleChange}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                  errors.category ? 'border-red-500' : 'border-gray-300'
+                  errors.domainName ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
-                <option value="">Select a category</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
+                <option value="">Select a domain</option>
+                {domains.map((domain) => (
+                  <option key={domain._id} value={domain._id}>
+                    {domain.name}
                   </option>
                 ))}
               </select>
             )}
-            {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+            {errors.domainName && <p className="text-red-500 text-sm mt-1">{errors.domainName}</p>}
           </div>
 
-          {/* Skills */}
-          {formData.category && (
+          <div className="relative">
+            <label htmlFor="roleUnderDomain" className="block text-sm font-medium text-gray-700 mb-1">
+              Role of the Person <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="roleUnderDomain"
+              name="roleUnderDomain"
+              value={formData.roleUnderDomain}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.roleUnderDomain ? 'border-red-500' : 'border-gray-300'
+              }`}
+            >
+              <option value="">Select a role</option>
+              {roles.map((role) => (
+                <option key={role._id} value={role._id}>
+                  {role.name}
+                </option>
+              ))}
+            </select>
+            {errors.roleUnderDomain && <p className="text-red-500 text-sm mt-1">{errors.roleUnderDomain}</p>}
+          </div>
+
+          {formData.domainName && (
             <div className="relative col-span-2">
               <label htmlFor="skills" className="block text-sm font-medium text-gray-700 mb-1">
                 Skills <span className="text-red-500">*</span>
@@ -693,7 +851,7 @@ function FounderPostForm({ onClose }) {
                 value={searchText}
                 onChange={handleSkillInput}
                 placeholder="Type to search skills"
-                className="witiv-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
               />
               {showSuggestions && filteredSkills.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
@@ -731,110 +889,67 @@ function FounderPostForm({ onClose }) {
             </div>
           )}
 
-          {/* Experience */}
           <div className="relative col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Experience <span className="text-red-500">*</span>
+              Work Basis <span className="text-red-500">*</span>
             </label>
-            <div className="flex space-x-6">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="experienceType"
-                  value="Fresher"
-                  checked={formData.experienceType === 'Fresher'}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                />
-                <span className="ml-2 text-gray-700">Fresher</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="experienceType"
-                  value="Experienced"
-                  checked={formData.experienceType === 'Experienced'}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                />
-                <span className="ml-2 text-gray-700">Experienced</span>
-              </label>
+            <div className="flex flex-wrap gap-4">
+              {['Partnership', 'Collaboration', 'Internship', 'Job', 'Freelance', 'ProjectBasis', 'PercentageBasis', 'Other'].map((basis) => (
+                <div key={basis} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={basis}
+                    checked={formData.workBasis[basis]}
+                    onChange={() => handleWorkBasisChange(basis)}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                  />
+                  <label htmlFor={basis} className="ml-2 text-gray-700">{basis.replace(/([A-Z])/g, ' $1').trim()}</label>
+                </div>
+              ))}
             </div>
-            {errors.experienceType && (
-              <p className="text-red-500 text-sm mt-1">{errors.experienceType}</p>
-            )}
-            {formData.experienceType === 'Experienced' && (
-              <div className="mt-4 grid grid-cols-3 gap-4">
-                <div>
-                  <label
-                    htmlFor="experienceYears"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Years
-                  </label>
-                  <input
-                    id="experienceYears"
-                    name="experienceYears"
-                    value={formData.experienceYears}
-                    onChange={handleChange}
-                    type="number"
-                    min="0"
-                    placeholder="Years"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="experienceMonths"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Months
-                  </label>
-                  <input
-                    id="experienceMonths"
-                    name="experienceMonths"
-                    value={formData.experienceMonths}
-                    onChange={handleChange}
-                    type="number"
-                    min="0"
-                    max="11"
-                    placeholder="Months"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="experienceDays"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Days
-                  </label>
-                  <input
-                    id="experienceDays"
-                    name="experienceDays"
-                    value={formData.experienceDays}
-                    onChange={handleChange}
-                    type="number"
-                    min="0"
-                    max="30"
-                    placeholder="Days"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                  />
-                </div>
+            {errors.workBasis && <p className="text-red-500 text-sm mt-1">{errors.workBasis}</p>}
+            {formData.workBasis.Other && (
+              <div className="mt-4">
+                <label htmlFor="otherWorkBasis" className="block text-sm font-medium text-gray-700 mb-1">
+                  Specify Work Basis <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="otherWorkBasis"
+                  name="otherWorkBasis"
+                  value={formData.otherWorkBasis}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Specify work basis"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                    errors.otherWorkBasis ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.otherWorkBasis && <p className="text-red-500 text-sm mt-1">{errors.otherWorkBasis}</p>}
               </div>
-            )}
-            {errors.experienceDuration && (
-              <p className="text-red-500 text-sm mt-1">{errors.experienceDuration}</p>
             )}
           </div>
 
-          {/* Work Mode */}
+          <div className="relative col-span-2">
+            <label htmlFor="compensationDetails" className="block text-sm font-medium text-gray-700 mb-1">
+              Compensation / Stipend / Percentage
+            </label>
+            <input
+              id="compensationDetails"
+              name="compensationDetails"
+              value={formData.compensationDetails}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter compensation details (e.g., ₹5000-10000 or 5% equity)"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+            />
+          </div>
+
           <div className="relative col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Work Mode <span className="text-red-500">*</span>
             </label>
             <div className="flex flex-wrap gap-4">
-              {['Remote', 'Hybrid', 'On-site'].map((mode) => (
+              {['Remote', 'Hybrid', 'Onsite'].map((mode) => (
                 <label key={mode} className="flex items-center">
                   <input
                     type="radio"
@@ -849,553 +964,195 @@ function FounderPostForm({ onClose }) {
               ))}
             </div>
             {errors.workMode && <p className="text-red-500 text-sm mt-1">{errors.workMode}</p>}
-            {(formData.workMode === 'Hybrid' || formData.workMode === 'On-site') && (
+            {(formData.workMode === 'Hybrid' || formData.workMode === 'Onsite') && (
               <div className="mt-4">
-                <label
-                  htmlFor="workLocation"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Work Location <span className="text-red-500">*</span>
+                <label htmlFor="workLocation" className="block text-sm font-medium text-gray-700 mb-1">
+                  Work Location
                 </label>
                 <input
                   id="workLocation"
                   name="workLocation"
                   value={formData.workLocation}
                   onChange={handleChange}
-                  placeholder="Enter work location (e.g., city, state)"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                    errors.workLocation ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
-                {errors.workLocation && (
-                  <p className="text-red-500 text-sm mt-1">{errors.workLocation}</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Work Type */}
-          <div className="relative col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Work Type <span className="text-red-500">*</span>
-            </label>
-            <div className="flex flex-wrap gap-4">
-              {['Partnership', 'Contract Basis', 'Project Basis', 'Internship', 'Job', 'Freelance'].map((type) => (
-                <label key={type} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="workType"
-                    value={type}
-                    checked={formData.workType === type}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="ml-2 text-gray-700">{type}</span>
-                </label>
-              ))}
-            </div>
-            {errors.workType && <p className="text-red-500 text-sm mt-1">{errors.workType}</p>}
-
-            {/* Partnership: Equity Percentage */}
-            {formData.workType === 'Partnership' && (
-              <div className="mt-4">
-                <label
-                  htmlFor="equityPercentage"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Percentage of Equity Offering <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="equityPercentage"
-                  name="equityPercentage"
-                  value={formData.equityPercentage}
-                  onChange={handleChange}
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="Enter equity percentage"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                    errors.equityPercentage ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
-                {errors.equityPercentage && (
-                  <p className="text-red-500 text-sm mt-1">{errors.equityPercentage}</p>
-                )}
-              </div>
-            )}
-
-            {/* Contract Basis: Duration and Scope of Work */}
-            {formData.workType === 'Contract Basis' && (
-              <div className="mt-4 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contract Duration <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label
-                        htmlFor="contractDurationYears"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Years
-                      </label>
-                      <input
-                        id="contractDurationYears"
-                        name="contractDurationYears"
-                        value={formData.contractDuration.years}
-                        onChange={(e) =>
-                          handleNestedChange('contractDuration', 'years', e.target.value)
-                        }
-                        type="number"
-                        min="0"
-                        placeholder="Years"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="contractDurationMonths"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Months
-                      </label>
-                      <input
-                        id="contractDurationMonths"
-                        name="contractDurationMonths"
-                        value={formData.contractDuration.months}
-                        onChange={(e) =>
-                          handleNestedChange('contractDuration', 'months', e.target.value)
-                        }
-                        type="number"
-                        min="0"
-                        max="11"
-                        placeholder="Months"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="contractDurationDays"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Days
-                      </label>
-                      <input
-                        id="contractDurationDays"
-                        name="contractDurationDays"
-                        value={formData.contractDuration.days}
-                        onChange={(e) =>
-                          handleNestedChange('contractDuration', 'days', e.target.value)
-                        }
-                        type="number"
-                        min="0"
-                        max="30"
-                        placeholder="Days"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                      />
-                    </div>
-                  </div>
-                  {errors.contractDuration && (
-                    <p className="text-red-500 text-sm mt-1">{errors.contractDuration}</p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="scopeOfWork"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Scope of Work <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    id="scopeOfWork"
-                    name="scopeOfWork"
-                    value={formData.scopeOfWork}
-                    onChange={handleChange}
-                    placeholder="Briefly describe what the person will be working on during the contract."
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[150px] ${
-                      errors.scopeOfWork ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.scopeOfWork && (
-                    <p className="text-red-500 text-sm mt-1">{errors.scopeOfWork}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Project Basis: Description, Timeline, Payment */}
-            {formData.workType === 'Project Basis' && (
-              <div className="mt-4 space-y-4">
-                <div>
-                  <label
-                    htmlFor="projectDescription"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Project Description <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    id="projectDescription"
-                    name="projectDescription"
-                    value={formData.projectDescription}
-                    onChange={handleChange}
-                    placeholder="Describe the project"
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[150px] ${
-                      errors.projectDescription ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.projectDescription && (
-                    <p className="text-red-500 text-sm mt-1">{errors.projectDescription}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Timeline <span className="text-red-500">*</span>
-                  </label>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label
-                        htmlFor="projectTimelineYears"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Years
-                      </label>
-                      <input
-                        id="projectTimelineYears"
-                        name="projectTimelineYears"
-                        value={formData.projectTimeline.years}
-                        onChange={(e) =>
-                          handleNestedChange('projectTimeline', 'years', e.target.value)
-                        }
-                        type="number"
-                        min="0"
-                        placeholder="Years"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="projectTimelineMonths"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Months
-                      </label>
-                      <input
-                        id="projectTimelineMonths"
-                        name="projectTimelineMonths"
-                        value={formData.projectTimeline.months}
-                        onChange={(e) =>
-                          handleNestedChange('projectTimeline', 'months', e.target.value)
-                        }
-                        type="number"
-                        min="0"
-                        max="11"
-                        placeholder="Months"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="projectTimelineDays"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Days
-                      </label>
-                      <input
-                        id="projectTimelineDays"
-                        name="projectTimelineDays"
-                        value={formData.projectTimeline.days}
-                        onChange={(e) =>
-                          handleNestedChange('projectTimeline', 'days', e.target.value)
-                        }
-                        type="number"
-                        min="0"
-                        max="30"
-                        placeholder="Days"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                      />
-                    </div>
-                  </div>
-                  {errors.projectTimeline && (
-                    <p className="text-red-500 text-sm mt-1">{errors.projectTimeline}</p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="projectPaymentAmount"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Payment (Optional, in ₹)
-                  </label>
-                  <input
-                    id="projectPaymentAmount"
-                    name="projectPaymentAmount"
-                    value={formData.projectPaymentAmount}
-                    onChange={handleChange}
-                    type="text"
-                    placeholder="Enter payment amount (e.g., 5000)"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Internship: Full-time/Part-time, Months, Payment */}
-            {formData.workType === 'Internship' && (
-              <div className="mt-4 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Internship Type <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="internshipType"
-                        value="Full-time"
-                        checked={formData.internshipType === 'Full-time'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Full-time</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="internshipType"
-                        value="Part-time"
-                        checked={formData.internshipType === 'Part-time'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Part-time</span>
-                    </label>
-                  </div>
-                  {errors.internshipType && (
-                    <p className="text-red-500 text-sm mt-1">{errors.internshipType}</p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="internshipMonths"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Time Period (Months) <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="internshipMonths"
-                    name="internshipMonths"
-                    value={formData.internshipMonths}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                      errors.internshipMonths ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  >
-                    <option value="">Select months</option>
-                    {[...Array(12).keys()].map((i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1} {i + 1 === 1 ? 'month' : 'months'}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.internshipMonths && (
-                    <p className="text-red-500 text-sm mt-1">{errors.internshipMonths}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Payment <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="internshipPayment"
-                        value="Paid"
-                        checked={formData.internshipPayment === 'Paid'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Paid</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="internshipPayment"
-                        value="Unpaid"
-                        checked={formData.internshipPayment === 'Unpaid'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Unpaid</span>
-                    </label>
-                  </div>
-                  {errors.internshipPayment && (
-                    <p className="text-red-500 text-sm mt-1">{errors.internshipPayment}</p>
-                  )}
-                  {formData.internshipPayment === 'Paid' && (
-                    <div className="mt-4">
-                      <label
-                        htmlFor="internshipPaymentAmount"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Amount (in ₹) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="internshipPaymentAmount"
-                        name="internshipPaymentAmount"
-                        value={formData.internshipPaymentAmount}
-                        onChange={handleChange}
-                        type="text"
-                        placeholder="Enter amount or range (e.g., 5000-10000)"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                          errors.internshipPaymentAmount ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
-                      {errors.internshipPaymentAmount && (
-                        <p className="text-red-500 text-sm mt-1">{errors.internshipPaymentAmount}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Job: Full-time/Part-time, Payment */}
-            {formData.workType === 'Job' && (
-              <div className="mt-4 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Job Type <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="jobType"
-                        value="Full-time"
-                        checked={formData.jobType === 'Full-time'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Full-time</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="jobType"
-                        value="Part-time"
-                        checked={formData.jobType === 'Part-time'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Part-time</span>
-                    </label>
-                  </div>
-                  {errors.jobType && <p className="text-red-500 text-sm mt-1">{errors.jobType}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Payment <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex space-x-6">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="jobPayment"
-                        value="Paid"
-                        checked={formData.jobPayment === 'Paid'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Paid</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="jobPayment"
-                        value="Unpaid"
-                        checked={formData.jobPayment === 'Unpaid'}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-gray-700">Unpaid</span>
-                    </label>
-                  </div>
-                  {errors.jobPayment && (
-                    <p className="text-red-500 text-sm mt-1">{errors.jobPayment}</p>
-                  )}
-                  {formData.jobPayment === 'Paid' && (
-                    <div className="mt-4">
-                      <label
-                        htmlFor="jobPaymentAmount"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Amount (in ₹) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="jobPaymentAmount"
-                        name="jobPaymentAmount"
-                        value={formData.jobPaymentAmount}
-                        onChange={handleChange}
-                        type="text"
-                        placeholder="Enter amount or range (e.g., 50000-70000)"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                          errors.jobPaymentAmount ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      />
-                      {errors.jobPaymentAmount && (
-                        <p className="text-red-500 text-sm mt-1">{errors.jobPaymentAmount}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Freelance: Payment Range */}
-            {formData.workType === 'Freelance' && (
-              <div className="mt-4">
-                <label
-                  htmlFor="freelancePaymentRange"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Payment Range (in ₹) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="freelancePaymentRange"
-                  name="freelancePaymentRange"
-                  value={formData.freelancePaymentRange}
-                  onChange={handleChange}
                   type="text"
-                  placeholder="Enter payment range (e.g., 10000-15000)"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                    errors.freelancePaymentRange ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  placeholder="Enter work location (e.g., city, state)"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
                 />
-                {errors.freelancePaymentRange && (
-                  <p className="text-red-500 text-sm mt-1">{errors.freelancePaymentRange}</p>
-                )}
               </div>
             )}
           </div>
 
-          {/* About the Work */}
+          <div className="relative">
+            <label htmlFor="experienceLevel" className="block text-sm font-medium text-gray-700 mb-1">
+              Experience Level <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="experienceLevel"
+              name="experienceLevel"
+              value={formData.experienceLevel}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.experienceLevel ? 'border-red-500' : 'border-gray-300'
+              }`}
+            >
+              <option value="">Select experience level</option>
+              {['Beginner', 'Intermediate', 'Experienced', 'Expert'].map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+            {errors.experienceLevel && <p className="text-red-500 text-sm mt-1">{errors.experienceLevel}</p>}
+          </div>
+
+          <div className="relative">
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+              Start Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="startDate"
+              name="startDate"
+              value={formData.startDate}
+              onChange={handleChange}
+              type="date"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.startDate ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
+          </div>
+
+          <div className="relative">
+            <label htmlFor="projectDuration" className="block text-sm font-medium text-gray-700 mb-1">
+              Project/Work Duration <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="projectDuration"
+              name="projectDuration"
+              value={formData.projectDuration}
+              onChange={handleChange}
+              type="text"
+              placeholder="e.g., 3 months"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.projectDuration ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.projectDuration && <p className="text-red-500 text-sm mt-1">{errors.projectDuration}</p>}
+          </div>
+
+          <div className="relative">
+            <label htmlFor="timeCommitment" className="block text-sm font-medium text-gray-700 mb-1">
+              Time Commitment <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="timeCommitment"
+              name="timeCommitment"
+              value={formData.timeCommitment}
+              onChange={handleChange}
+              type="text"
+              placeholder="e.g., 10-15 hr/week"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.timeCommitment ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.timeCommitment && <p className="text-red-500 text-sm mt-1">{errors.timeCommitment}</p>}
+          </div>
+
+          <div className="col-span-2 flex justify-between space-x-4 mt-6">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+            >
+              Next Step
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Step 3: About the Opportunity */}
+      {step === 3 && (
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <h3 className="col-span-2 text-xl font-semibold text-gray-800 mb-4">
+            About the Opportunity
+          </h3>
+
           <div className="relative col-span-2">
-            <label htmlFor="aboutWork" className="block text-sm font-medium text-gray-700 mb-1">
-              About the Work (Optional, max 300 words)
+            <label htmlFor="aboutOpportunity" className="block text-sm font-medium text-gray-700 mb-1">
+              About the Project/Work/Business <span className="text-red-500">*</span>
             </label>
             <textarea
-              id="aboutWork"
-              name="aboutWork"
-              value={formData.aboutWork}
+              id="aboutOpportunity"
+              name="aboutOpportunity"
+              value={formData.aboutOpportunity}
               onChange={handleChange}
               maxLength={1800}
-              placeholder="Describe the work or opportunity"
+              placeholder="Describe the project/work/business"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[150px] ${
+                errors.aboutOpportunity ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.aboutOpportunity && <p className="text-red-500 text-sm mt-1">{errors.aboutOpportunity}</p>}
+          </div>
+
+          <div className="relative col-span-2">
+            <label htmlFor="responsibilities" className="block text-sm font-medium text-gray-700 mb-1">
+              What will this person do? <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="responsibilities"
+              name="responsibilities"
+              value={formData.responsibilities}
+              onChange={handleChange}
+              maxLength={1800}
+              placeholder="Describe the responsibilities"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[150px] ${
+                errors.responsibilities ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.responsibilities && <p className="text-red-500 text-sm mt-1">{errors.responsibilities}</p>}
+          </div>
+
+          <div className="relative col-span-2">
+            <label htmlFor="whyShouldJoin" className="block text-sm font-medium text-gray-700 mb-1">
+              Why should someone join you? <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="whyShouldJoin"
+              name="whyShouldJoin"
+              value={formData.whyShouldJoin}
+              onChange={handleChange}
+              maxLength={1800}
+              placeholder="Explain the value proposition"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[150px] ${
+                errors.whyShouldJoin ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.whyShouldJoin && <p className="text-red-500 text-sm mt-1">{errors.whyShouldJoin}</p>}
+          </div>
+
+          <div className="relative col-span-2">
+            <label htmlFor="anyOtherInfo" className="block text-sm font-medium text-gray-700 mb-1">
+              Any Other Information
+            </label>
+            <textarea
+              id="anyOtherInfo"
+              name="anyOtherInfo"
+              value={formData.anyOtherInfo}
+              onChange={handleChange}
+              maxLength={1800}
+              placeholder="Any additional info"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[150px]"
             />
           </div>
 
-          {/* Navigation Buttons */}
           <div className="col-span-2 flex justify-between space-x-4 mt-6">
             <button
               type="button"
