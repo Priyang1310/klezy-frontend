@@ -203,6 +203,7 @@ const SignUpRequest = () => {
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-3">
+                                    {/* Below is first name */}
                                     <div className="text-left">
                                         <label className="block font-medium mb-1 text-black opacity-[73%]">
                                             First Name
@@ -217,6 +218,7 @@ const SignUpRequest = () => {
                                             }
                                         />
                                     </div>
+                                    {/* Below is middle name */}
                                     <div className="text-left">
                                         <label className="block font-medium mb-1 text-black opacity-[73%]">
                                             Middle Name (Optional)
@@ -231,6 +233,7 @@ const SignUpRequest = () => {
                                             }
                                         />
                                     </div>
+                                    {/* Below is last name */}
                                     <div className="text-left">
                                         <label className="block font-medium mb-1 text-black opacity-[73%]">
                                             Last Name
@@ -245,6 +248,7 @@ const SignUpRequest = () => {
                                             }
                                         />
                                     </div>
+                                    {/* Below is Phone Input */}
                                     <div className="text-left">
                                         <label className="block font-medium mb-1 text-black opacity-[73%]">
                                             Phone number
@@ -287,6 +291,7 @@ const SignUpRequest = () => {
                                     </button>
                                 </div>
                             </div>
+                            {/* Belo is Image */}
                             <div className="h-full w-fit flex justify-center items-center">
                                 <img
                                     src="./image1.svg"
