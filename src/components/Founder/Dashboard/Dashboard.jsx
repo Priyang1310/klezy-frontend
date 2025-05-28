@@ -293,6 +293,7 @@ const Dashboard = () => {
         </div>
       </div>
       {/* Modal */}
+      {/* Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
@@ -305,13 +306,13 @@ const Dashboard = () => {
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
             width: "90%",
-            maxWidth: "320px", // 320-576px
+            maxWidth: "60vw", // 320-576px
             xs: { maxWidth: "320px" }, // 320-576px
             sm: { maxWidth: "600px" }, // 576-768px
             md: { maxWidth: "700px" }, // 768-992px
             lg: { maxWidth: "800px" }, // 992-1280px
             xl: { maxWidth: "800px" }, // 1280-2400px
-            maxHeight: "80vh",
+            maxHeight: "85vh",
             overflowY: "auto",
             padding: "2px xs:2px sm:4px",
             borderRadius: "12px xs:12px sm:16px",
@@ -319,9 +320,11 @@ const Dashboard = () => {
             border: "none",
           },
           overlay: {
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backgroundColor: "rgba(188, 121, 226, 0.2)",
+            backdropFilter: "blur(3px)",
+            WebkitBackdropFilter: "blur(4px)",
             zIndex: 1000,
-          },
+          }
         }}
       >
         <FounderPostForm onClose={closeModal} />

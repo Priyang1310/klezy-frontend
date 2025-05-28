@@ -95,22 +95,23 @@ const Login = () => {
         <motion.div
           key="step1"
           //   className="flex w-screen justify-center items-center h-screen bg-[#f3f3f3] overflow-hidden"
-          // className="flex w-screen justify-center items-center h-screen bg-[#ffffff] overflow-hidden"
-          className="flex w-screen justify-center items-center h-screen bg-gradient-to-br from-blue-200 via-violet-200 to-pink-200 overflow-hidden"
+          className="flex w-screen justify-center items-center h-screen bg-[#ffffff] overflow-hidden"
+          // className="flex w-screen justify-center items-center h-screen bg-gradient-to-br from-blue-200 via-violet-200 to-pink-200 overflow-hidden"
           initial="initial"
           animate="animate"
           exit="exit"
           variants={pageVariants}
         >
             {/* Below is the background divs */}
-          {/* <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
-            <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-10 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
+            <div className="absolute -right-[50%] top-[100%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-40 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-            <div className="absolute -right-[15%] top-[70%] rounded-2xl w-[714px] h-[714px] border-[100px] opacity-15 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-            <div className="absolute left-[35%] -bottom-[50%] rounded-2xl w-[814px] h-[614px] border-[100px] opacity-10 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-            <div className="absolute  left-[5%] top-[10%] rounded-2xl w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-            <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[914px] h-[914px] border-[100px] opacity-15 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-          </div> */}
+            {/* <div className="absolute -right-[15%] top-[70%] rounded-2xl w-[714px] h-[714px] border-[100px] opacity-15 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div> */}
+            {/* <div className="absolute left-[35%] -bottom-[50%] rounded-2xl w-[814px] h-[614px] border-[100px] opacity-10 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div> */}
+            {/* <div className="absolute  left-[5%] top-[10%] rounded-2xl w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div> */}
+            <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+          </div>
           <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
             <div className="h-full w-fit flex justify-center items-center">
               <img src="./image1.svg" alt="" className="h-full" />
