@@ -9,7 +9,7 @@ const PrivateRoute = ({ children }) => {
         
         const verifyToken = async () => {
             try {
-                const res = await fetch(`http://62.72.13.232:3333/api/auth/protected`, {
+                const res = await fetch(`http://localhost:3333/api/auth/protected`, {
                     method: "GET",
                     credentials: "include", // include cookies
                 });

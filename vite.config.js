@@ -9,6 +9,6 @@ export default defineConfig({
   ],
   server: {
     port: 5174,
-    allowedHosts:"ls8c4g804c4gcskg8s804wgs.62.72.13.232.sslip.io"
+    allowedHosts:"ls8c4g804c4gcskg8s804wgs.localhost.sslip.io"
   },
 })

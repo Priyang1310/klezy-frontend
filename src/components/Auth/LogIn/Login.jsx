@@ -17,7 +17,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch(`http://62.72.13.232:3333/api/auth/signin`, {
+      const response = await fetch(`http://localhost:3333/api/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

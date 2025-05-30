@@ -19,7 +19,7 @@ const PostNew = ({ post }) => {
   const location = post.workType;
   const time = post.paymentMode;
   const {
-    aboutUs: description,
+    // aboutUs: description,
     categoryName: role,
     companyName,
     createdAt,
@@ -49,7 +49,7 @@ const PostNew = ({ post }) => {
     phoneNumber: phone,
     role: TalentRole,
   } = userDetails;
-
+  const description = ""
   const sortedSkills = [...skills].sort((a, b) => a.length - b.length);
   const isLongDescription = description.length > 65;
   let visibleSkills = [];

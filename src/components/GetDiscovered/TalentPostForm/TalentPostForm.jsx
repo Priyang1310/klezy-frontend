@@ -39,7 +39,7 @@ function DiscoverMeForm({ onClose }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`http://62.72.13.232:3333/api/category/get-all-categories`);
+        const response = await fetch(`http://localhost:3333/api/category/get-all-categories`);
         if (!response.ok) throw new Error('Failed to fetch categories');
         const data = await response.json();
         const sortedCategories = (data.categories || []).sort((a, b) =>
@@ -66,7 +66,7 @@ function DiscoverMeForm({ onClose }) {
       if (formData.category) {
         try {
           const response = await fetch(
-            `http://62.72.13.232:3333/api/skills/?categoryId=${formData.category}`
+            `http://localhost:3333/api/skills/?categoryId=${formData.category}`
           );
           if (!response.ok) throw new Error('Failed to fetch skills');
           const data = await response.json();
@@ -315,7 +315,7 @@ function DiscoverMeForm({ onClose }) {
     e.preventDefault();
     if (validateStep2()) {
       try {
-        const response = await fetch(`http://62.72.13.232:3333/api/discover-me`, {
+        const response = await fetch(`http://localhost:3333/api/discover-me`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
