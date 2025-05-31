@@ -5,14 +5,43 @@ import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput from "react-phone-input-2";
 
 const Login = () => {
-  const [MobileNumber, setEmailOrPhone] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [loginMethod, setLoginMethod] = useState("phone"); // 'phone' or 'email'
+
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Phone validation function
+  const validatePhone = (phone) => {
+    // Remove any non-digit characters except the leading +
+    const cleanedPhone = phone.replace(/[^\d+]/g, '');
+    // Check for valid phone number (allowing + and 10-15 digits)
+    const phoneRegex = /^\+?\d{10,15}$/;
+    return phoneRegex.test(cleanedPhone);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!MobileNumber || !password) {
-      toast("All fields are required!");
+
+    // Validate inputs
+    if (!emailOrPhone || !password) {
+      toast.error("All fields are required!");
+      return;
+    }
+
+    // Validate based on login method
+    if (loginMethod === "email" && !validateEmail(emailOrPhone)) {
+      toast.error("Please enter a valid email address!");
+      return;
+    }
+
+    if (loginMethod === "phone" && !validatePhone(emailOrPhone)) {
+      toast.error("Please enter a valid phone number!");
       return;
     }
 
@@ -22,9 +51,9 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // ✅ Include cookies
+        credentials: "include",
         body: JSON.stringify({
-          MobileNumber,
+          emailOrPhone,
           password,
         }),
       });
@@ -39,9 +68,6 @@ const Login = () => {
         localStorage.setItem("middleName", data.middleName);
         localStorage.setItem("lastName", data.lastName);
         localStorage.setItem("email", data.email);
-
-        // ✅ Do NOT store token in localStorage anymore
-        // ✅ Cookie is automatically stored by browser
 
         // Redirect based on role
         console.log("User role:", data.role);
@@ -94,25 +120,19 @@ const Login = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key="step1"
-          //   className="flex w-screen justify-center items-center h-screen bg-[#f3f3f3] overflow-hidden"
           className="flex w-screen justify-center items-center h-screen bg-[#ffffff] overflow-hidden"
-          // className="flex w-screen justify-center items-center h-screen bg-gradient-to-br from-blue-200 via-violet-200 to-pink-200 overflow-hidden"
           initial="initial"
           animate="animate"
           exit="exit"
           variants={pageVariants}
         >
-            {/* Below is the background divs */}
           <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
             <div className="absolute -right-[50%] top-[100%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-40 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-            {/* <div className="absolute -right-[15%] top-[70%] rounded-2xl w-[714px] h-[714px] border-[100px] opacity-15 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div> */}
-            {/* <div className="absolute left-[35%] -bottom-[50%] rounded-2xl w-[814px] h-[614px] border-[100px] opacity-10 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div> */}
-            {/* <div className="absolute  left-[5%] top-[10%] rounded-2xl w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div> */}
             <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
           </div>
-          <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-evenly">
+          <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-md shadow-[#5C058E] text-center text-sm items-center justify-evenly">
             <div className="h-full w-fit flex justify-center items-center">
               <img src="./image1.svg" alt="" className="h-full" />
             </div>
@@ -136,51 +156,85 @@ const Login = () => {
                 </p>
               </div>
               <div>
-                {/* Below is Phone number */}
-                <div className="text-left">
+                <div className="mb-4 text-left">
                   <label className="block font-medium mb-1 text-black opacity-[73%]">
-                    Phone number
+                    Login using
                   </label>
-                  <PhoneInput
-                    country={"in"}
-                    value={MobileNumber}
-                    onChange={(value) => setEmailOrPhone(value)}
-                    containerClass="w-full"
-                    inputClass="w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                    buttonClass="border-gray-300 h-14 w-16"
-                    dropdownClass="h-28"
-                    containerStyle={{
-                      height: "56px",
-                      width: "100%",
-                    }}
-                    inputStyle={{
-                      height: "43px",
-                      width: "100%",
-                    }}
-                    buttonStyle={{
-                      position: "absolute",
-                      left: "5px",
-                      top: "1px",
-                      height: "40px",
-                      width: "40px",
-                      backgroundColor: "transparent",
-                      border: "none",
-                      outline: "none",
-                    }}
-                  />
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-1">
+                      <input
+                        type="radio"
+                        value="phone"
+                        checked={loginMethod === "phone"}
+                        onChange={() => {
+                          setLoginMethod("phone");
+                          setEmailOrPhone("");
+                        }}
+                      />
+                      Phone
+                    </label>
+                    <label className="flex items-center gap-1">
+                      <input
+                        type="radio"
+                        value="email"
+                        checked={loginMethod === "email"}
+                        onChange={() => {
+                          setLoginMethod("email");
+                          setEmailOrPhone("");
+                        }}
+                      />
+                      Email
+                    </label>
+                  </div>
                 </div>
-                {/* <div className="text-left mb-4">
-                  <label className="block font-medium text-gray-600">
-                    Phone number
-                  </label>
-                  <input
-                    type="text"
-                    value={MobileNumber}
-                    onChange={(e) => setEmailOrPhone(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Phone number"
-                  />
-                </div> */}
+
+                {loginMethod === "phone" ? (
+                  <div className="text-left">
+                    <label className="block font-medium mb-1 text-black opacity-[73%]">
+                      Phone number
+                    </label>
+                    <PhoneInput
+                      country={"in"}
+                      value={emailOrPhone}
+                      onChange={(value) => setEmailOrPhone(value)}
+                      containerClass="w-full"
+                      inputClass="w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                      buttonClass="border-gray-300 h-14 w-16"
+                      dropdownClass="h-28"
+                      containerStyle={{
+                        height: "56px",
+                        width: "100%",
+                      }}
+                      inputStyle={{
+                        height: "43px",
+                        width: "100%",
+                      }}
+                      buttonStyle={{
+                        position: "absolute",
+                        left: "5px",
+                        top: "1px",
+                        height: "40px",
+                        width: "40px",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="text-left mb-4">
+                    <label className="block font-medium mb-1 text-black opacity-[73%]">
+                      Email address
+                    </label>
+                    <input
+                      type="email"
+                      value={emailOrPhone}
+                      onChange={(e) => setEmailOrPhone(e.target.value)}
+                      className="w-full h-10 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                )}
 
                 <div className="text-left mb-4">
                   <label className="block font-medium mb-1 text-black opacity-[73%]">
