@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 const Login = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState(""); // New state for role
+  const [errors, setErrors] = useState({}); // New state for validation errors
   const navigate = useNavigate();
   const [loginMethod, setLoginMethod] = useState("phone"); // 'phone' or 'email'
 
@@ -18,9 +21,7 @@ const Login = () => {
 
   // Phone validation function
   const validatePhone = (phone) => {
-    // Remove any non-digit characters except the leading +
     const cleanedPhone = phone.replace(/[^\d+]/g, '');
-    // Check for valid phone number (allowing + and 10-15 digits)
     const phoneRegex = /^\+?\d{10,15}$/;
     return phoneRegex.test(cleanedPhone);
   };
@@ -29,7 +30,15 @@ const Login = () => {
     e.preventDefault();
 
     // Validate inputs
-    if (!emailOrPhone || !password) {
+    const newErrors = {
+      emailOrPhone: !emailOrPhone,
+      password: !password,
+      role: !role, // Validate role
+    };
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((error) => error)) {
       toast.error("All fields are required!");
       return;
     }
@@ -55,6 +64,7 @@ const Login = () => {
         body: JSON.stringify({
           emailOrPhone,
           password,
+          role, // Include role in the request
         }),
       });
 
@@ -156,6 +166,48 @@ const Login = () => {
                 </p>
               </div>
               <div>
+                {/* Role Selection */}
+                <div className="mb-4 text-left">
+                  <label className="block font-medium mb-1 text-black opacity-[73%]">
+                    Who you are
+                  </label>
+                  <div className="flex gap-4">
+                    <label
+                      className={`flex items-center gap-2 ${errors.role ? "text-red-500" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value="Founder"
+                        checked={role === "Founder"}
+                        onChange={(e) => {
+                          setRole(e.target.value);
+                          setErrors((prev) => ({ ...prev, role: false }));
+                        }}
+                        className="h-4 w-4 border-gray-300"
+                      />
+                      <span className="text-sm text-gray-600">Discover Talent</span>
+                    </label>
+                    <label
+                      className={`flex items-center gap-2 ${errors.role ? "text-red-500" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value="GetDiscovered"
+                        checked={role === "GetDiscovered"}
+                        onChange={(e) => {
+                          setRole(e.target.value);
+                          setErrors((prev) => ({ ...prev, role: false }));
+                        }}
+                        className="h-4 w-4 text-violet-500 focus:ring-violet-500 border-gray-300"
+                      />
+                      <span className="text-sm text-gray-600">Getting Discovered</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Login Method Selection */}
                 <div className="mb-4 text-left">
                   <label className="block font-medium mb-1 text-black opacity-[73%]">
                     Login using
@@ -170,6 +222,7 @@ const Login = () => {
                           setLoginMethod("phone");
                           setEmailOrPhone("");
                         }}
+                        className="h-4 w-4 border-gray-300"
                       />
                       Phone
                     </label>
@@ -182,6 +235,7 @@ const Login = () => {
                           setLoginMethod("email");
                           setEmailOrPhone("");
                         }}
+                        className="h-4 w-4 text-violet-500 focus:ring-violet-500 border-gray-300"
                       />
                       Email
                     </label>
@@ -189,7 +243,7 @@ const Login = () => {
                 </div>
 
                 {loginMethod === "phone" ? (
-                  <div className="text-left">
+                  <div className="text-left mb-4">
                     <label className="block font-medium mb-1 text-black opacity-[73%]">
                       Phone number
                     </label>
@@ -198,7 +252,9 @@ const Login = () => {
                       value={emailOrPhone}
                       onChange={(value) => setEmailOrPhone(value)}
                       containerClass="w-full"
-                      inputClass="w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                      inputClass={`w-full h-12 px-4 text-gray-900 border ${
+                        errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                      } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                       buttonClass="border-gray-300 h-14 w-16"
                       dropdownClass="h-28"
                       containerStyle={{
@@ -230,7 +286,9 @@ const Login = () => {
                       type="email"
                       value={emailOrPhone}
                       onChange={(e) => setEmailOrPhone(e.target.value)}
-                      className="w-full h-10 px-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                      className={`w-full h-10 px-3 border ${
+                        errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                      } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                       placeholder="Enter your email"
                     />
                   </div>
@@ -244,7 +302,9 @@ const Login = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-10 px-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
+                    className={`w-full h-10 px-2 border ${
+                      errors.password ? "border-red-500" : "border-gray-300"
+                    } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                     placeholder="Enter Password"
                   />
                 </div>

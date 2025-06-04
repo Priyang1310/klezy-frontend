@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
+import { FaMagic } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 function FounderPostForm({ onClose }) {
@@ -51,6 +52,7 @@ function FounderPostForm({ onClose }) {
         internshipStipendRange: { min: "", max: "" },
         internshipPerformanceCriteria: "",
         collaborationDescription: "",
+		jobTimeType: null,
         jobAmountRange: { min: "", max: "" },
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
@@ -403,6 +405,7 @@ function FounderPostForm({ onClose }) {
                 } else if (basis === "Collaboration") {
                     updatedFormData.collaborationDescription = "";
                 } else if (basis === "Job") {
+					updatedFormData.jobTimeType = null;
                     updatedFormData.jobAmountRange = { min: "", max: "" };
                 } else if (basis === "Freelance") {
                     updatedFormData.freelancePaymentRange = {
@@ -431,6 +434,7 @@ function FounderPostForm({ onClose }) {
             internshipStipendRange: { min: "", max: "" },
             internshipPerformanceCriteria: "",
             collaborationDescription: "",
+			jobTimeType: "",
             jobAmountRange: { min: "", max: "" },
             freelancePaymentRange: { min: "", max: "" },
             projectDescription: "",
@@ -758,29 +762,31 @@ function FounderPostForm({ onClose }) {
             newErrors.collaborationDescription =
                 "Collaboration description is required";
         if (formData.workBasis.Job) {
-            const min = Number(formData.jobAmountRange.min);
-            const max = Number(formData.jobAmountRange.max);
-            if (
-                !formData.jobAmountRange.min.trim() ||
-                isNaN(min) ||
-                min < 0 ||
-                !Number.isInteger(min)
-            )
-                newErrors.jobAmountRange = {
-                    ...newErrors.jobAmountRange,
-                    min: "Valid whole number minimum amount is required",
-                };
-            if (
-                !formData.jobAmountRange.max.trim() ||
-                isNaN(max) ||
-                max < min ||
-                !Number.isInteger(max)
-            )
-                newErrors.jobAmountRange = {
-                    ...newErrors.jobAmountRange,
-                    max: "Valid whole number maximum amount must be at least the minimum",
-                };
-        }
+    if (!formData.jobTimeType)
+        newErrors.jobTimeType = "Please specify job time type";
+    const min = Number(formData.jobAmountRange.min);
+    const max = Number(formData.jobAmountRange.max);
+    if (
+        !formData.jobAmountRange.min.trim() ||
+        isNaN(min) ||
+        min < 0 ||
+        !Number.isInteger(min)
+    )
+        newErrors.jobAmountRange = {
+            ...newErrors.jobAmountRange,
+            min: "Valid whole number minimum amount is required",
+        };
+    if (
+        !formData.jobAmountRange.max.trim() ||
+        isNaN(max) ||
+        max < min ||
+        !Number.isInteger(max)
+    )
+        newErrors.jobAmountRange = {
+            ...newErrors.jobAmountRange,
+            max: "Valid whole number maximum amount must be at least the minimum",
+        };
+}
         if (formData.workBasis.Freelance) {
             if (
                 !formData.freelancePaymentRange.min.trim() ||
@@ -1017,6 +1023,7 @@ function FounderPostForm({ onClose }) {
                     workState: formData.workLocation.state,
                     workCity: formData.workLocation.district,
                     internshipTimeType: formData.internshipTimeType || "",
+					jobTimeType: formData.jobTimeType || "",
                     internshipDuration:
                         formData.workBasis.Internship &&
                         formData.internshipDuration.value &&
@@ -1153,279 +1160,396 @@ function FounderPostForm({ onClose }) {
     }
 
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
-            <div className="h-20 flex items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-[50%] mx-auto text-xl">
-                <div className="flex flex-col">
-                    <p className="flex items-center gap-2">
-                        01{" "}
-                        <span className={`text-sm text-violet-600`}>
-                            About Founder
-                        </span>
-                    </p>
-                    <div className="flex items-center gap-1">
-                        <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600`}
-                        >
-                            ✓
-                        </div>
-                        <div
-                            className={`w-[150px] h-1 ${
-                                step > 1 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
-                        ></div>
-                    </div>
-                </div>
-                <div className="flex flex-col">
-                    <p className="flex items-center gap-2">
-                        02{" "}
-                        <span
-                            className={`text-sm ${
-                                step > 1 ? "text-violet-600" : "text-black"
-                            }`}
-                        >
-                            Skills and Strength
-                        </span>
-                    </p>
-                    <div className="flex items-center gap-1">
-                        <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 1 ? "bg-violet-600" : "bg-white"
-                            }`}
-                        >
-                            ✓
-                        </div>
-                        <div
-                            className={`w-[150px] h-1 ${
-                                step > 2 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
-                        ></div>
-                    </div>
-                </div>
-                <div className="flex flex-col">
-                    <p className="flex items-center gap-2 w-[150px]">
-                        03{" "}
-                        <span
-                            className={`text-sm ${
-                                step > 2 ? "text-violet-600" : "text-black"
-                            }`}
-                        >
-                            Looking for
-                        </span>
-                    </p>
-                    <div className="flex items-center gap-1">
-                        <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 2 ? "bg-violet-600" : "bg-white"
-                            }`}
-                        >
-                            ✓
-                        </div>
-                    </div>
-                </div>
-            </div>
+		<div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
+			<div className="h-20 flex items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-[50%] mx-auto text-xl">
+				<div className="flex flex-col">
+					<p className="flex items-center gap-2">
+						01{" "}
+						<span className={`text-sm text-violet-600`}>
+							About Founder
+						</span>
+					</p>
+					<div className="flex items-center gap-1">
+						<div
+							className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600`}
+						>
+							✓
+						</div>
+						<div
+							className={`w-[150px] h-1 ${
+								step > 1 ? "bg-violet-600" : "bg-gray-200"
+							}`}
+						></div>
+					</div>
+				</div>
+				<div className="flex flex-col">
+					<p className="flex items-center gap-2">
+						02{" "}
+						<span
+							className={`text-sm ${
+								step > 1 ? "text-violet-600" : "text-black"
+							}`}
+						>
+							Skills and Strength
+						</span>
+					</p>
+					<div className="flex items-center gap-1">
+						<div
+							className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
+								step > 1 ? "bg-violet-600" : "bg-white"
+							}`}
+						>
+							✓
+						</div>
+						<div
+							className={`w-[150px] h-1 ${
+								step > 2 ? "bg-violet-600" : "bg-gray-200"
+							}`}
+						></div>
+					</div>
+				</div>
+				<div className="flex flex-col">
+					<p className="flex items-center gap-2 w-[150px]">
+						03{" "}
+						<span
+							className={`text-sm ${
+								step > 2 ? "text-violet-600" : "text-black"
+							}`}
+						>
+							Looking for
+						</span>
+					</p>
+					<div className="flex items-center gap-1">
+						<div
+							className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
+								step > 2 ? "bg-violet-600" : "bg-white"
+							}`}
+						>
+							✓
+						</div>
+					</div>
+				</div>
+			</div>
 
-            {step === 1 && (
-                <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
-                    <div className="flex flex-col">
-                        <p className="text-violet-700 text-xl">
-                            Stay It Your Way
-                        </p>
-                        <p className="text-violet-400">
-                            This isn't your typical hiring form. In a few short
-                            questions, you'll paint a picture of your world and
-                            who you're looking for — no corporate lingo
-                            required.
-                        </p>
-                    </div>
-                    <img src="./FormImage1.svg" alt="" className="scale-150" />
-                </div>
-            )}
+			{step === 1 && (
+				<div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
+					<div className="flex flex-col">
+						<p className="text-violet-700 text-xl">
+							Stay It Your Way
+						</p>
+						<p className="text-violet-400">
+							This isn't your typical hiring form. In a few short
+							questions, you'll paint a picture of your world and
+							who you're looking for — no corporate lingo
+							required.
+						</p>
+					</div>
+					<img src="./FormImage1.svg" alt="" className="scale-150" />
+				</div>
+			)}
 
-            {step === 2 && (
-                <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
-                    <div className="flex flex-col">
-                        <p className="text-violet-700 text-xl">
-                            You're almost there!
-                        </p>
-                        <p className="text-violet-400">
-                            This fun little form helps you describe your vibe
-                            and your need — quick, casual, and human. No
-                            resumes, no HR jargon. Just say it like it is.
-                        </p>
-                    </div>
-                    <img src="./FormImage2.svg" alt="" className="" />
-                </div>
-            )}
+			{step === 2 && (
+				<div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
+					<div className="flex flex-col">
+						<p className="text-violet-700 text-xl">
+							You're almost there!
+						</p>
+						<p className="text-violet-400">
+							This fun little form helps you describe your vibe
+							and your need — quick, casual, and human. No
+							resumes, no HR jargon. Just say it like it is.
+						</p>
+					</div>
+					<img src="./FormImage2.svg" alt="" className="" />
+				</div>
+			)}
 
-            {step === 3 && (
-                <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
-                    <div className="flex flex-col">
-                        <p className="text-violet-700 text-xl">
-                            You’ve made it to the final step!
-                        </p>
-                        <p className="text-violet-400">
-                            This short form captures who you are, what you need,
-                            and how your team works — no fluff, no lengthy job
-                            descriptions. Just clear, honest details. Done in
-                            minutes.
-                        </p>
-                    </div>
-                    <img src="./FormImage3.svg" alt="" className="" />
-                </div>
-            )}
+			{step === 3 && (
+				<div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
+					<div className="flex flex-col">
+						<p className="text-violet-700 text-xl">
+							You’ve made it to the final step!
+						</p>
+						<p className="text-violet-400">
+							This short form captures who you are, what you need,
+							and how your team works — no fluff, no lengthy job
+							descriptions. Just clear, honest details. Done in
+							minutes.
+						</p>
+					</div>
+					<img src="./FormImage3.svg" alt="" className="" />
+				</div>
+			)}
 
-            {step === 1 && (
-                <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
-                        Let’s introduce you to the world.
-                    </h3>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="first_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="first_name"
-                            name="first_name"
-                            value={formData.first_name}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.first_name && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.first_name}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="middle_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Middle Name
-                        </label>
-                        <input
-                            id="middle_name"
-                            name="middle_name"
-                            value={formData.middle_name}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="last_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="last_name"
-                            name="last_name"
-                            value={formData.last_name}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.last_name && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.last_name}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="gender"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Gender <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="gender"
-                            name="gender"
-                            value={formData.gender}
-                            disabled
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Prefer not to specify">
-                                Prefer not to specify
-                            </option>
-                        </select>
-                        {errors.gender && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.gender}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            You are a <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-4">
-                            {[
-                                "Business Owner",
-                                "Startup Founder",
-                                "Working Professional",
-                                "Freelancer",
-                                "Student",
-                                "Other",
-                            ].map((type) => (
-                                <label key={type} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="userType"
-                                        value={type}
-                                        checked={formData.userType === type}
-                                        onChange={handleChange}
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <span className="ml-2 text-gray-700">
-                                        {type}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.userType && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.userType}
-                            </p>
-                        )}
-                        {formData.userType === "Other" && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="otherUserType"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Specify User Type{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        id="otherUserType"
-                                        name="otherUserType"
-                                        value={formData.otherUserType}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Specify your user type"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.otherUserType
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                    {/* <button
+			{step === 1 && (
+				<form className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+					<h3 className="col-span-3 text-xl font-semibold text-[#7900BF] mb-4">
+						Let’s introduce you to the world.
+					</h3>
+                    {/* First Name */}
+					<div className="relative">
+						<label
+							htmlFor="first_name"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							First Name <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="first_name"
+							name="first_name"
+							value={formData.first_name}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+						{errors.first_name && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.first_name}
+							</p>
+						)}
+					</div>
+                    {/* Mid Name */}
+					<div className="relative">
+						<label
+							htmlFor="middle_name"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Middle Name
+						</label>
+						<input
+							id="middle_name"
+							name="middle_name"
+							value={formData.middle_name}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+					</div>
+                    {/* Last name */}
+					<div className="relative">
+						<label
+							htmlFor="last_name"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Last Name <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="last_name"
+							name="last_name"
+							value={formData.last_name}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+						{errors.last_name && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.last_name}
+							</p>
+						)}
+					</div>
+                    {/* Country */}
+					<div className="relative">
+						<label
+							htmlFor="country"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Country <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="country"
+							name="country"
+							value={formData.country}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+						{errors.country && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.country}
+							</p>
+						)}
+					</div>
+                    {/* State */}
+					<div className="relative">
+						<label
+							htmlFor="state"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							State <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="state"
+							name="state"
+							value={formData.state}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+						{errors.state && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.state}
+							</p>
+						)}
+					</div>
+                    {/* City */}
+					<div className="relative">
+						<label
+							htmlFor="district"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							City <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="district"
+							name="district"
+							value={formData.district}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+						{errors.district && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.district}
+							</p>
+						)}
+					</div>
+                    {/* Gender */}
+					<div className="relative">
+						<label
+							htmlFor="gender"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Gender <span className="text-red-500">*</span>
+						</label>
+						<select
+							id="gender"
+							name="gender"
+							value={formData.gender}
+							disabled
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						>
+							<option value="">Select Gender</option>
+							<option value="Male">Male</option>
+							<option value="Female">Female</option>
+							<option value="Prefer not to specify">
+								Prefer not to specify
+							</option>
+						</select>
+						{errors.gender && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.gender}
+							</p>
+						)}
+					</div>
+                    {/* Email */}
+					<div className="relative">
+						<label
+							htmlFor="email"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Email <span className="text-red-500">*</span>
+						</label>
+						<input
+							id="email"
+							name="email"
+							value={formData.email}
+							disabled
+							type="text"
+							className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+						/>
+						{errors.email && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.email}
+							</p>
+						)}
+					</div>
+                    
+                    {/* Personal Website */}
+					<div className="relative">
+						<label
+							htmlFor="websiteOfStartupLink"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Personal website
+						</label>
+						<div className="flex items-center gap-2">
+							<input
+								id="websiteOfStartupLink"
+								name="websiteOfStartupLink"
+								value={formData.websiteOfStartupLink}
+								onChange={handleChange}
+								type="url"
+								placeholder="Enter website URL (https://)"
+								className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+									errors.websiteOfStartupLink
+										? "border-red-500"
+										: "border-gray-300"
+								}`}
+							/>
+						</div>
+						{errors.websiteOfStartupLink && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.websiteOfStartupLink}
+							</p>
+						)}
+					</div>
+					<div className="relative col-span-3">
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							You are a <span className="text-red-500">*</span>
+						</label>
+						<div className="flex flex-wrap gap-4">
+							{[
+								"Business Owner",
+								"Startup Founder",
+								"Working Professional",
+								"Freelancer",
+								"Student",
+								"Other",
+							].map((type) => (
+								<label key={type} className="flex items-center">
+									<input
+										type="radio"
+										name="userType"
+										value={type}
+										checked={formData.userType === type}
+										onChange={handleChange}
+										className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+									/>
+									<span className="ml-2 text-gray-700">
+										{type}
+									</span>
+								</label>
+							))}
+						</div>
+						{errors.userType && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.userType}
+							</p>
+						)}
+						{formData.userType === "Other" && (
+							<div className="mt-4">
+								<label
+									htmlFor="otherUserType"
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									Specify User Type{" "}
+									<span className="text-red-500">*</span>
+								</label>
+								<div className="flex items-center gap-2">
+									<input
+										id="otherUserType"
+										name="otherUserType"
+										value={formData.otherUserType}
+										onChange={handleChange}
+										type="text"
+										placeholder="Specify your user type"
+										className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+											errors.otherUserType
+												? "border-red-500"
+												: "border-gray-300"
+										}`}
+									/>
+									{/* <button
                     type="button"
                     onClick={() => enhanceField('otherUserType', formData.otherUserType)}
                     disabled={enhanceLoading.otherUserType}
@@ -1433,75 +1557,75 @@ function FounderPostForm({ onClose }) {
                   >
                     {enhanceLoading.otherUserType ? 'Enhancing...' : 'Enhance'}
                   </button> */}
-                                </div>
-                                {errors.otherUserType && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.otherUserType}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    </div>
+								</div>
+								{errors.otherUserType && (
+									<p className="text-red-500 text-sm mt-1">
+										{errors.otherUserType}
+									</p>
+								)}
+							</div>
+						)}
+					</div>
 
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            This requirement is for a{" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-4">
-                            {[
-                                "Business",
-                                "Startup",
-                                "Side Project",
-                                "Personal Need",
-                                "Other",
-                            ].map((type) => (
-                                <label key={type} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="requirementType"
-                                        value={type}
-                                        checked={
-                                            formData.requirementType === type
-                                        }
-                                        onChange={handleChange}
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <span className="ml-2 text-gray-700">
-                                        {type}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.requirementType && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.requirementType}
-                            </p>
-                        )}
-                        {formData.requirementType === "Other" && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="otherRequirementType"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Specify Requirement Type{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        id="otherRequirementType"
-                                        name="otherRequirementType"
-                                        value={formData.otherRequirementType}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Specify requirement type"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.otherRequirementType
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                    {/* <button
+					<div className="relative col-span-3">
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							This requirement is for a{" "}
+							<span className="text-red-500">*</span>
+						</label>
+						<div className="flex flex-wrap gap-4">
+							{[
+								"Business",
+								"Startup",
+								"Side Project",
+								"Personal Need",
+								"Other",
+							].map((type) => (
+								<label key={type} className="flex items-center">
+									<input
+										type="radio"
+										name="requirementType"
+										value={type}
+										checked={
+											formData.requirementType === type
+										}
+										onChange={handleChange}
+										className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+									/>
+									<span className="ml-2 text-gray-700">
+										{type}
+									</span>
+								</label>
+							))}
+						</div>
+						{errors.requirementType && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.requirementType}
+							</p>
+						)}
+						{formData.requirementType === "Other" && (
+							<div className="mt-4">
+								<label
+									htmlFor="otherRequirementType"
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									Specify Requirement Type{" "}
+									<span className="text-red-500">*</span>
+								</label>
+								<div className="flex items-center gap-2">
+									<input
+										id="otherRequirementType"
+										name="otherRequirementType"
+										value={formData.otherRequirementType}
+										onChange={handleChange}
+										type="text"
+										placeholder="Specify requirement type"
+										className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+											errors.otherRequirementType
+												? "border-red-500"
+												: "border-gray-300"
+										}`}
+									/>
+									{/* <button
                     type="button"
                     onClick={() => enhanceField('otherRequirementType', formData.otherRequirementType)}
                     disabled={enhanceLoading.otherRequirementType}
@@ -1509,40 +1633,40 @@ function FounderPostForm({ onClose }) {
                   >
                     {enhanceLoading.otherRequirementType ? 'Enhancing...' : 'Enhance'}
                   </button> */}
-                                </div>
-                                {errors.otherRequirementType && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.otherRequirementType}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                        {["Startup", "Business"].includes(
-                            formData.requirementType
-                        ) && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="startUpName"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Business/Startup Name{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        id="startUpName"
-                                        name="startUpName"
-                                        value={formData.startUpName}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Enter business/startup name"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.startUpName
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                    {/* <button
+								</div>
+								{errors.otherRequirementType && (
+									<p className="text-red-500 text-sm mt-1">
+										{errors.otherRequirementType}
+									</p>
+								)}
+							</div>
+						)}
+						{["Startup", "Business"].includes(
+							formData.requirementType
+						) && (
+							<div className="mt-4">
+								<label
+									htmlFor="startUpName"
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									Business/Startup Name{" "}
+									<span className="text-red-500">*</span>
+								</label>
+								<div className="flex items-center gap-2">
+									<input
+										id="startUpName"
+										name="startUpName"
+										value={formData.startUpName}
+										onChange={handleChange}
+										type="text"
+										placeholder="Enter business/startup name"
+										className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+											errors.startUpName
+												? "border-red-500"
+												: "border-gray-300"
+										}`}
+									/>
+									{/* <button
                     type="button"
                     onClick={() => enhanceField('startUpName', formData.startUpName)}
                     disabled={enhanceLoading.startUpName}
@@ -1550,1745 +1674,1584 @@ function FounderPostForm({ onClose }) {
                   >
                     {enhanceLoading.startUpName ? 'Enhancing...' : 'Enhance'}
                   </button> */}
-                                </div>
-                                {errors.startUpName && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.startUpName}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    </div>
+								</div>
+								{errors.startUpName && (
+									<p className="text-red-500 text-sm mt-1">
+										{errors.startUpName}
+									</p>
+								)}
+							</div>
+						)}
+					</div>
+                    {/* About Me */}
+					<div className="relative col-span-2">
+						<label
+							htmlFor="aboutEntity"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							About the {formData.requirementType}
+						</label>
+						<div className="relative">
+							<textarea
+								id="aboutEntity"
+								name="aboutEntity"
+								value={formData.aboutEntity}
+								onChange={handleChange}
+								maxLength={300}
+								placeholder="Briefly describe your business/project/startup"
+								className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
+							/>
+							<button
+								type="button"
+								onClick={() =>
+									enhanceField(
+										"aboutEntity",
+										formData.aboutEntity
+									)
+								}
+								disabled={enhanceLoading.aboutEntity}
+								className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+									enhanceLoading.aboutEntity
+										? "animate-pulse"
+										: ""
+								}`}
+								title={
+									enhanceLoading.aboutEntity
+										? "Enhancing..."
+										: "Enhance"
+								}
+							>
+								<FaMagic className="w-5 h-5" />
+							</button>
+						</div>
+					</div>
 
-                    <div className="relative col-span-2">
-                        <label
-                            htmlFor="aboutEntity"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            About the {formData.requirementType}
-                        </label>
-                        <div className="flex items-start gap-2">
-                            <textarea
-                                id="aboutEntity"
-                                name="aboutEntity"
-                                value={formData.aboutEntity}
-                                onChange={handleChange}
-                                maxLength={300}
-                                placeholder="Briefly describe your business/project/startup"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "aboutEntity",
-                                        formData.aboutEntity
-                                    )
-                                }
-                                disabled={enhanceLoading.aboutEntity}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                            >
-                                {enhanceLoading.aboutEntity
-                                    ? "Enhancing..."
-                                    : "Enhance"}
-                            </button>
-                        </div>
-                    </div>
+					<div className="relative col-span-3">
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							How people can reach out to you (select at least
+							two) <span className="text-red-500">*</span>
+						</label>
+						<div className="flex flex-wrap gap-4">
+							{[
+								"call",
+								"whatsapp",
+								"instagram",
+								"linkedin",
+								"facebook",
+								"other",
+							].map((method) => (
+								<div key={method} className="flex items-center">
+									<input
+										type="checkbox"
+										id={method}
+										checked={
+											formData.contact_methods[method]
+												.selected
+										}
+										onChange={() =>
+											handleContactMethodChange(method)
+										}
+										className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+									/>
+									<label
+										htmlFor={method}
+										className="ml-2 text-gray-700"
+									>
+										{method.charAt(0).toUpperCase() +
+											method.slice(1)}
+									</label>
+								</div>
+							))}
+						</div>
+						{errors.contact_methods && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.contact_methods}
+							</p>
+						)}
+						<div className="mt-4 space-y-4 grid grid-cols-3 gap-10">
+							{Object.entries(formData.contact_methods).map(
+								([method, { selected, value }]) =>
+									selected && (
+										<div key={method} className="relative">
+											<label
+												htmlFor={`${method}Value`}
+												className="block font-medium mb-1 text-black opacity-[73%]"
+											>
+												{method
+													.charAt(0)
+													.toUpperCase() +
+													method.slice(1)}{" "}
+												{method === "whatsapp" ||
+												method === "call"
+													? "Number"
+													: "URL"}{" "}
+												<span className="text-red-500">
+													*
+												</span>
+											</label>
+											<div className="gap-2">
+												{method === "call" ||
+												method === "whatsapp" ? (
+													<div className="text-left ">
+														<PhoneInput
+															country="in"
+															value={value}
+															onChange={(phone) =>
+																handleContactValueChange(
+																	method,
+																	phone
+																)
+															}
+															// disabled={method === 'call'}
+															containerClass="w-full"
+															inputClass={`w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 ${
+																errors[
+																	`${method}Value`
+																]
+																	? "border-red-500"
+																	: ""
+															} `}
+															buttonClass="border-gray-300 h-14 w-16"
+															dropdownClass="h-28"
+															containerStyle={{
+																height: "56px",
+																width: "100%",
+															}}
+															inputStyle={{
+																height: "43px",
+																width: "100%",
+															}}
+															buttonStyle={{
+																position:
+																	"absolute",
+																left: "5px",
+																top: "1px",
+																height: "40px",
+																width: "40px",
+																backgroundColor:
+																	"transparent",
+																border: "none",
+																outline: "none",
+															}}
+														/>
+													</div>
+												) : (
+													<input
+														id={`${method}Value`}
+														type="url"
+														value={value}
+														onChange={(e) =>
+															handleContactValueChange(
+																method,
+																e.target.value
+															)
+														}
+														placeholder={`Enter your ${method} URL (https://)`}
+														className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+															errors[
+																`${method}Value`
+															]
+																? "border-red-500"
+																: "border-gray-300"
+														}`}
+													/>
+												)}
+											</div>
+											{errors[`${method}Value`] && (
+												<p className="text-red-500 text-sm mt-1">
+													{errors[`${method}Value`]}
+												</p>
+											)}
+										</div>
+									)
+							)}
+						</div>
+					</div>
 
-                    <div className="relative">
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.email && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.email}
-                            </p>
-                        )}
-                    </div>
+					<div className="col-span-3 flex justify-between space-x-4 mt-6">
+						<button
+							type="button"
+							onClick={handleCancel}
+							className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+						>
+							Cancel
+						</button>
+						<button
+							type="button"
+							onClick={handleNext}
+							className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+						>
+							Next Step
+						</button>
+					</div>
+				</form>
+			)}
 
-                    <div className="relative">
-                        <label
-                            htmlFor="country"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Country <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="country"
-                            name="country"
-                            value={formData.country}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.country && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.country}
-                            </p>
-                        )}
-                    </div>
+			{step === 2 && (
+				<form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					<h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
+						Your dream teammate, freelancer, or hire — describe them
+						here.
+					</h3>
 
-                    <div className="relative">
-                        <label
-                            htmlFor="state"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            State <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="state"
-                            name="state"
-                            value={formData.state}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.state && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.state}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="district"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            District <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="district"
-                            name="district"
-                            value={formData.district}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.district && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.district}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="websiteOfStartupLink"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Personal website
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="websiteOfStartupLink"
-                                name="websiteOfStartupLink"
-                                value={formData.websiteOfStartupLink}
-                                onChange={handleChange}
-                                type="url"
-                                placeholder="Enter website URL (https://)"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.websiteOfStartupLink
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                            />
-                        </div>
-                        {errors.websiteOfStartupLink && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.websiteOfStartupLink}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            How people can reach out to you (select at least
-                            two) <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-4">
-                            {[
-                                "call",
-                                "whatsapp",
-                                "instagram",
-                                "linkedin",
-                                "facebook",
-                                "other",
-                            ].map((method) => (
-                                <div key={method} className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={method}
-                                        checked={
-                                            formData.contact_methods[method]
-                                                .selected
-                                        }
-                                        onChange={() =>
-                                            handleContactMethodChange(method)
-                                        }
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <label
-                                        htmlFor={method}
-                                        className="ml-2 text-gray-700"
-                                    >
-                                        {method.charAt(0).toUpperCase() +
-                                            method.slice(1)}
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                        {errors.contact_methods && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.contact_methods}
-                            </p>
-                        )}
-                        <div className="mt-4 space-y-4">
-                            {Object.entries(formData.contact_methods).map(
-                                ([method, { selected, value }]) =>
-                                    selected && (
-                                        <div key={method} className="relative">
-                                            <label
-                                                htmlFor={`${method}Value`}
-                                                className="block font-medium mb-1 text-black opacity-[73%]"
-                                            >
-                                                {method
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    method.slice(1)}{" "}
-                                                {method === "whatsapp" ||
-                                                method === "call"
-                                                    ? "Number"
-                                                    : "URL"}{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="flex items-center gap-2">
-                                                {method === "call" ||
-                                                method === "whatsapp" ? (
-                                                    <div className="text-left w-full">
-                                                        <PhoneInput
-                                                            country="in"
-                                                            value={value}
-                                                            onChange={(phone) =>
-                                                                handleContactValueChange(
-                                                                    method,
-                                                                    phone
-                                                                )
-                                                            }
-                                                            // disabled={method === 'call'}
-                                                            containerClass="w-full"
-                                                            inputClass={`w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 ${
-                                                                errors[
-                                                                    `${method}Value`
-                                                                ]
-                                                                    ? "border-red-500"
-                                                                    : ""
-                                                            } `}
-                                                            buttonClass="border-gray-300 h-14 w-16"
-                                                            dropdownClass="h-28"
-                                                            containerStyle={{
-                                                                height: "56px",
-                                                                width: "100%",
-                                                            }}
-                                                            inputStyle={{
-                                                                height: "43px",
-                                                                width: "100%",
-                                                            }}
-                                                            buttonStyle={{
-                                                                position:
-                                                                    "absolute",
-                                                                left: "5px",
-                                                                top: "1px",
-                                                                height: "40px",
-                                                                width: "40px",
-                                                                backgroundColor:
-                                                                    "transparent",
-                                                                border: "none",
-                                                                outline: "none",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <input
-                                                        id={`${method}Value`}
-                                                        type="url"
-                                                        value={value}
-                                                        onChange={(e) =>
-                                                            handleContactValueChange(
-                                                                method,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder={`Enter your ${method} URL (https://)`}
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors[
-                                                                `${method}Value`
-                                                            ]
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                        }`}
-                                                    />
-                                                )}
-                                            </div>
-                                            {errors[`${method}Value`] && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {errors[`${method}Value`]}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="col-span-2 flex justify-between space-x-4 mt-6">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Next Step
-                        </button>
-                    </div>
-                </form>
-            )}
-
-            {step === 2 && (
-                <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
-                        Your dream teammate, freelancer, or hire — describe them
-                        here.
-                    </h3>
-
-                    <div className="relative col-span-2">
-                        <label
-                            htmlFor="headline"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Headline (e.g., I am looking for...){" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="headline"
-                                name="headline"
-                                value={formData.headline}
-                                onChange={handleChange}
-                                maxLength={80}
-                                placeholder="Enter a catchy headline"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.headline
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField("headline", formData.headline)
-                                }
-                                disabled={enhanceLoading.headline}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                            >
-                                {enhanceLoading.headline
-                                    ? "Enhancing..."
-                                    : "Enhance"}
-                            </button>
-                        </div>
-                        {errors.headline && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.headline}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="roleUnderDomain"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Role of the Person{" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="roleUnderDomain"
-                            name="roleUnderDomainInput"
-                            value={roleSearchText}
-                            onChange={handleRoleInput}
-                            onFocus={handleRoleFocus}
-                            onBlur={handleRoleBlur}
-                            placeholder="Type to search roles"
-                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                errors.roleUnderDomain
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                            }`}
-                        />
-                        {showRoleSuggestions && filteredRoles.length > 0 && (
-                            <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                {filteredRoles.map((role) => (
-                                    <li
-                                        key={role._id}
-                                        onMouseDown={() =>
-                                            handleRoleSelect(role)
-                                        }
-                                        className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                    >
-                                        {role.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                        {errors.roleUnderDomain && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.roleUnderDomain}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="domainName"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Domain of the Person Needed{" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        {loadingDomains ? (
-                            <p className="text-gray-500">Loading domains...</p>
-                        ) : (
-                            <>
+					<div className="relative col-span-2">
+						<label
+							htmlFor="headline"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Headline (e.g., I am looking for...){" "}
+							<span className="text-red-500">*</span>
+						</label>
+						<div className="relative">
                                 <input
-                                    id="domainName"
-                                    name="domainNameInput"
-                                    value={domainSearchText}
-                                    onChange={handleDomainInput}
-                                    onFocus={handleDomainFocus}
-                                    onBlur={handleDomainBlur}
-                                    placeholder="Type to search domains"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.domainName
-                                            ? "border-red-500"
-                                            : "border-gray-300"
+                                    id="headline"
+                                    name="headline"
+                                    value={formData.headline}
+                                    onChange={handleChange}
+                                    maxLength={80}
+                                    placeholder="Enter a catchy headline"
+                                    className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                        errors.headline ? "border-red-500" : "border-gray-300"
                                     }`}
                                 />
-                                {showDomainSuggestions &&
-                                    filteredDomains.length > 0 && (
-                                        <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                            {filteredDomains.map((domain) => (
-                                                <li
-                                                    key={domain._id}
-                                                    onMouseDown={() =>
-                                                        handleDomainSelect(
-                                                            domain
-                                                        )
-                                                    }
-                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                                >
-                                                    {domain.name}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                            </>
-                        )}
-                        {errors.domainName && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.domainName}
-                            </p>
-                        )}
-                    </div>
-
-                    {formData.domainName && (
-                        <div className="relative col-span-2">
-                            <label
-                                htmlFor="skills"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Skills <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                id="skills"
-                                name="skillsInput"
-                                value={skillSearchText}
-                                onChange={handleSkillInput}
-                                placeholder="Type to search skills"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                            />
-                            {showSkillSuggestions &&
-                                filteredSkills.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                        {filteredSkills
-                                            .filter(
-                                                (skill) =>
-                                                    !formData.skills.some(
-                                                        (s) =>
-                                                            s._id === skill._id
-                                                    )
-                                            )
-                                            .map((skill) => (
-                                                <li
-                                                    key={skill._id}
-                                                    onClick={() =>
-                                                        handleSkillSelect(skill)
-                                                    }
-                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                                >
-                                                    {skill.name}
-                                                </li>
-                                            ))}
-                                    </ul>
-                                )}
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {formData.skills.map((skill) => (
-                                    <span
-                                        key={skill._id}
-                                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
-                                    >
-                                        {skill.name}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleSkillRemove(skill._id)
-                                            }
-                                            className="ml-2 text-purple-600 hover:text-purple-800"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => enhanceField("headline", formData.headline)}
+                                    disabled={enhanceLoading.headline}
+                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.headline ? "animate-pulse" : ""}`}
+                                    title={enhanceLoading.headline ? "Enhancing..." : "Enhance"}
+                                >
+                                    <FaMagic className="w-5 h-5" />
+                                </button>
                             </div>
-                            {errors.skills && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.skills}
-                                </p>
-                            )}
-                        </div>
-                    )}
+						{errors.headline && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.headline}
+							</p>
+						)}
+					</div>
 
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Work Basis <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-4">
-                            {[
-                                "Partnership",
-                                "Collaboration",
-                                "EquityBasis",
-                                "ProjectBasis",
-                                "PercentageBasis",
-                                "Job",
-                                "Internship",
-                                "Freelance",
-                                "Other",
-                            ].map((basis) => (
-                                <div key={basis} className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={basis}
-                                        checked={formData.workBasis[basis]}
-                                        onChange={() =>
-                                            handleWorkBasisChange(basis)
-                                        }
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <label
-                                        htmlFor={basis}
-                                        className="ml-2 text-gray-700"
-                                    >
-                                        {basis
-                                            .replace(/([A-Z])/g, " $1")
-                                            .trim()}
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                        {errors.workBasis && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.workBasis}
-                            </p>
-                        )}
+					<div className="relative">
+						<label
+							htmlFor="roleUnderDomain"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Role of the Person{" "}
+							<span className="text-red-500">*</span>
+						</label>
+						<input
+							id="roleUnderDomain"
+							name="roleUnderDomainInput"
+							value={roleSearchText}
+							onChange={handleRoleInput}
+							onFocus={handleRoleFocus}
+							onBlur={handleRoleBlur}
+							placeholder="Type to search roles"
+							className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+								errors.roleUnderDomain
+									? "border-red-500"
+									: "border-gray-300"
+							}`}
+						/>
+						{showRoleSuggestions && filteredRoles.length > 0 && (
+							<ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
+								{filteredRoles.map((role) => (
+									<li
+										key={role._id}
+										onMouseDown={() =>
+											handleRoleSelect(role)
+										}
+										className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
+									>
+										{role.name}
+									</li>
+								))}
+							</ul>
+						)}
+						{errors.roleUnderDomain && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.roleUnderDomain}
+							</p>
+						)}
+					</div>
 
-                        <div className="mt-4 space-y-4">
-                            {formData.workBasis.Partnership && (
-                                <div className="relative">
-                                    <label
-                                        htmlFor="partnershipCriteria"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Partnership Criteria{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-start gap-2">
-                                        <textarea
-                                            id="partnershipCriteria"
-                                            name="partnershipCriteria"
-                                            value={formData.partnershipCriteria}
-                                            onChange={handleChange}
-                                            placeholder="Describe the partnership criteria"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.partnershipCriteria
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                enhanceField(
-                                                    "partnershipCriteria",
-                                                    formData.partnershipCriteria
-                                                )
-                                            }
-                                            disabled={
-                                                enhanceLoading.partnershipCriteria
-                                            }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                                        >
-                                            {enhanceLoading.partnershipCriteria
-                                                ? "Enhancing..."
-                                                : "Enhance"}
-                                        </button>
-                                    </div>
-                                    {errors.partnershipCriteria && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.partnershipCriteria}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+					<div className="relative">
+						<label
+							htmlFor="domainName"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Domain of the Person Needed{" "}
+							<span className="text-red-500">*</span>
+						</label>
+						{loadingDomains ? (
+							<p className="text-gray-500">Loading domains...</p>
+						) : (
+							<>
+								<input
+									id="domainName"
+									name="domainNameInput"
+									value={domainSearchText}
+									onChange={handleDomainInput}
+									onFocus={handleDomainFocus}
+									onBlur={handleDomainBlur}
+									placeholder="Type to search domains"
+									className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+										errors.domainName
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+								/>
+								{showDomainSuggestions &&
+									filteredDomains.length > 0 && (
+										<ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
+											{filteredDomains.map((domain) => (
+												<li
+													key={domain._id}
+													onMouseDown={() =>
+														handleDomainSelect(
+															domain
+														)
+													}
+													className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
+												>
+													{domain.name}
+												</li>
+											))}
+										</ul>
+									)}
+							</>
+						)}
+						{errors.domainName && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.domainName}
+							</p>
+						)}
+					</div>
 
-                            {formData.workBasis.Internship && (
-                                <div className="space-y-4">
-                                    <div className="relative">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Internship Time Type{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="flex gap-4">
-                                            {["FullTime", "PartTime"].map(
-                                                (type) => (
-                                                    <label
-                                                        key={type}
-                                                        className="flex items-center"
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="internshipTimeType"
-                                                            value={type}
-                                                            checked={
-                                                                formData.internshipTimeType ===
-                                                                type
-                                                            }
-                                                            onChange={() =>
-                                                                handleInternshipTimeTypeChange(
-                                                                    type
-                                                                )
-                                                            }
-                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                                        />
-                                                        <span className="ml-2 text-gray-700">
-                                                            {type === "FullTime"
-                                                                ? "Full-time"
-                                                                : "Part-time"}
-                                                        </span>
-                                                    </label>
-                                                )
-                                            )}
-                                        </div>
-                                        {errors.internshipTimeType && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors.internshipTimeType}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Internship Type{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="flex gap-4">
-                                            {[
-                                                "Paid",
-                                                "Unpaid",
-                                                "PerformanceBased",
-                                            ].map((type) => (
-                                                <label
-                                                    key={type}
-                                                    className="flex items-center"
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        name="internshipType"
-                                                        value={type}
-                                                        checked={
-                                                            formData.internshipType ===
-                                                            type
-                                                        }
-                                                        onChange={() =>
-                                                            handleInternshipTypeChange(
-                                                                type
-                                                            )
-                                                        }
-                                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                                    />
-                                                    <span className="ml-2 text-gray-700">
-                                                        {type
-                                                            .replace(
-                                                                /([A-Z])/g,
-                                                                " $1"
-                                                            )
-                                                            .trim()}
-                                                    </span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                        {errors.internshipType && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors.internshipType}
-                                            </p>
-                                        )}
-                                    </div>
+					{formData.domainName && (
+						<div className="relative col-span-2">
+							<label
+								htmlFor="skills"
+								className="block text-sm font-medium text-gray-700 mb-1"
+							>
+								Skills <span className="text-red-500">*</span>
+							</label>
+							<input
+								id="skills"
+								name="skillsInput"
+								value={skillSearchText}
+								onChange={handleSkillInput}
+								placeholder="Type to search skills"
+								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
+							/>
+							{showSkillSuggestions &&
+								filteredSkills.length > 0 && (
+									<ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
+										{filteredSkills
+											.filter(
+												(skill) =>
+													!formData.skills.some(
+														(s) =>
+															s._id === skill._id
+													)
+											)
+											.map((skill) => (
+												<li
+													key={skill._id}
+													onClick={() =>
+														handleSkillSelect(skill)
+													}
+													className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
+												>
+													{skill.name}
+												</li>
+											))}
+									</ul>
+								)}
+							<div className="mt-2 flex flex-wrap gap-2">
+								{formData.skills.map((skill) => (
+									<span
+										key={skill._id}
+										className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+									>
+										{skill.name}
+										<button
+											type="button"
+											onClick={() =>
+												handleSkillRemove(skill._id)
+											}
+											className="ml-2 text-purple-600 hover:text-purple-800"
+										>
+											×
+										</button>
+									</span>
+								))}
+							</div>
+							{errors.skills && (
+								<p className="text-red-500 text-sm mt-1">
+									{errors.skills}
+								</p>
+							)}
+						</div>
+					)}
 
-                                    <div className="relative flex gap-4">
-                                        <div className="w-1/2">
-                                            <label
-                                                htmlFor="internshipDuration"
-                                                className="block text-sm font-medium text-gray-700 mb-1"
-                                            >
-                                                Internship Duration{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    id="internshipDuration"
-                                                    name="internshipDuration.value"
-                                                    value={
-                                                        formData
-                                                            .internshipDuration
-                                                            .value
-                                                    }
-                                                    onChange={(e) =>
-                                                        handleNestedChange(
-                                                            "internshipDuration",
-                                                            "value",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    type="number"
-                                                    min="1"
-                                                    placeholder="Duration"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors
-                                                            .internshipDuration
-                                                            ?.value
-                                                            ? "border-red-500"
-                                                            : "border-gray-300"
-                                                    }`}
-                                                />
-                                            </div>
-                                            {errors.internshipDuration
-                                                ?.value && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {
-                                                        errors
-                                                            .internshipDuration
-                                                            .value
-                                                    }
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="w-1/2">
-                                            <label
-                                                htmlFor="internshipDurationUnit"
-                                                className="block text-sm font-medium text-gray-700 mb-1"
-                                            >
-                                                Unit{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <select
-                                                id="internshipDurationUnit"
-                                                name="internshipDuration.unit"
-                                                value={
-                                                    formData.internshipDuration
-                                                        .unit
-                                                }
-                                                onChange={(e) =>
-                                                    handleNestedChange(
-                                                        "internshipDuration",
-                                                        "unit",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.internshipDuration
-                                                        ?.unit
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
+					<div className="relative col-span-2">
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							Work Basis <span className="text-red-500">*</span>
+						</label>
+						<div className="flex flex-wrap gap-4">
+							{[
+								"Partnership",
+								"Collaboration",
+								"EquityBasis",
+								"ProjectBasis",
+								"PercentageBasis",
+								"Job",
+								"Internship",
+								"Freelance",
+								"Other",
+							].map((basis) => (
+								<div key={basis} className="flex items-center">
+									<input
+										type="checkbox"
+										id={basis}
+										checked={formData.workBasis[basis]}
+										onChange={() =>
+											handleWorkBasisChange(basis)
+										}
+										className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+									/>
+									<label
+										htmlFor={basis}
+										className="ml-2 text-gray-700"
+									>
+										{basis
+											.replace(/([A-Z])/g, " $1")
+											.trim()}
+									</label>
+								</div>
+							))}
+						</div>
+						{errors.workBasis && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.workBasis}
+							</p>
+						)}
+
+						<div className="mt-4 space-y-4">
+							{formData.workBasis.Partnership && (
+								<div className="relative">
+									<label
+										htmlFor="partnershipCriteria"
+										className="block text-sm font-medium text-gray-700 mb-1"
+									>
+										Partnership Criteria{" "}
+										<span className="text-red-500">*</span>
+									</label>
+									<div className="relative">
+                                            <textarea
+                                                id="partnershipCriteria"
+                                                name="partnershipCriteria"
+                                                value={formData.partnershipCriteria}
+                                                onChange={handleChange}
+                                                placeholder="Describe the partnership criteria"
+                                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                                    errors.partnershipCriteria ? "border-red-500" : "border-gray-300"
                                                 }`}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => enhanceField("partnershipCriteria", formData.partnershipCriteria)}
+                                                disabled={enhanceLoading.partnershipCriteria}
+                                                className={`absolute right-3 top-3  text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.partnershipCriteria ? "animate-pulse" : ""}`}
+                                                title={enhanceLoading.partnershipCriteria ? "Enhancing..." : "Enhance"}
                                             >
-                                                <option value="">
-                                                    Select Unit
-                                                </option>
-                                                <option value="Weeks">
-                                                    Weeks
-                                                </option>
-                                                <option value="Months">
-                                                    Months
-                                                </option>
-                                            </select>
-                                            {errors.internshipDuration
-                                                ?.unit && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {
-                                                        errors
-                                                            .internshipDuration
-                                                            .unit
-                                                    }
-                                                </p>
-                                            )}
+                                                <FaMagic className="w-5 h-5" />
+                                            </button>
                                         </div>
-                                    </div>
+									{errors.partnershipCriteria && (
+										<p className="text-red-500 text-sm mt-1">
+											{errors.partnershipCriteria}
+										</p>
+									)}
+								</div>
+							)}
 
-                                    {formData.internshipType === "Paid" && (
-                                        <div className="relative flex gap-4">
-                                            <div className="w-1/2">
-                                                <label
-                                                    htmlFor="internshipStipendRangeMin"
-                                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                                >
-                                                    Min Stipend (₹){" "}
-                                                    <span className="text-red-500">
-                                                        *
-                                                    </span>
-                                                </label>
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        id="internshipStipendRangeMin"
-                                                        name="internshipStipendRange.min"
-                                                        value={
-                                                            formData
-                                                                .internshipStipendRange
-                                                                .min
-                                                        }
-                                                        onChange={(e) =>
-                                                            handleNestedChange(
-                                                                "internshipStipendRange",
-                                                                "min",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        type="number"
-                                                        min="0"
-                                                        placeholder="Min stipend"
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors
-                                                                .internshipStipendRange
-                                                                ?.min
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                        }`}
-                                                    />
-                                                </div>
-                                                {errors.internshipStipendRange
-                                                    ?.min && (
-                                                    <p className="text-red-500 text-sm mt-1">
-                                                        {
-                                                            errors
-                                                                .internshipStipendRange
-                                                                .min
-                                                        }
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <div className="w-1/2">
-                                                <label
-                                                    htmlFor="internshipStipendRangeMax"
-                                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                                >
-                                                    Max Stipend (₹){" "}
-                                                    <span className="text-red-500">
-                                                        *
-                                                    </span>
-                                                </label>
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        id="internshipStipendRangeMax"
-                                                        name="internshipStipendRange.max"
-                                                        value={
-                                                            formData
-                                                                .internshipStipendRange
-                                                                .max
-                                                        }
-                                                        onChange={(e) =>
-                                                            handleNestedChange(
-                                                                "internshipStipendRange",
-                                                                "max",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        type="number"
-                                                        min="0"
-                                                        placeholder="Max stipend"
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors
-                                                                .internshipStipendRange
-                                                                ?.max
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                        }`}
-                                                    />
-                                                </div>
-                                                {errors.internshipStipendRange
-                                                    ?.max && (
-                                                    <p className="text-red-500 text-sm mt-1">
-                                                        {
-                                                            errors
-                                                                .internshipStipendRange
-                                                                .max
-                                                        }
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
+							{formData.workBasis.Internship && (
+								<div className="space-y-4">
+									<div className="relative">
+										<label className="block text-sm font-medium text-gray-700 mb-1">
+											Internship Time Type{" "}
+											<span className="text-red-500">
+												*
+											</span>
+										</label>
+										<div className="flex gap-4">
+											{["FullTime", "PartTime"].map(
+												(type) => (
+													<label
+														key={type}
+														className="flex items-center"
+													>
+														<input
+															type="radio"
+															name="internshipTimeType"
+															value={type}
+															checked={
+																formData.internshipTimeType ===
+																type
+															}
+															onChange={() =>
+																handleInternshipTimeTypeChange(
+																	type
+																)
+															}
+															className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+														/>
+														<span className="ml-2 text-gray-700">
+															{type === "FullTime"
+																? "Full-time"
+																: "Part-time"}
+														</span>
+													</label>
+												)
+											)}
+										</div>
+										{errors.internshipTimeType && (
+											<p className="text-red-500 text-sm mt-1">
+												{errors.internshipTimeType}
+											</p>
+										)}
+									</div>
+									<div className="relative">
+										<label className="block text-sm font-medium text-gray-700 mb-1">
+											Internship Type{" "}
+											<span className="text-red-500">
+												*
+											</span>
+										</label>
+										<div className="flex gap-4">
+											{[
+												"Paid",
+												"Unpaid",
+												"PerformanceBased",
+											].map((type) => (
+												<label
+													key={type}
+													className="flex items-center"
+												>
+													<input
+														type="radio"
+														name="internshipType"
+														value={type}
+														checked={
+															formData.internshipType ===
+															type
+														}
+														onChange={() =>
+															handleInternshipTypeChange(
+																type
+															)
+														}
+														className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+													/>
+													<span className="ml-2 text-gray-700">
+														{type
+															.replace(
+																/([A-Z])/g,
+																" $1"
+															)
+															.trim()}
+													</span>
+												</label>
+											))}
+										</div>
+										{errors.internshipType && (
+											<p className="text-red-500 text-sm mt-1">
+												{errors.internshipType}
+											</p>
+										)}
+									</div>
 
-                                    {formData.internshipType ===
-                                        "PerformanceBased" && (
-                                        <div className="relative">
-                                            <label
-                                                htmlFor="internshipPerformanceCriteria"
-                                                className="block text-sm font-medium text-gray-700 mb-1"
-                                            >
-                                                Performance Criteria{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="flex items-start gap-2">
+									<div className="relative flex gap-4">
+										<div className="w-1/2">
+											<label
+												htmlFor="internshipDuration"
+												className="block text-sm font-medium text-gray-700 mb-1"
+											>
+												Internship Duration{" "}
+												<span className="text-red-500">
+													*
+												</span>
+											</label>
+											<div className="flex items-center gap-2">
+												<input
+													id="internshipDuration"
+													name="internshipDuration.value"
+													value={
+														formData
+															.internshipDuration
+															.value
+													}
+													onChange={(e) =>
+														handleNestedChange(
+															"internshipDuration",
+															"value",
+															e.target.value
+														)
+													}
+													type="number"
+													min="1"
+													placeholder="Duration"
+													className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+														errors
+															.internshipDuration
+															?.value
+															? "border-red-500"
+															: "border-gray-300"
+													}`}
+												/>
+											</div>
+											{errors.internshipDuration
+												?.value && (
+												<p className="text-red-500 text-sm mt-1">
+													{
+														errors
+															.internshipDuration
+															.value
+													}
+												</p>
+											)}
+										</div>
+										<div className="w-1/2">
+											<label
+												htmlFor="internshipDurationUnit"
+												className="block text-sm font-medium text-gray-700 mb-1"
+											>
+												Unit{" "}
+												<span className="text-red-500">
+													*
+												</span>
+											</label>
+											<select
+												id="internshipDurationUnit"
+												name="internshipDuration.unit"
+												value={
+													formData.internshipDuration
+														.unit
+												}
+												onChange={(e) =>
+													handleNestedChange(
+														"internshipDuration",
+														"unit",
+														e.target.value
+													)
+												}
+												className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+													errors.internshipDuration
+														?.unit
+														? "border-red-500"
+														: "border-gray-300"
+												}`}
+											>
+												<option value="">
+													Select Unit
+												</option>
+												<option value="Weeks">
+													Weeks
+												</option>
+												<option value="Months">
+													Months
+												</option>
+                                                <option value="Years">
+													Years
+												</option>
+											</select>
+											{errors.internshipDuration
+												?.unit && (
+												<p className="text-red-500 text-sm mt-1">
+													{
+														errors
+															.internshipDuration
+															.unit
+													}
+												</p>
+											)}
+										</div>
+									</div>
+
+									{formData.internshipType === "Paid" && (
+										<div className="relative flex gap-4">
+											<div className="w-1/2">
+												<label
+													htmlFor="internshipStipendRangeMin"
+													className="block text-sm font-medium text-gray-700 mb-1"
+												>
+													Min Stipend (₹){" "}
+													<span className="text-red-500">
+														*
+													</span>
+												</label>
+												<div className="flex items-center gap-2">
+													<input
+														id="internshipStipendRangeMin"
+														name="internshipStipendRange.min"
+														value={
+															formData
+																.internshipStipendRange
+																.min
+														}
+														onChange={(e) =>
+															handleNestedChange(
+																"internshipStipendRange",
+																"min",
+																e.target.value
+															)
+														}
+														type="number"
+														min="0"
+														placeholder="Min stipend"
+														className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+															errors
+																.internshipStipendRange
+																?.min
+																? "border-red-500"
+																: "border-gray-300"
+														}`}
+													/>
+												</div>
+												{errors.internshipStipendRange
+													?.min && (
+													<p className="text-red-500 text-sm mt-1">
+														{
+															errors
+																.internshipStipendRange
+																.min
+														}
+													</p>
+												)}
+											</div>
+											<div className="w-1/2">
+												<label
+													htmlFor="internshipStipendRangeMax"
+													className="block text-sm font-medium text-gray-700 mb-1"
+												>
+													Max Stipend (₹){" "}
+													<span className="text-red-500">
+														*
+													</span>
+												</label>
+												<div className="flex items-center gap-2">
+													<input
+														id="internshipStipendRangeMax"
+														name="internshipStipendRange.max"
+														value={
+															formData
+																.internshipStipendRange
+																.max
+														}
+														onChange={(e) =>
+															handleNestedChange(
+																"internshipStipendRange",
+																"max",
+																e.target.value
+															)
+														}
+														type="number"
+														min="0"
+														placeholder="Max stipend"
+														className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+															errors
+																.internshipStipendRange
+																?.max
+																? "border-red-500"
+																: "border-gray-300"
+														}`}
+													/>
+												</div>
+												{errors.internshipStipendRange
+													?.max && (
+													<p className="text-red-500 text-sm mt-1">
+														{
+															errors
+																.internshipStipendRange
+																.max
+														}
+													</p>
+												)}
+											</div>
+										</div>
+									)}
+
+									{formData.internshipType ===
+										"PerformanceBased" && (
+										<div className="relative">
+											<label
+												htmlFor="internshipPerformanceCriteria"
+												className="block text-sm font-medium text-gray-700 mb-1"
+											>
+												Performance Criteria{" "}
+												<span className="text-red-500">
+													*
+												</span>
+											</label>
+                                                                                                <div className="relative">
+                                                        <textarea
+                                                            id="internshipPerformanceCriteria"
+                                                            name="internshipPerformanceCriteria"
+                                                            value={formData.internshipPerformanceCriteria}
+                                                            onChange={handleChange}
+                                                            placeholder="Describe performance criteria"
+                                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                                                errors.internshipPerformanceCriteria ? "border-red-500" : "border-gray-300"
+                                                            }`}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => enhanceField("internshipPerformanceCriteria", formData.internshipPerformanceCriteria)}
+                                                            disabled={enhanceLoading.internshipPerformanceCriteria}
+                                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.internshipPerformanceCriteria ? "animate-pulse" : ""}`}
+                                                            title={enhanceLoading.internshipPerformanceCriteria ? "Enhancing..." : "Enhance"}
+                                                        >
+                                                            <FaMagic className="w-5 h-5" />
+                                                        </button>
+                                                    </div>
+											{errors.internshipPerformanceCriteria && (
+												<p className="text-red-500 text-sm mt-1">
+													{
+														errors.internshipPerformanceCriteria
+													}
+												</p>
+											)}
+										</div>
+									)}
+								</div>
+							)}
+
+							{formData.workBasis.Collaboration && (
+								<div className="relative">
+									<label
+										htmlFor="collaborationDescription"
+										className="block text-sm font-medium text-gray-700 mb-1"
+									>
+										Collaboration Description{" "}
+										<span className="text-red-500">*</span>
+									</label>
+									<div className="relative">
                                                 <textarea
-                                                    id="internshipPerformanceCriteria"
-                                                    name="internshipPerformanceCriteria"
-                                                    value={
-                                                        formData.internshipPerformanceCriteria
-                                                    }
+                                                    id="collaborationDescription"
+                                                    name="collaborationDescription"
+                                                    value={formData.collaborationDescription}
                                                     onChange={handleChange}
-                                                    placeholder="Describe performance criteria"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                        errors.internshipPerformanceCriteria
-                                                            ? "border-red-500"
-                                                            : "border-gray-300"
+                                                    placeholder="Describe the collaboration"
+                                                    className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                                        errors.collaborationDescription ? "border-red-500" : "border-gray-300"
                                                     }`}
                                                 />
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        enhanceField(
-                                                            "internshipPerformanceCriteria",
-                                                            formData.internshipPerformanceCriteria
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        enhanceLoading.internshipPerformanceCriteria
-                                                    }
-                                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                                    onClick={() => enhanceField("collaborationDescription", formData.collaborationDescription)}
+                                                    disabled={enhanceLoading.collaborationDescription}
+                                                    className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.collaborationDescription ? "animate-pulse" : ""}`}
+                                                    title={enhanceLoading.collaborationDescription ? "Enhancing..." : "Enhance"}
                                                 >
-                                                    {enhanceLoading.internshipPerformanceCriteria
-                                                        ? "Enhancing..."
-                                                        : "Enhance"}
+                                                    <FaMagic className="w-5 h-5" />
                                                 </button>
                                             </div>
-                                            {errors.internshipPerformanceCriteria && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {
-                                                        errors.internshipPerformanceCriteria
-                                                    }
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+									{errors.collaborationDescription && (
+										<p className="text-red-500 text-sm mt-1">
+											{errors.collaborationDescription}
+										</p>
+									)}
+								</div>
+							)}
 
-                            {formData.workBasis.Collaboration && (
-                                <div className="relative">
-                                    <label
-                                        htmlFor="collaborationDescription"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Collaboration Description{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-start gap-2">
-                                        <textarea
-                                            id="collaborationDescription"
-                                            name="collaborationDescription"
-                                            value={
-                                                formData.collaborationDescription
-                                            }
-                                            onChange={handleChange}
-                                            placeholder="Describe the collaboration"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.collaborationDescription
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                enhanceField(
-                                                    "collaborationDescription",
-                                                    formData.collaborationDescription
-                                                )
-                                            }
-                                            disabled={
-                                                enhanceLoading.collaborationDescription
-                                            }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                                        >
-                                            {enhanceLoading.collaborationDescription
-                                                ? "Enhancing..."
-                                                : "Enhance"}
-                                        </button>
-                                    </div>
-                                    {errors.collaborationDescription && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.collaborationDescription}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+							{formData.workBasis.Job && (
+    <div className="space-y-4">
+        <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+                Job Time Type <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-4">
+                {["FullTime", "PartTime"].map((type) => (
+                    <label key={type} className="flex items-center">
+                        <input
+                            type="radio"
+                            name="jobTimeType"
+                            value={type}
+                            checked={formData.jobTimeType === type}
+                            onChange={(e) => handleNestedChange("jobTimeType", null, e.target.value)}
+                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="ml-2 text-gray-700">
+                            {type === "FullTime" ? "Full-time" : "Part-time"}
+                        </span>
+                    </label>
+                ))}
+            </div>
+            {errors.jobTimeType && (
+                <p className="text-red-500 text-sm mt-1">
+                    {errors.jobTimeType}
+                </p>
+            )}
+        </div>
+        <div className="relative flex gap-4">
+            <div className="w-1/2">
+                <label
+                    htmlFor="jobAmountRangeMin"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                    Min Amount (₹) <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center gap-2">
+                    <input
+                        id="jobAmountRangeMin"
+                        name="jobAmountRange.min"
+                        value={formData.jobAmountRange.min}
+                        onChange={(e) =>
+                            handleNestedChange("jobAmountRange", "min", e.target.value)
+                        }
+                        type="number"
+                        min="0"
+                        placeholder="Min amount"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                            errors.jobAmountRange?.min ? "border-red-500" : "border-gray-300"
+                        }`}
+                    />
+                </div>
+                {errors.jobAmountRange?.min && (
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.jobAmountRange.min}
+                    </p>
+                )}
+            </div>
+            <div className="w-1/2">
+                <label
+                    htmlFor="jobAmountRangeMax"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                    Max Amount (₹) <span className="text-red-500">*</span>
+                </label>
+                <div className="flex items-center gap-2">
+                    <input
+                        id="jobAmountRangeMax"
+                        name="jobAmountRange.max"
+                        value={formData.jobAmountRange.max}
+                        onChange={(e) =>
+                            handleNestedChange("jobAmountRange", "max", e.target.value)
+                        }
+                        type="number"
+                        min="0"
+                        placeholder="Max amount"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                            errors.jobAmountRange?.max ? "border-red-500" : "border-gray-300"
+                        }`}
+                    />
+                </div>
+                {errors.jobAmountRange?.max && (
+                    <p className="text-red-500 text-sm mt-1">
+                        {errors.jobAmountRange.max}
+                    </p>
+                )}
+            </div>
+        </div>
+    </div>
+)}
 
-                            {formData.workBasis.Job && (
-                                <div className="relative flex gap-4">
-                                    <div className="w-1/2">
-                                        <label
-                                            htmlFor="jobAmountRangeMin"
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Min Amount (₹){" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                id="jobAmountRangeMin"
-                                                name="jobAmountRange.min"
-                                                value={
-                                                    formData.jobAmountRange.min
-                                                }
-                                                onChange={(e) =>
-                                                    handleNestedChange(
-                                                        "jobAmountRange",
-                                                        "min",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                min="0"
-                                                placeholder="Min amount"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.jobAmountRange?.min
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
-                                        </div>
-                                        {errors.jobAmountRange?.min && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors.jobAmountRange.min}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="w-1/2">
-                                        <label
-                                            htmlFor="jobAmountRangeMax"
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Max Amount (₹){" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                id="jobAmountRangeMax"
-                                                name="jobAmountRange.max"
-                                                value={
-                                                    formData.jobAmountRange.max
-                                                }
-                                                onChange={(e) =>
-                                                    handleNestedChange(
-                                                        "jobAmountRange",
-                                                        "max",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                min="0"
-                                                placeholder="Max amount"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.jobAmountRange?.max
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
-                                        </div>
-                                        {errors.jobAmountRange?.max && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors.jobAmountRange.max}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+							{formData.workBasis.Freelance && (
+								<div className="relative flex gap-4">
+									<div className="w-1/2">
+										<label
+											htmlFor="freelancePaymentRangeMin"
+											className="block text-sm font-medium text-gray-700 mb-1"
+										>
+											Min Payment (₹){" "}
+											<span className="text-red-500">
+												*
+											</span>
+										</label>
+										<div className="flex items-center gap-2">
+											<input
+												id="freelancePaymentRangeMin"
+												name="freelancePaymentRange.min"
+												value={
+													formData
+														.freelancePaymentRange
+														.min
+												}
+												onChange={(e) =>
+													handleNestedChange(
+														"freelancePaymentRange",
+														"min",
+														e.target.value
+													)
+												}
+												type="number"
+												min="0"
+												placeholder="Min payment"
+												className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+													errors.freelancePaymentRange
+														?.min
+														? "border-red-500"
+														: "border-gray-300"
+												}`}
+											/>
+										</div>
+										{errors.freelancePaymentRange?.min && (
+											<p className="text-red-500 text-sm mt-1">
+												{
+													errors.freelancePaymentRange
+														.min
+												}
+											</p>
+										)}
+									</div>
+									<div className="w-1/2">
+										<label
+											htmlFor="freelancePaymentRangeMax"
+											className="block text-sm font-medium text-gray-700 mb-1"
+										>
+											Max Payment (₹){" "}
+											<span className="text-red-500">
+												*
+											</span>
+										</label>
+										<div className="flex items-center gap-2">
+											<input
+												id="freelancePaymentRangeMax"
+												name="freelancePaymentRange.max"
+												value={
+													formData
+														.freelancePaymentRange
+														.max
+												}
+												onChange={(e) =>
+													handleNestedChange(
+														"freelancePaymentRange",
+														"max",
+														e.target.value
+													)
+												}
+												type="number"
+												min="0"
+												placeholder="Max payment"
+												className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+													errors.freelancePaymentRange
+														?.max
+														? "border-red-500"
+														: "border-gray-300"
+												}`}
+											/>
+										</div>
+										{errors.freelancePaymentRange?.max && (
+											<p className="text-red-500 text-sm mt-1">
+												{
+													errors.freelancePaymentRange
+														.max
+												}
+											</p>
+										)}
+									</div>
+								</div>
+							)}
 
-                            {formData.workBasis.Freelance && (
-                                <div className="relative flex gap-4">
-                                    <div className="w-1/2">
-                                        <label
-                                            htmlFor="freelancePaymentRangeMin"
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Min Payment (₹){" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                id="freelancePaymentRangeMin"
-                                                name="freelancePaymentRange.min"
-                                                value={
-                                                    formData
-                                                        .freelancePaymentRange
-                                                        .min
-                                                }
-                                                onChange={(e) =>
-                                                    handleNestedChange(
-                                                        "freelancePaymentRange",
-                                                        "min",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                min="0"
-                                                placeholder="Min payment"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.freelancePaymentRange
-                                                        ?.min
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
-                                        </div>
-                                        {errors.freelancePaymentRange?.min && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors.freelancePaymentRange
-                                                        .min
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="w-1/2">
-                                        <label
-                                            htmlFor="freelancePaymentRangeMax"
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Max Payment (₹){" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                id="freelancePaymentRangeMax"
-                                                name="freelancePaymentRange.max"
-                                                value={
-                                                    formData
-                                                        .freelancePaymentRange
-                                                        .max
-                                                }
-                                                onChange={(e) =>
-                                                    handleNestedChange(
-                                                        "freelancePaymentRange",
-                                                        "max",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                min="0"
-                                                placeholder="Max payment"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.freelancePaymentRange
-                                                        ?.max
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
-                                        </div>
-                                        {errors.freelancePaymentRange?.max && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors.freelancePaymentRange
-                                                        .max
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                            {formData.workBasis.ProjectBasis && (
-                                <div className="relative">
-                                    <label
-                                        htmlFor="projectDescription"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Project Description{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-start gap-2">
+							{formData.workBasis.ProjectBasis && (
+								<div className="relative">
+									<label
+										htmlFor="projectDescription"
+										className="block text-sm font-medium text-gray-700 mb-1"
+									>
+										Project Description{" "}
+										<span className="text-red-500">*</span>
+									</label>
+									<div className="relative">
                                         <textarea
                                             id="projectDescription"
                                             name="projectDescription"
                                             value={formData.projectDescription}
                                             onChange={handleChange}
                                             placeholder="Describe the project"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.projectDescription
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                                errors.projectDescription ? "border-red-500" : "border-gray-300"
                                             }`}
                                         />
                                         <button
                                             type="button"
-                                            onClick={() =>
-                                                enhanceField(
-                                                    "projectDescription",
-                                                    formData.projectDescription
-                                                )
-                                            }
-                                            disabled={
-                                                enhanceLoading.projectDescription
-                                            }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                            onClick={() => enhanceField("projectDescription", formData.projectDescription)}
+                                            disabled={enhanceLoading.projectDescription}
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.projectDescription ? "animate-pulse" : ""}`}
+                                            title={enhanceLoading.projectDescription ? "Enhancing..." : "Enhance"}
                                         >
-                                            {enhanceLoading.projectDescription
-                                                ? "Enhancing..."
-                                                : "Enhance"}
+                                            <FaMagic className="w-5 h-5" />
                                         </button>
                                     </div>
-                                    {errors.projectDescription && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.projectDescription}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+									{errors.projectDescription && (
+										<p className="text-red-500 text-sm mt-1">
+											{errors.projectDescription}
+										</p>
+									)}
+								</div>
+							)}
 
-                            {formData.workBasis.PercentageBasis && (
-                                <div className="relative">
-                                    <label
-                                        htmlFor="percentageBasisValue"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Percentage Value (%){" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            id="percentageBasisValue"
-                                            name="percentageBasisValue"
-                                            value={
-                                                formData.percentageBasisValue
-                                            }
-                                            onChange={handleChange}
-                                            type="text"
-                                            placeholder="Enter percentage value"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.percentageBasisValue
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                    </div>
-                                    {errors.percentageBasisValue && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.percentageBasisValue}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+							{formData.workBasis.PercentageBasis && (
+								<div className="relative">
+									<label
+										htmlFor="percentageBasisValue"
+										className="block text-sm font-medium text-gray-700 mb-1"
+									>
+										Percentage Value (%){" "}
+										<span className="text-red-500">*</span>
+									</label>
+									<div className="flex items-center gap-2">
+										<input
+											id="percentageBasisValue"
+											name="percentageBasisValue"
+											value={
+												formData.percentageBasisValue
+											}
+											onChange={handleChange}
+											type="text"
+											placeholder="Enter percentage value"
+											className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+												errors.percentageBasisValue
+													? "border-red-500"
+													: "border-gray-300"
+											}`}
+										/>
+									</div>
+									{errors.percentageBasisValue && (
+										<p className="text-red-500 text-sm mt-1">
+											{errors.percentageBasisValue}
+										</p>
+									)}
+								</div>
+							)}
 
-                            {formData.workBasis.EquityBasis && (
-                                <div className="relative">
-                                    <label
-                                        htmlFor="equityBasisValue"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Equity Value (%){" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            id="equityBasisValue"
-                                            name="equityBasisValue"
-                                            value={formData.equityBasisValue}
-                                            onChange={handleChange}
-                                            type="text"
-                                            placeholder="Enter equity value"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.equityBasisValue
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                    </div>
-                                    {errors.equityBasisValue && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.equityBasisValue}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+							{formData.workBasis.EquityBasis && (
+								<div className="relative">
+									<label
+										htmlFor="equityBasisValue"
+										className="block text-sm font-medium text-gray-700 mb-1"
+									>
+										Equity Value (%){" "}
+										<span className="text-red-500">*</span>
+									</label>
+									<div className="flex items-center gap-2">
+										<input
+											id="equityBasisValue"
+											name="equityBasisValue"
+											value={formData.equityBasisValue}
+											onChange={handleChange}
+											type="text"
+											placeholder="Enter equity value"
+											className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+												errors.equityBasisValue
+													? "border-red-500"
+													: "border-gray-300"
+											}`}
+										/>
+									</div>
+									{errors.equityBasisValue && (
+										<p className="text-red-500 text-sm mt-1">
+											{errors.equityBasisValue}
+										</p>
+									)}
+								</div>
+							)}
 
-                            {formData.workBasis.Other && (
-                                <div className="relative">
-                                    <label
-                                        htmlFor="otherWorkBasis"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Other Work Basis{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-start gap-2">
-                                        <textarea
-                                            id="otherWorkBasis"
-                                            name="otherWorkBasis"
-                                            value={formData.otherWorkBasis}
-                                            onChange={handleChange}
-                                            placeholder="Describe other work basis"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.otherWorkBasis
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                    </div>
-                                    {errors.otherWorkBasis && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors.otherWorkBasis}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
+							{formData.workBasis.Other && (
+								<div className="relative">
+									<label
+										htmlFor="otherWorkBasis"
+										className="block text-sm font-medium text-gray-700 mb-1"
+									>
+										Other Work Basis{" "}
+										<span className="text-red-500">*</span>
+									</label>
+									<div className="flex items-start gap-2">
+										<textarea
+											id="otherWorkBasis"
+											name="otherWorkBasis"
+											value={formData.otherWorkBasis}
+											onChange={handleChange}
+											placeholder="Describe other work basis"
+											className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+												errors.otherWorkBasis
+													? "border-red-500"
+													: "border-gray-300"
+											}`}
+										/>
+									</div>
+									{errors.otherWorkBasis && (
+										<p className="text-red-500 text-sm mt-1">
+											{errors.otherWorkBasis}
+										</p>
+									)}
+								</div>
+							)}
+						</div>
+					</div>
 
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Time Commitment
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="timeCommitment"
-                                name="timeCommitment"
-                                value={formData.timeCommitment}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="e.g., 20 hours/week"
-                                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
-                            />
-                        </div>
-                    </div>
+					<div className="relative col-span-2">
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							Time Commitment
+						</label>
+						<div className="flex items-center gap-2">
+							<input
+								id="timeCommitment"
+								name="timeCommitment"
+								value={formData.timeCommitment}
+								onChange={handleChange}
+								type="text"
+								placeholder="e.g., 20 hours/week"
+								className="w-1/3 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
+							/>
+						</div>
+					</div>
 
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Work Mode <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-wrap gap-4">
-                            {["Remote", "Hybrid", "Onsite"].map((mode) => (
-                                <div key={mode} className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={mode}
-                                        checked={formData.workMode[mode]}
-                                        onChange={() =>
-                                            handleWorkModeChange(mode)
-                                        }
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+					<div className="relative col-span-2">
+						<label className="block text-sm font-medium text-gray-700 mb-1">
+							Work Mode <span className="text-red-500">*</span>
+						</label>
+						<div className="flex flex-wrap gap-4">
+							{["Remote", "Hybrid", "Onsite"].map((mode) => (
+								<div key={mode} className="flex items-center">
+									<input
+										type="checkbox"
+										id={mode}
+										checked={formData.workMode[mode]}
+										onChange={() =>
+											handleWorkModeChange(mode)
+										}
+										className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+									/>
+									<label
+										htmlFor={mode}
+										className="ml-2 text-gray-700"
+									>
+										{mode}
+									</label>
+								</div>
+							))}
+						</div>
+						{errors.workMode && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.workMode}
+							</p>
+						)}
+					</div>
+
+					{(formData.workMode.Hybrid || formData.workMode.Onsite) && (
+						<div className="relative col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+							<div>
+								<label
+									htmlFor="workLocationCountry"
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									Country{" "}
+									<span className="text-red-500">*</span>
+								</label>
+								<select
+									id="workLocationCountry"
+									name="workLocation.country"
+									value={formData.workLocation.country}
+									onChange={(e) =>
+										handleNestedChange(
+											"workLocation",
+											"country",
+											e.target.value
+										)
+									}
+									className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+										errors.workLocation?.country
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+								>
+									<option value="">Select Country</option>
+									{countries.map((country) => (
+										<option
+											key={country.isoCode}
+											value={country.isoCode}
+										>
+											{country.name}
+										</option>
+									))}
+								</select>
+								{errors.workLocation?.country && (
+									<p className="text-red-500 text-sm mt-1">
+										{errors.workLocation.country}
+									</p>
+								)}
+							</div>
+							<div>
+								<label
+									htmlFor="workLocationState"
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									State{" "}
+									<span className="text-red-500">*</span>
+								</label>
+								<select
+									id="workLocationState"
+									name="workLocation.state"
+									value={formData.workLocation.state}
+									onChange={(e) =>
+										handleNestedChange(
+											"workLocation",
+											"state",
+											e.target.value
+										)
+									}
+									className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+										errors.workLocation?.state
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+								>
+									<option value="">Select State</option>
+									{states.map((state) => (
+										<option
+											key={state.isoCode}
+											value={state.isoCode}
+										>
+											{state.name}
+										</option>
+									))}
+								</select>
+								{errors.workLocation?.state && (
+									<p className="text-red-500 text-sm mt-1">
+										{errors.workLocation.state}
+									</p>
+								)}
+							</div>
+							<div>
+								<label
+									htmlFor="workLocationDistrict"
+									className="block text-sm font-medium text-gray-700 mb-1"
+								>
+									District{" "}
+									<span className="text-red-500">*</span>
+								</label>
+								<select
+									id="workLocationDistrict"
+									name="workLocation.district"
+									value={formData.workLocation.district}
+									onChange={(e) =>
+										handleNestedChange(
+											"workLocation",
+											"district",
+											e.target.value
+										)
+									}
+									className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+										errors.workLocation?.district
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+								>
+									<option value="">Select District</option>
+									{districts.map((district, index) => (
+										<option
+											key={index}
+											value={district.name}
+										>
+											{district.name}
+										</option>
+									))}
+								</select>
+								{errors.workLocation?.district && (
+									<p className="text-red-500 text-sm mt-1">
+										{errors.workLocation.district}
+									</p>
+								)}
+							</div>
+						</div>
+					)}
+
+					<div className="relative col-span-2 flex gap-4">
+						<div className="w-1/2">
+							<label
+								htmlFor="experienceRangeMin"
+								className="block text-sm font-medium text-gray-700 mb-1"
+							>
+								Min Experience (Years){" "}
+								<span className="text-red-500">*</span>
+							</label>
+							<div className="flex items-center gap-2">
+								<input
+									id="experienceRangeMin"
+									name="experienceRange.min"
+									value={formData.experienceRange.min}
+									onChange={(e) =>
+										handleNestedChange(
+											"experienceRange",
+											"min",
+											e.target.value
+										)
+									}
+									type="number"
+									min="0"
+									placeholder="Min experience"
+									className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+										errors.experienceRange?.min
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+								/>
+							</div>
+							{errors.experienceRange?.min && (
+								<p className="text-red-500 text-sm mt-1">
+									{errors.experienceRange.min}
+								</p>
+							)}
+						</div>
+						<div className="w-1/2">
+							<label
+								htmlFor="experienceRangeMax"
+								className="block text-sm font-medium text-gray-700 mb-1"
+							>
+								Max Experience (Years){" "}
+								<span className="text-red-500">*</span>
+							</label>
+							<div className="flex items-center gap-2">
+								<input
+									id="experienceRangeMax"
+									name="experienceRange.max"
+									value={formData.experienceRange.max}
+									onChange={(e) =>
+										handleNestedChange(
+											"experienceRange",
+											"max",
+											e.target.value
+										)
+									}
+									type="number"
+									min="0"
+									placeholder="Max experience"
+									className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+										errors.experienceRange?.max
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+								/>
+							</div>
+							{errors.experienceRange?.max && (
+								<p className="text-red-500 text-sm mt-1">
+									{errors.experienceRange.max}
+								</p>
+							)}
+						</div>
+					</div>
+
+					<div className="col-span-2 flex justify-between items-center mt-6">
+						<button
+							type="button"
+							onClick={handleBack}
+							className="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+						>
+							Back
+						</button>
+						<div className="flex space-x-4">
+							<button
+								type="button"
+								onClick={handleCancel}
+								className="bg-gray-300 text-gray-700 px-6 py-1 rounded-lg font-medium hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+							>
+								Cancel
+							</button>
+							<button
+								type="button"
+								onClick={handleNext}
+								className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-400"
+							>
+								Next Step
+							</button>
+						</div>
+					</div>
+				</form>
+			)}
+
+			{step === 3 && (
+				<form onSubmit={handleSubmit} className="space-y-6">
+					<div className="relative">
+						<label
+							htmlFor="responsibilities"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Responsibilities{" "}
+							<span className="text-red-500">*</span>
+						</label>
+						<div className="relative">
+                                    <textarea
+                                        id="responsibilities"
+                                        name="responsibilities"
+                                        value={formData.responsibilities}
+                                        onChange={handleChange}
+                                        maxLength={400}
+                                        placeholder="List key responsibilities"
+                                        className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
                                     />
-                                    <label
-                                        htmlFor={mode}
-                                        className="ml-2 text-gray-700"
+                                    <button
+                                        type="button"
+                                        onClick={() => enhanceField("responsibilities", formData.responsibilities)}
+                                        disabled={enhanceLoading.responsibilities}
+                                        className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.responsibilities ? "animate-pulse" : ""}`}
+                                        title={enhanceLoading.responsibilities ? "Enhancing..." : "Enhance"}
                                     >
-                                        {mode}
-                                    </label>
+                                        <FaMagic className="w-5 h-5" />
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
-                        {errors.workMode && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.workMode}
-                            </p>
-                        )}
-                    </div>
+						{errors.responsibilities && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.responsibilities}
+							</p>
+						)}
+					</div>
 
-                    {(formData.workMode.Hybrid || formData.workMode.Onsite) && (
-                        <div className="relative col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label
-                                    htmlFor="workLocationCountry"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Country{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="workLocationCountry"
-                                    name="workLocation.country"
-                                    value={formData.workLocation.country}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "workLocation",
-                                            "country",
-                                            e.target.value
-                                        )
-                                    }
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.workLocation?.country
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                >
-                                    <option value="">Select Country</option>
-                                    {countries.map((country) => (
-                                        <option
-                                            key={country.isoCode}
-                                            value={country.isoCode}
-                                        >
-                                            {country.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.workLocation?.country && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.workLocation.country}
-                                    </p>
-                                )}
-                            </div>
-                            <div>
-                                <label
-                                    htmlFor="workLocationState"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    State{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="workLocationState"
-                                    name="workLocation.state"
-                                    value={formData.workLocation.state}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "workLocation",
-                                            "state",
-                                            e.target.value
-                                        )
-                                    }
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.workLocation?.state
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                >
-                                    <option value="">Select State</option>
-                                    {states.map((state) => (
-                                        <option
-                                            key={state.isoCode}
-                                            value={state.isoCode}
-                                        >
-                                            {state.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.workLocation?.state && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.workLocation.state}
-                                    </p>
-                                )}
-                            </div>
-                            <div>
-                                <label
-                                    htmlFor="workLocationDistrict"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    District{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    id="workLocationDistrict"
-                                    name="workLocation.district"
-                                    value={formData.workLocation.district}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "workLocation",
-                                            "district",
-                                            e.target.value
-                                        )
-                                    }
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.workLocation?.district
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                >
-                                    <option value="">Select District</option>
-                                    {districts.map((district, index) => (
-                                        <option
-                                            key={index}
-                                            value={district.name}
-                                        >
-                                            {district.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.workLocation?.district && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.workLocation.district}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="relative col-span-2 flex gap-4">
-                        <div className="w-1/2">
-                            <label
-                                htmlFor="experienceRangeMin"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Min Experience (Years){" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="experienceRangeMin"
-                                    name="experienceRange.min"
-                                    value={formData.experienceRange.min}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "experienceRange",
-                                            "min",
-                                            e.target.value
-                                        )
-                                    }
-                                    type="number"
-                                    min="0"
-                                    placeholder="Min experience"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experienceRange?.min
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
+					<div className="relative">
+						<label
+							htmlFor="whyShouldJoin"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Why Should They Join?{" "}
+							<span className="text-red-500">*</span>
+						</label>
+						<div className="relative">
+                                <textarea
+                                    id="whyShouldJoin"
+                                    name="whyShouldJoin"
+                                    value={formData.whyShouldJoin}
+                                    onChange={handleChange}
+                                    maxLength={300}
+                                    placeholder="What makes this opportunity exciting?"
+                                    className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => enhanceField("whyShouldJoin", formData.whyShouldJoin)}
+                                    disabled={enhanceLoading.whyShouldJoin}
+                                    className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.whyShouldJoin ? "animate-pulse" : ""}`}
+                                    title={enhanceLoading.whyShouldJoin ? "Enhancing..." : "Enhance"}
+                                >
+                                    <FaMagic className="w-5 h-5" />
+                                </button>
                             </div>
-                            {errors.experienceRange?.min && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.experienceRange.min}
-                                </p>
-                            )}
-                        </div>
-                        <div className="w-1/2">
-                            <label
-                                htmlFor="experienceRangeMax"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Max Experience (Years){" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="experienceRangeMax"
-                                    name="experienceRange.max"
-                                    value={formData.experienceRange.max}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "experienceRange",
-                                            "max",
-                                            e.target.value
-                                        )
-                                    }
-                                    type="number"
-                                    min="0"
-                                    placeholder="Max experience"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experienceRange?.max
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                            </div>
-                            {errors.experienceRange?.max && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.experienceRange.max}
-                                </p>
-                            )}
-                        </div>
-                    </div>
+						{errors.whyShouldJoin && (
+							<p className="text-red-500 text-sm mt-1">
+								{errors.whyShouldJoin}
+							</p>
+						)}
+					</div>
 
-                    <div className="col-span-2 flex justify-between items-center mt-6">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Back
-                        </button>
-                        <div className="flex space-x-4">
-                            <button
-                                type="button"
-                                onClick={handleCancel}
-                                className="bg-gray-300 text-gray-700 px-6 py-1 rounded-lg font-medium hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleNext}
-                                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-400"
-                            >
-                                Next Step
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            )}
-
-            {step === 3 && (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="relative">
-                        <label
-                            htmlFor="responsibilities"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Responsibilities{" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex items-start gap-2">
-                            <textarea
-                                id="responsibilities"
-                                name="responsibilities"
-                                value={formData.responsibilities}
-                                onChange={handleChange}
-                                maxLength={400}
-                                placeholder="List key responsibilities"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "responsibilities",
-                                        formData.responsibilities
-                                    )
-                                }
-                                disabled={enhanceLoading.responsibilities}
-                                className="bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 rounded disabled:bg-blue-400"
-                            >
-                                {enhanceLoading.responsibilities
-                                    ? "Enhancing..."
-                                    : "Enhance"}
-                            </button>
-                        </div>
-                        {errors.responsibilities && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.responsibilities}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="whyShouldJoin"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Why Should They Join?{" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex items-start gap-2">
-                            <textarea
-                                id="whyShouldJoin"
-                                name="whyShouldJoin"
-                                value={formData.whyShouldJoin}
-                                onChange={handleChange}
-                                maxLength={300}
-                                placeholder="What makes this opportunity exciting?"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "whyShouldJoin",
-                                        formData.whyShouldJoin
-                                    )
-                                }
-                                disabled={enhanceLoading.whyShouldJoin}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                            >
-                                {enhanceLoading.whyShouldJoin
-                                    ? "Enhancing..."
-                                    : "Enhance"}
-                            </button>
-                        </div>
-                        {errors.whyShouldJoin && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.whyShouldJoin}
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="relative">
-                        <label
-                            htmlFor="anyOtherInfo"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Any Other Information
-                        </label>
-                        <div className="flex items-start gap-2">
+					<div className="relative">
+						<label
+							htmlFor="anyOtherInfo"
+							className="block text-sm font-medium text-gray-700 mb-1"
+						>
+							Any Other Information
+						</label>
+						<div className="relative">
                             <textarea
                                 id="anyOtherInfo"
                                 name="anyOtherInfo"
@@ -3296,60 +3259,54 @@ function FounderPostForm({ onClose }) {
                                 onChange={handleChange}
                                 maxLength={200}
                                 placeholder="Additional details (optional)"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
+                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
                             />
                             <button
                                 type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "anyOtherInfo",
-                                        formData.anyOtherInfo
-                                    )
-                                }
+                                onClick={() => enhanceField("anyOtherInfo", formData.anyOtherInfo)}
                                 disabled={enhanceLoading.anyOtherInfo}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.anyOtherInfo ? "animate-pulse" : ""}`}
+                                title={enhanceLoading.anyOtherInfo ? "Enhancing..." : "Enhance"}
                             >
-                                {enhanceLoading.anyOtherInfo
-                                    ? "Enhancing..."
-                                    : "Enhance"}
+                                <FaMagic className="w-5 h-5" />
                             </button>
                         </div>
-                    </div>
+					</div>
 
-                    {errors.submit && (
-                        <p className="text-red-500 text-sm mt-4">
-                            {errors.submit}
-                        </p>
-                    )}
+					{errors.submit && (
+						<p className="text-red-500 text-sm mt-4">
+							{errors.submit}
+						</p>
+					)}
 
-                    <div className="flex justify-between items-center mt-6">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Back
-                        </button>
-                        <div className="flex space-x-4">
-                            <button
-                                type="button"
-                                onClick={handleCancel}
-                                className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-blue-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                            >
-                                Submit
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            )}
-        </div>
-    );
+					<div className="flex justify-between items-center mt-6">
+						<button
+							type="button"
+							onClick={handleBack}
+							className="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+						>
+							Back
+						</button>
+						<div className="flex space-x-4">
+							<button
+								type="button"
+								onClick={handleCancel}
+								className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-blue-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+							>
+								Cancel
+							</button>
+							<button
+								type="submit"
+								className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+							>
+								Submit
+							</button>
+						</div>
+					</div>
+				</form>
+			)}
+		</div>
+	);
 }
 
 export default FounderPostForm;

@@ -410,6 +410,7 @@ const SignUpRequest = () => {
                 phoneNumber,
                 password,
                 role,
+                gender,
                 dob,
                 email,
                 country,
@@ -529,8 +530,8 @@ const SignUpRequest = () => {
                                                 <input
                                                     type="radio"
                                                     name="role"
-                                                    value="Talent"
-                                                    checked={role === "Talent"}
+                                                    value="GetDiscovered"
+                                                    checked={role === "GetDiscovered"}
                                                     onChange={(e) => {
                                                         setRole(e.target.value);
                                                         setErrors((prev) => ({
