@@ -1,36 +1,41 @@
-import React, {useRef, useState} from "react";
+import React, { useRef } from "react";
 import { FaTimes } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-// import UpdateTalentsForm from "../TalentPostForm/UpdateTalentsForm";
+import { Country, State } from "country-state-city";
 function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
-  // Helper to get display value for domain
-  const modalContentRef = useRef(null);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  console.log(post.skills)
-  const getDomainName = (domainId) => {
-    // Placeholder: In practice, fetch domain name from domains array or API
-    return domainId || "N/A";
-  };
+	// Helper to get display value for domain
+	const modalContentRef = useRef(null);
 
-  // Helper to get display value for role
-  const getRoleName = (roleId) => {
-    // Placeholder: In practice, fetch role name from roles array or API
-    return roleId || "N/A";
-  };
+	console.log(post.skills);
 
-  // Helper to get display value for skills
-  const getSkillNames = (skills) => {
-    return skills.map((skill) => skill.name || "N/A").join(", ") || "None";
-  };
-  const handleOverlayClick = (e) => {
-    // Check if the click is outside the modal content
-    if (modalContentRef.current && !modalContentRef.current.contains(e.target)) {
-      onClose(); // Trigger the onClose function
-    }
-  };
+	const getDomainName = (domainId) => {
+		// Placeholder: In practice, fetch domain name from domains array or API
+		return domainId || "N/A";
+	};
 
-  return (
+	// Helper to get display value for role
+	const getRoleName = (roleId) => {
+		// Placeholder: In practice, fetch role name from roles array or API
+		return roleId || "N/A";
+	};
+
+	// Helper to get display value for skills
+	const getSkillNames = (skills) => {
+		return skills.map((skill) => skill.name || "N/A").join(", ") || "None";
+	};
+
+	const handleOverlayClick = (e) => {
+		// Check if the click is outside the modal content
+		if (
+			modalContentRef.current &&
+			!modalContentRef.current.contains(e.target)
+		) {
+			onClose(); // Trigger the onClose function
+		}
+	};
+
+	return (
 		<div
 			className="fixed inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
 			onClick={handleOverlayClick}
@@ -40,7 +45,6 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 				className="bg-white p-6 sm:p-8 rounded-2xl w-full max-w-4xl m-4 relative max-h-[90vh] overflow-y-auto"
 			>
 				{/* Close Button */}
-
 				<button
 					onClick={onClose}
 					className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -1086,8 +1090,13 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 											className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
 										>
 											<option value="">
-												{post.workLocation.country ||
-													"Select Country"}
+												{post.workLocation.country
+													? Country.getCountryByCode(
+															post.workLocation
+																.country
+													  )?.name ||
+													  post.workLocation.country
+													: "Select Country"}
 											</option>
 										</select>
 										{errors.workLocation?.country && (
@@ -1109,8 +1118,16 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 											className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
 										>
 											<option value="">
-												{post.workLocation.state ||
-													"Select State"}
+												{post.workLocation.state &&
+												post.workLocation.country
+													? State.getStateByCodeAndCountry(
+															post.workLocation
+																.state,
+															post.workLocation
+																.country
+													  )?.name ||
+													  post.workLocation.state
+													: "Select State"}
 											</option>
 										</select>
 										{errors.workLocation?.state && (
@@ -1246,12 +1263,20 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 							<label className="block text-sm font-medium text-gray-700 mb-1">
 								Resume Link
 							</label>
-							<input
-								value={post.resumeLink}
-								disabled
-								type="text"
-								className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-							/>
+							{post.resumeLink ? (
+								<a
+									href={post.resumeLink}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-blue-600 hover:underline break-all"
+								>
+									{post.resumeLink}
+								</a>
+							) : (
+								<p className="text-gray-500">
+									No resume link provided.
+								</p>
+							)}
 							{errors.resumeLink && (
 								<p className="text-red-500 text-sm mt-1">
 									{errors.resumeLink}
@@ -1276,7 +1301,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 												value={project.title}
 												disabled
 												type="text"
-												placeholder="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+												className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
 											/>
 											<textarea
 												value={project.description}
@@ -1373,10 +1398,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 											Link {index + 1}
 										</h4>
 										<div className="mt-2 space-y-2">
-											<div
-												key={index}
-												className="mb-4 flex items-center gap-2"
-											>
+											<div className="mb-4 flex items-center gap-2">
 												<input
 													value={link.title}
 													disabled
@@ -1436,7 +1458,9 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 				{/* Close Button */}
 				<div className="mt-6 flex justify-end">
 					<button
-						onClick={() => setShowUpdateModal(true)}
+						onClick={() =>
+							onClose({ openUpdate: true, listingId: post._id })
+						}
 						className="bg-[#7900BF] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#5c0099] focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 mr-4"
 					>
 						Update
@@ -1449,14 +1473,8 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 					</button>
 				</div>
 			</div>
-            {showUpdateModal && (
-  <UpdateTalentsForm
-    listingId={post._id} // Assuming post has an _id field
-    onClose={() => setShowUpdateModal(false)}
-  />
-)}
 		</div>
-  );
+	);
 }
 
 export default ViewGetDiscoveredModal;

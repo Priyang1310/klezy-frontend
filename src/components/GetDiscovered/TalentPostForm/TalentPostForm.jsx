@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { toast, ToastContainer } from "react-toastify";
 
 function GetDiscoveredForm({ onClose }) {
     const [step, setStep] = useState(1);
@@ -68,7 +69,7 @@ function GetDiscoveredForm({ onClose }) {
         expectations: "",
         anyOtherInfo: "",
     });
-
+    const [resumeFile, setResumeFile] = useState(null);
     const [errors, setErrors] = useState({});
     const [domains, setDomains] = useState([]);
     const [allRoles, setAllRoles] = useState([]);
@@ -677,6 +678,7 @@ function GetDiscoveredForm({ onClose }) {
         if (!formData.state) newErrors.state = "State is required";
         if (!formData.district) newErrors.district = "District is required";
         if (!formData.userType) newErrors.userType = "User type is required";
+         if (!formData.aboutSelf) newErrors.aboutSelf = "About your self is required";
         if (formData.userType === "Other" && !formData.otherUserType.trim())
             newErrors.otherUserType = "Please specify user type";
         
@@ -919,38 +921,76 @@ function GetDiscoveredForm({ onClose }) {
         return Object.keys(newErrors).length === 0;
     };
 
-    const validateStep3 = () => {
-        const newErrors = {};
-        if (
-            formData.portfolioLink &&
-            !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
-                formData.portfolioLink
-            )
-        )
-            newErrors.portfolioLink = "Invalid URL (must start with https://)";
-        if (
-            formData.resumeLink &&
-            !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
-                formData.resumeLink
-            )
-        )
-            newErrors.resumeLink = "Invalid URL (must start with https://)";
-        formData.projects.forEach((project, index) => {
-            if (project.link && !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(project.link)) {
-                newErrors[`projectLink${index}`] = "Invalid URL (must start with https://)";
-            }
-        });
+    // const validateStep3 = () => {
+    //     const newErrors = {};
+    //     if (
+    //         formData.portfolioLink &&
+    //         !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+    //             formData.portfolioLink
+    //         )
+    //     )
+    //         newErrors.portfolioLink = "Invalid URL (must start with https://)";
+    //          if (!formData.resumeLink) newErrors.district = "Resume is required";
+    //     if (
+    //         formData.resumeLink &&
+    //         !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+    //             formData.resumeLink
+    //         )
+    //     )
+    //         newErrors.resumeLink = "Invalid URL (must start with https://)";
+    //     formData.projects.forEach((project, index) => {
+    //         if (project.link && !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(project.link)) {
+    //             newErrors[`projectLink${index}`] = "Invalid URL (must start with https://)";
+    //         }
+    //     });
         
-        formData.otherLinks.forEach((link, index) => {
-            if (link && !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(link)) {
-                newErrors[`otherLink${index}`] = "Invalid URL (must start with https://)";
-            }
-        });
+    //     formData.otherLinks.forEach((link, index) => {
+    //         if (link && !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(link)) {
+    //             newErrors[`otherLink${index}`] = "Invalid URL (must start with https://)";
+    //         }
+    //     });
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+    //     setErrors(newErrors);
+    //     return Object.keys(newErrors).length === 0;
+    // };
+    const validateStep3 = () => {
+    const newErrors = {};
+    if (
+        formData.portfolioLink &&
+        !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+            formData.portfolioLink
+        )
+    ) {
+        newErrors.portfolioLink = "Invalid URL (must start with https://)";
+    }
+    if (!formData.resumeLink) {
+        newErrors.resumeFile = "Resume upload is required"; // Updated error message
+    }
+    formData.projects.forEach((project, index) => {
+        if (
+            project.link &&
+            !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+                project.link
+            )
+        ) {
+            newErrors[`projectLink${index}`] = "Invalid URL (must start with https://)";
+        }
+    });
 
+    formData.otherLinks.forEach((link, index) => {
+        if (
+            link &&
+            !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+                link
+            )
+        ) {
+            newErrors[`otherLink${index}`] = "Invalid URL (must start with https://)";
+        }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+};
     const handleNext = async () => {
         let isValid = false;
         if (step === 1) isValid = validateStep1();
@@ -963,105 +1003,262 @@ function GetDiscoveredForm({ onClose }) {
     };
 
     const handleBack = () => setStep(step - 1);
+    /////////////////////////////To upload resume/////////////
+    const uploadResume = async (file) => {
+    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = [
+        "application/pdf",
+        "application/msword", // .doc
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+    ];
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (validateStep3()) {
-            try {
-                const domain = domains.find(
-                    (d) => d._id === formData.domainName
-                );
-                const role = allRoles.find(
-                    (r) => r._id === formData.roleUnderDomain
-                );
-                const submitData = {
-                    ...formData,
-                    domainName: domain ? domain.name : "",
-                    roleUnderDomain: role ? role.name : "",
-                    skills: formData.skills.map((skill) => skill.name),
-                    workBasis: Object.keys(formData.workBasis).filter(
-                        (key) => formData.workBasis[key]
-                    ),
-                    workMode: Object.keys(formData.workMode)
-                        .filter((key) => formData.workMode[key])
-                        .at(),
-                    call: formData.contact_methods.call.selected
-                        ? formData.contact_methods.call.value
-                        : "",
-                    whatsapp: formData.contact_methods.whatsapp.selected
-                        ? formData.contact_methods.whatsapp.value
-                        : "",
-                    instagram: formData.contact_methods.instagram.selected
-                        ? formData.contact_methods.instagram.value
-                        : "",
-                    linkedin: formData.contact_methods.linkedin.selected
-                        ? formData.contact_methods.linkedin.value
-                        : "",
-                    facebook: formData.contact_methods.facebook.selected
-                        ? formData.contact_methods.facebook.value
-                        : "",
-                    otherContact: formData.contact_methods.other.selected
-                        ? formData.contact_methods.other.value
-                        : "",
-                    workCountry: formData.workLocation.country,
-                    workState: formData.workLocation.state,
-                    workCity: formData.workLocation.district,
-                    internshipTimeType: formData.internshipTimeType || "",
-                    jobTimeType: formData.jobTimeType || "", // Add this line
-                    internshipDuration:
-                        formData.workBasis.Internship &&
-                        formData.internshipDuration.value &&
-                        formData.internshipDuration.unit
-                            ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-                            : "",
-                    freelancePaymentRange:
-                        formData.workBasis.Freelance &&
-                        formData.freelancePaymentRange.min &&
-                        formData.freelancePaymentRange.max
-                            ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-                            : "",
-                    internshipStipendRange:
-                        formData.internshipType === "Paid" &&
-                        formData.internshipStipendRange.min &&
-                        formData.internshipStipendRange.max
-                            ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-                            : "",
-                    experience: formData.experience.years ||
-                        formData.experience.months ||
-                        formData.experience.days
-                            ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
-                            : "",
-                    jobAmountRange:
-                        formData.workBasis.Job &&
-                        formData.jobAmountRange.min &&
-                        formData.jobAmountRange.max
-                            ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
-                            : "",
-                };
-                delete submitData.contact_methods;
-                const response = await fetch(
-                    "http://localhost:3333/api/get-discovered/add-listing",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(submitData),
-                        credentials: "include",
-                    }
-                );
-                if (response.ok) {
-                    console.log("Form submitted:", submitData);
-                    onClose();
-                } else {
-                    setErrors({
-                        submit: "Failed to submit the form. Please try again.",
-                    });
-                }
-            } catch (err) {
-                setErrors({ submit: "An error occurred. Please try again." });
-            }
+    // Validate file
+    if (!file) {
+        setErrors((prev) => ({ ...prev, resumeFile: "Please select a file." }));
+        setResumeFile(null);
+        return;
+    }
+
+    // Size check
+    if (file.size > MAX_SIZE) {
+        setErrors((prev) => ({
+            ...prev,
+            resumeFile: "File is too large. Max allowed size is 10MB.",
+        }));
+        setResumeFile(null);
+        return;
+    }
+
+    // Type check
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        setErrors((prev) => ({
+            ...prev,
+            resumeFile: "Only PDF, DOC, and DOCX files are allowed.",
+        }));
+        setResumeFile(null);
+        return;
+    }
+
+    // Prepare FormData for upload
+    const formDataToSend = new FormData();
+    formDataToSend.append("media", file);
+
+    try {
+        const res = await fetch("http://localhost:3333/api/media/upload", {
+            method: "POST",
+            body: formDataToSend,
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            // Store the returned URL in formData.resumeLink
+            setFormData((prev) => ({
+                ...prev,
+                resumeLink: data.url,
+            }));
+            setErrors((prev) => ({ ...prev, resumeFile: "" }));
+            setResumeFile(null); // Clear the temporary file state
+            toast("Resume Uploaded!")
+        } else {
+            setErrors((prev) => ({
+                ...prev,
+                resumeFile: data.error || "Upload failed. Please try again.",
+            }));
+            setResumeFile(null);
         }
-    };
+    } catch (err) {
+        console.error("Upload error:", err);
+        setErrors((prev) => ({
+            ...prev,
+            resumeFile: "Something went wrong while uploading.",
+        }));
+        setResumeFile(null);
+    }
+};
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     if (validateStep3()) {
+    //         try {
+    //             const domain = domains.find(
+    //                 (d) => d._id === formData.domainName
+    //             );
+    //             const role = allRoles.find(
+    //                 (r) => r._id === formData.roleUnderDomain
+    //             );
+    //             const submitData = {
+    //                 ...formData,
+    //                 domainName: domain ? domain.name : "",
+    //                 roleUnderDomain: role ? role.name : "",
+    //                 skills: formData.skills.map((skill) => skill.name),
+    //                 workBasis: Object.keys(formData.workBasis).filter(
+    //                     (key) => formData.workBasis[key]
+    //                 ),
+    //                 workMode: Object.keys(formData.workMode)
+    //                     .filter((key) => formData.workMode[key])
+    //                     .at(),
+    //                 call: formData.contact_methods.call.selected
+    //                     ? formData.contact_methods.call.value
+    //                     : "",
+    //                 whatsapp: formData.contact_methods.whatsapp.selected
+    //                     ? formData.contact_methods.whatsapp.value
+    //                     : "",
+    //                 instagram: formData.contact_methods.instagram.selected
+    //                     ? formData.contact_methods.instagram.value
+    //                     : "",
+    //                 linkedin: formData.contact_methods.linkedin.selected
+    //                     ? formData.contact_methods.linkedin.value
+    //                     : "",
+    //                 facebook: formData.contact_methods.facebook.selected
+    //                     ? formData.contact_methods.facebook.value
+    //                     : "",
+    //                 otherContact: formData.contact_methods.other.selected
+    //                     ? formData.contact_methods.other.value
+    //                     : "",
+    //                 workCountry: formData.workLocation.country,
+    //                 workState: formData.workLocation.state,
+    //                 workCity: formData.workLocation.district,
+    //                 internshipTimeType: formData.internshipTimeType || "",
+    //                 jobTimeType: formData.jobTimeType || "", // Add this line
+    //                 internshipDuration:
+    //                     formData.workBasis.Internship &&
+    //                     formData.internshipDuration.value &&
+    //                     formData.internshipDuration.unit
+    //                         ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
+    //                         : "",
+    //                 freelancePaymentRange:
+    //                     formData.workBasis.Freelance &&
+    //                     formData.freelancePaymentRange.min &&
+    //                     formData.freelancePaymentRange.max
+    //                         ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
+    //                         : "",
+    //                 internshipStipendRange:
+    //                     formData.internshipType === "Paid" &&
+    //                     formData.internshipStipendRange.min &&
+    //                     formData.internshipStipendRange.max
+    //                         ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
+    //                         : "",
+    //                 experience: formData.experience.years ||
+    //                     formData.experience.months ||
+    //                     formData.experience.days
+    //                         ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
+    //                         : "",
+    //                 jobAmountRange:
+    //                     formData.workBasis.Job &&
+    //                     formData.jobAmountRange.min &&
+    //                     formData.jobAmountRange.max
+    //                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
+    //                         : "",
+    //                           otherLinks: formData.otherLinks.map((url, index) => ({
+    //                     url,
+    //                     title: `Link ${index + 1}`,
+    //                 })),
+    //             };
+                
+    //             delete submitData.contact_methods;
+    //             const response = await fetch(
+    //                 "http://localhost:3333/api/get-discovered/add-listing",
+    //                 {
+    //                     method: "POST",
+    //                     headers: { "Content-Type": "application/json" },
+    //                     body: JSON.stringify(submitData),
+    //                     credentials: "include",
+    //                 }
+    //             );
+    //             if (response.ok) {
+    //                 console.log("Form submitted:", submitData);
+    //                 onClose();
+    //             } else {
+    //                 setErrors({
+    //                     submit: "Failed to submit the form. Please try again.",
+    //                 });
+    //             }
+    //         } catch (err) {
+    //             setErrors({ submit: "An error occurred. Please try again." });
+    //         }
+    //     }
+    // };
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateStep3()) {
+        try {
+            const domain = domains.find((d) => d._id === formData.domainName);
+            const role = allRoles.find((r) => r._id === formData.roleUnderDomain);
 
+            const submitData = {
+                ...formData,
+                domainName: domain ? domain.name : formData.domainName,
+                roleUnderDomain: role ? role.name : formData.roleUnderDomain,
+                skills: formData.skills.map((skill) => skill.name),
+                workBasis: formData.workBasis, // Keep the full workBasis object
+                workMode: formData.workMode, // Keep the full workMode object
+                contact_methods: {
+                    call: formData.contact_methods.call,
+                    whatsapp: formData.contact_methods.whatsapp,
+                    instagram: formData.contact_methods.instagram,
+                    linkedin: formData.contact_methods.linkedin,
+                    facebook: formData.contact_methods.facebook,
+                    other: formData.contact_methods.other,
+                },
+                workCountry: formData.workLocation.country,
+                workState: formData.workLocation.state,
+                workCity: formData.workLocation.district,
+                internshipDuration: formData.internshipDuration.value && formData.internshipDuration.unit
+                    ? { value: formData.internshipDuration.value, unit: formData.internshipDuration.unit }
+                    : { value: "", unit: "" },
+                freelancePaymentRange: formData.freelancePaymentRange.min && formData.freelancePaymentRange.max
+                    ? { min: formData.freelancePaymentRange.min, max: formData.freelancePaymentRange.max }
+                    : { min: "", max: "" },
+                internshipStipendRange: formData.internshipType === "Paid" && formData.internshipStipendRange.min && formData.internshipStipendRange.max
+                    ? { min: formData.internshipStipendRange.min, max: formData.internshipStipendRange.max }
+                    : { min: "", max: "" },
+                jobAmountRange: formData.jobAmountRange.min && formData.jobAmountRange.max
+                    ? { min: formData.jobAmountRange.min, max: formData.jobAmountRange.max }
+                    : { min: "", max: "" },
+                experience: {
+                    years: formData.experience.years || "",
+                    months: formData.experience.months || "",
+                    days: formData.experience.days || "",
+                },
+                otherLinks: formData.otherLinks.map((url, index) => ({
+                    url,
+                    title: `Link ${index + 1}`,
+                })),
+            };
+
+            // Remove individual contact method fields if backend expects contact_methods object
+            delete submitData.call;
+            delete submitData.whatsapp;
+            delete submitData.instagram;
+            delete submitData.linkedin;
+            delete submitData.facebook;
+            delete submitData.otherContact;
+
+            const response = await fetch(
+                "http://localhost:3333/api/get-discovered/add-listing",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(submitData),
+                    credentials: "include",
+                }
+            );
+
+            if (response.ok) {
+                console.log("Form submitted:", submitData);
+                onClose();
+            } else {
+                const errorData = await response.json();
+                setErrors({
+                    submit: errorData.message || "Failed to submit the form. Please try again.",
+                });
+            }
+        } catch (err) {
+            console.error("Submission error:", err);
+            setErrors({ submit: "An error occurred. Please try again." });
+        }
+    }
+};
     const handleCancel = () => {
         setFormData({
             first_name: formData.first_name,
@@ -1131,6 +1328,7 @@ function GetDiscoveredForm({ onClose }) {
         setShowSkillSuggestions(false);
         setStep(1);
         setErrors({});
+        setResumeFile(null);
         onClose();
     };
 
@@ -1143,7 +1341,9 @@ function GetDiscoveredForm({ onClose }) {
     }
 
     return (
+
         <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
+            
             <div className="h-20 flex items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-[50%] mx-auto text-xl">
                 <div className="flex flex-col">
                     <p className="flex items-center gap-2">
@@ -1495,6 +1695,7 @@ function GetDiscoveredForm({ onClose }) {
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
                             About Yourself
+                            <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
                             <textarea
@@ -1504,8 +1705,11 @@ function GetDiscoveredForm({ onClose }) {
                                 onChange={handleChange}
                                 maxLength={300}
                                 placeholder="Briefly describe yourself"
-                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-                            />
+                               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                            errors.aboutSelf
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}                />
                             <button
                                 type="button"
                                 onClick={() =>
@@ -1523,7 +1727,13 @@ function GetDiscoveredForm({ onClose }) {
                             >
                                 <FaMagic className="w-5 h-5" />
                             </button>
+                            
                         </div>
+                        {errors.aboutSelf && (
+                                    <p className="text-red-500 text-sm mt-1">
+                                        {errors.aboutSelf}
+                                    </p>
+                                )}
                     </div>
                     <div className="relative col-span-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2846,29 +3056,43 @@ function GetDiscoveredForm({ onClose }) {
                         )}
                     </div>
                     <div className="relative col-span-2">
-                        <label
-                            htmlFor="resumeLink"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Resume Link
-                        </label>
-                        <input
-                            id="resumeLink"
-                            name="resumeLink"
-                            value={formData.resumeLink}
-                            onChange={handleChange}
-                            type="url"
-                            placeholder="Enter resume URL (https://)"
-                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                errors.resumeLink ? "border-red-500" : "border-gray-300"
-                            }`}
-                        />
-                        {errors.resumeLink && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.resumeLink}
-                            </p>
-                        )}
-                    </div>
+    <label
+        htmlFor="resumeFile"
+        className="block text-sm font-medium text-gray-700 mb-1"
+    >
+        Upload Resume <span className="text-red-500">*</span>
+    </label>
+    <input
+        id="resumeFile"
+        name="resumeFile"
+        type="file"
+        accept=".pdf,.doc,.docx"
+        onChange={(e) => {
+            const file = e.target.files[0];
+            setResumeFile(file);
+            if (file) {
+                uploadResume(file); // Trigger the upload immediately
+            }
+        }}
+        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+            errors.resumeFile ? "border-red-500" : "border-gray-300"
+        }`}
+    />
+    {resumeFile && (
+        <p className="text-gray-600 text-sm mt-1">
+            Selected file: {resumeFile.name}
+        </p>
+    )}
+    {formData.resumeLink && (
+        <p className="text-green-600 text-sm mt-1">
+            Resume Uploaded!
+            {/* Uploaded: <a href={formData.resumeLink} target="_blank" rel="noopener noreferrer">{formData.resumeLink}</a> */}
+        </p>
+    )}
+    {errors.resumeFile && (
+        <p className="text-red-500 text-sm mt-1">{errors.resumeFile}</p>
+    )}
+</div>
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Projects
