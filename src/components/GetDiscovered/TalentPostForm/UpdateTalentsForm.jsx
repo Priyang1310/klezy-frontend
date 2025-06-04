@@ -57,13 +57,14 @@ function UpdateGetDiscoveredForm({listingId, onClose }) {
         experience: { years: "", months: "", days: "" },
         portfolioLink: "",
         resumeLink: "",
+        resumeFile: null, // Add this to store the new resume file
         projects: [],
         workExperience: [],
         otherLinks: [],
         expectations: "",
         anyOtherInfo: "",
     });
-
+    const [uploadSuccess, setUploadSuccess] = useState("");
     const [errors, setErrors] = useState({});
     const [domains, setDomains] = useState([]);
     const [allRoles, setAllRoles] = useState([]);
@@ -163,6 +164,7 @@ function UpdateGetDiscoveredForm({listingId, onClose }) {
                 experience: data.experience || { years: "", months: "", days: "" },
                 portfolioLink: data.portfolioLink || "",
                 resumeLink: data.resumeLink || "",
+                resumeFile: null,
                 projects: data.projects.map((proj) => ({
                     title: proj.title,
                     description: proj.description,
@@ -950,99 +952,101 @@ const handleRemoveOtherLink = (index) => {
 
     const handleBack = () => setStep(step - 1);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (validateStep3()) {
-            try {
-                const domain = domains.find((d) => d._id === formData.domainName);
-                const role = allRoles.find((r) => r._id === formData.roleUnderDomain);
-                const submitData = {
-                    ...formData,
-                    domainName: domain ? domain.name : "",
-                    roleUnderDomain: role ? role.name : "",
-                    skills: formData.skills.map((skill) => skill.name),
-                    workBasis: Object.keys(formData.workBasis).filter(
-                        (key) => formData.workBasis[key]
-                    ),
-                    workMode: Object.keys(formData.workMode)
-                        .filter((key) => formData.workMode[key])
-                        .join(", "),
-                    call: formData.contact_methods.call.selected ? formData.contact_methods.call.value : "",
-                    whatsapp: formData.contact_methods.whatsapp.selected ? formData.contact_methods.whatsapp.value : "",
-                    instagram: formData.contact_methods.instagram.selected ? formData.contact_methods.instagram.value : "",
-                    linkedin: formData.contact_methods.linkedin.selected ? formData.contact_methods.linkedin.value : "",
-                    facebook: formData.contact_methods.facebook.selected ? formData.contact_methods.facebook.value : "",
-                    otherContact: formData.contact_methods.other.selected ? formData.contact_methods.other.value : "",
-                    workCountry: formData.workLocation.country,
-                    workState: formData.workLocation.state,
-                    workCity: formData.workLocation.district,
-                    internshipTimeType: formData.internshipTimeType || "",
-                    jobTimeType: formData.jobTimeType || "",
-                    internshipDuration:
-                        formData.workBasis.Internship &&
-                        formData.internshipDuration.value &&
-                        formData.internshipDuration.unit
-                            ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-                            : "",
-                    freelancePaymentRange:
-                        formData.workBasis.Freelance &&
-                        formData.freelancePaymentRange.min &&
-                        formData.freelancePaymentRange.max
-                            ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-                            : "",
-                    internshipStipendRange:
-                        formData.internshipType === "Paid" &&
-                        formData.internshipStipendRange.min &&
-                        formData.internshipStipendRange.max
-                            ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-                            : "",
-                    experience:
-                        formData.experience.years || formData.experience.months || formData.experience.days
-                            ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
-                            : "",
-                    jobAmountRange:
-                        formData.workBasis.Job &&
-                        formData.jobAmountRange.min &&
-                        formData.jobAmountRange.max
-                            ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
-                            : "",
-                    workExperience: formData.workExperience.map((exp) => ({
-                        company: exp.companyName,
-                        role: exp.role,
-                        duration:
-                            exp.startDate && exp.endDate
-                                ? `${exp.startDate} - ${exp.endDate}`
-                                : exp.startDate || "",
-                        description: exp.description,
-                    })),
-                    // otherLinks: formData.otherLinks,
-                    otherLinks: formData.otherLinks.map((url, index) => ({
-                        url,
-                        title: `Link ${index + 1}`,
-                    })),
-                };
-                delete submitData.contact_methods;
-                delete submitData.workLocation;
-                const response = await fetch(
-                    `http://localhost:3333/api/get-discovered/update-post/${listingId}`,
-                    {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(submitData),
-                        credentials: "include",
-                    }
-                );
-                if (response.ok) {
-                    console.log("Form updated:", submitData);
-                    onClose();
-                } else {
-                    setErrors({ submit: "Failed to update the form. Please try again." });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateStep3()) {
+        try {
+            const domain = domains.find((d) => d._id === formData.domainName);
+            const role = allRoles.find((r) => r._id === formData.roleUnderDomain);
+            const submitData = {
+                ...formData,
+                domainName: domain ? domain.name : "",
+                roleUnderDomain: role ? role.name : "",
+                skills: formData.skills.map((skill) => skill.name),
+                workBasis: Object.keys(formData.workBasis).filter(
+                    (key) => formData.workBasis[key]
+                ),
+                workMode: Object.keys(formData.workMode)
+                    .filter((key) => formData.workMode[key])
+                    .join(", "),
+                call: formData.contact_methods.call.selected ? formData.contact_methods.call.value : "",
+                whatsapp: formData.contact_methods.whatsapp.selected ? formData.contact_methods.whatsapp.value : "",
+                instagram: formData.contact_methods.instagram.selected ? formData.contact_methods.instagram.value : "",
+                linkedin: formData.contact_methods.linkedin.selected ? formData.contact_methods.linkedin.value : "",
+                facebook: formData.contact_methods.facebook.selected ? formData.contact_methods.facebook.value : "",
+                otherContact: formData.contact_methods.other.selected ? formData.contact_methods.other.value : "",
+                workCountry: formData.workLocation.country,
+                workState: formData.workLocation.state,
+                workCity: formData.workLocation.district,
+                internshipTimeType: formData.internshipTimeType || "",
+                jobTimeType: formData.jobTimeType || "",
+                internshipDuration:
+                    formData.workBasis.Internship &&
+                    formData.internshipDuration.value &&
+                    formData.internshipDuration.unit
+                        ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
+                        : "",
+                freelancePaymentRange:
+                    formData.workBasis.Freelance &&
+                    formData.freelancePaymentRange.min &&
+                    formData.freelancePaymentRange.max
+                        ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
+                        : "",
+                internshipStipendRange:
+                    formData.internshipType === "Paid" &&
+                    formData.internshipStipendRange.min &&
+                    formData.internshipStipendRange.max
+                        ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
+                        : "",
+                experience:
+                    formData.experience.years || formData.experience.months || formData.experience.days
+                        ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
+                        : "",
+                jobAmountRange:
+                    formData.workBasis.Job &&
+                    formData.jobAmountRange.min &&
+                    formData.jobAmountRange.max
+                        ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
+                        : "",
+                workExperience: formData.workExperience.map((exp) => ({
+                    company: exp.companyName,
+                    role: exp.role,
+                    duration:
+                        exp.startDate && exp.endDate
+                            ? `${exp.startDate} - ${exp.endDate}`
+                            : exp.startDate || "",
+                    description: exp.description,
+                })),
+                otherLinks: formData.otherLinks.map((link) => ({
+                    url: link.url,
+                    title: link.title,
+                })),
+            };
+            delete submitData.contact_methods;
+            delete submitData.workLocation;
+            delete submitData.resumeFile; // No need to include resumeFile since it's already uploaded
+
+            const response = await fetch(
+                `http://localhost:3333/api/get-discovered/update-post/${listingId}`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(submitData),
+                    credentials: "include",
                 }
-            } catch (err) {
-                setErrors({ submit: "An error occurred. Please try again." });
+            );
+            if (response.ok) {
+                console.log("Form updated:", submitData);
+                onClose();
+            } else {
+                setErrors({ submit: "Failed to update the form. Please try again." });
             }
+        } catch (err) {
+            setErrors({ submit: "An error occurred. Please try again." });
+            console.error(err);
         }
-    };
+    }
+};
 
     const handleCancel = () => {
         setFormData({
@@ -1093,6 +1097,7 @@ const handleRemoveOtherLink = (index) => {
             experience: { years: "", months: "", days: "" },
             portfolioLink: "",
             resumeLink: "",
+            resumeFile: null,
             projects: [],
             workExperience: [],
             otherLinks: [],
@@ -2183,22 +2188,105 @@ const handleRemoveOtherLink = (index) => {
                         {errors.portfolioLink && <p className="text-red-500 text-sm mt-1">{errors.portfolioLink}</p>}
                     </div>
                     <div className="relative">
-                        <label htmlFor="resumeLink" className="block text-sm font-medium text-gray-700 mb-1">
-                            Resume Link
-                        </label>
-                        <input
-                            id="resumeLink"
-                            name="resumeLink"
-                            value={formData.resumeLink}
-                            onChange={handleChange}
-                            type="url"
-                            placeholder="https://yourresume.com"
-                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                errors.resumeLink ? "border-red-500" : "border-gray-300"
-                            }`}
-                        />
-                        {errors.resumeLink && <p className="text-red-500 text-sm mt-1">{errors.resumeLink}</p>}
-                    </div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">Resume Link</label>
+    {/* Display the current resume link if it exists and no new file is selected */}
+    {formData.resumeLink && !formData.resumeFile && (
+        <div className="mb-2">
+            <a
+                href={formData.resumeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline break-all"
+            >
+                {formData.resumeLink}
+            </a>
+            <button
+                type="button"
+                onClick={() => {
+                    setFormData((prev) => ({ ...prev, resumeLink: "" }));
+                    setUploadSuccess(""); // Clear success message when removing link
+                }}
+                className="ml-2 text-red-600 hover:text-red-800"
+            >
+                Remove
+            </button>
+        </div>
+    )}
+    {/* Display the new file name if a file is selected but not yet uploaded */}
+    {formData.resumeFile && !formData.resumeLink && (
+        <div className="mb-2 flex items-center">
+            <span className="text-gray-700">{formData.resumeFile.name}</span>
+            <button
+                type="button"
+                onClick={() => {
+                    setFormData((prev) => ({ ...prev, resumeFile: null }));
+                    setUploadSuccess(""); // Clear success message when removing file
+                }}
+                className="ml-2 text-red-600 hover:text-red-800"
+            >
+                Remove
+            </button>
+        </div>
+    )}
+    {/* Show success message if upload is successful */}
+    {uploadSuccess && (
+        <p className="text-green-600 text-sm mb-2">{uploadSuccess}</p>
+    )}
+    {/* Show file input if no file is selected or after removing the link */}
+    {(!formData.resumeLink || formData.resumeFile) && (
+        <input
+            id="resumeFile"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    setFormData((prev) => ({
+                        ...prev,
+                        resumeFile: file,
+                    }));
+                    try {
+                        const formDataToUpload = new FormData();
+                        formDataToUpload.append("media", file);
+
+                        const uploadResponse = await fetch("http://localhost:3333/api/media/upload", {
+                            method: "POST",
+                            body: formDataToUpload,
+                            credentials: "include",
+                        });
+
+                        if (!uploadResponse.ok) {
+                            throw new Error("Failed to upload resume");
+                        }
+
+                        const uploadData = await uploadResponse.json();
+                        const newResumeLink = uploadData.url; // Assuming the server returns { url: "https://new-resume-url.com" }
+
+                        setFormData((prev) => ({
+                            ...prev,
+                            resumeLink: newResumeLink,
+                            resumeFile: null, // Clear the file after successful upload
+                        }));
+                        setUploadSuccess("Resume uploaded successfully!");
+                    } catch (error) {
+                        console.error("Upload error:", error);
+                        setErrors((prev) => ({
+                            ...prev,
+                            resumeFile: "Failed to upload resume. Please try again.",
+                        }));
+                        setFormData((prev) => ({
+                            ...prev,
+                            resumeFile: null, // Clear the file on failure
+                        }));
+                    }
+                }
+            }}
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 border-gray-300"
+        />
+    )}
+    {errors.resumeFile && <p className="text-red-500 text-sm mt-1">{errors.resumeFile}</p>}
+    {errors.resumeLink && <p className="text-red-500 text-sm mt-1">{errors.resumeLink}</p>}
+</div>
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Projects</label>
                         {formData.projects.map((project, index) => (
