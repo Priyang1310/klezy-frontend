@@ -4,12 +4,13 @@ import { IoMdTime } from "react-icons/io";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
 import { PiBagBold } from "react-icons/pi";
-// import UpdateTalentPostForm from "../TalentPostForm/UpdateTalentPostForm";
+import UpdateTalentPostForm from "../TalentPostForm/UpdateTalentsForm"; // Ensure this path is correct
 import ViewTalentPostModal from "./ViewTalentPostModal";
 
 const NewCard = ({ post }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [listingId, setListingId] = useState(null);
 
   const statusColor = {
     Pending: "bg-[#FFE167] border-yellow-200",
@@ -41,7 +42,7 @@ const NewCard = ({ post }) => {
     expectations = "",
     anyOtherInfo = "",
     freelancePaymentRange = {},
-    _id: listingId,
+    _id: listingIdFromPost,
   } = post || {};
 
   // Format work basis
@@ -84,6 +85,15 @@ const NewCard = ({ post }) => {
     } else break;
   }
   const remainingCount = sortedSkills.length - visibleSkills.length;
+
+  // Handle modal close with openUpdate flag
+  const handleViewModalClose = (options = {}) => {
+    setIsModalOpen(false);
+    if (options.openUpdate && options.listingId) {
+      setListingId(options.listingId);
+      setIsUpdateModalOpen(true);
+    }
+  };
 
   return (
     <>
@@ -189,7 +199,10 @@ const NewCard = ({ post }) => {
           <div className="flex justify-end gap-2 mt-1 w-full">
             <button
               className="bg-purple-600 text-white text-xs font-medium px-4 py-2 rounded-full hover:bg-purple-700"
-              onClick={() => setIsUpdateModalOpen(true)}
+              onClick={() => {
+                setListingId(listingIdFromPost);
+                setIsUpdateModalOpen(true);
+              }}
             >
               Update
             </button>
@@ -207,28 +220,41 @@ const NewCard = ({ post }) => {
       {isModalOpen && (
         <ViewTalentPostModal
           post={post}
-          onClose={() => setIsModalOpen(false)}
-          onUpdate={() => {
-            setIsModalOpen(false);
-            setIsUpdateModalOpen(true);
-          }}
+          onClose={handleViewModalClose}
+          errors={{}}
         />
       )}
 
       {/* Update Modal */}
       {isUpdateModalOpen && (
-        <div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-[800px] max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-violet-900">Update Talent Profile</h2>
-              <button
-                className="text-gray-600 text-sm font-medium px-4 py-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200"
-                onClick={() => setIsUpdateModalOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-            <UpdateTalentPostForm listingId={listingId} onClose={() => setIsUpdateModalOpen(false)} />
+        <div
+          className="fixed inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+          onClick={() => setIsUpdateModalOpen(false)} // Close on overlay click
+        >
+          <div
+            className="bg-white p-6 sm:p-8 rounded-2xl w-full max-w-4xl m-4 relative max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsUpdateModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+
+            {/* Header */}
+            <h2 className="text-2xl font-semibold text-[#7900BF] mb-6 text-center">
+              Update Talent Profile
+            </h2>
+
+            {/* Render UpdateTalentPostForm */}
+            <UpdateTalentPostForm
+              listingId={listingId}
+              onClose={() => setIsUpdateModalOpen(false)}
+            />
           </div>
         </div>
       )}

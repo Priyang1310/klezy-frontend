@@ -964,104 +964,189 @@ function GetDiscoveredForm({ onClose }) {
 
     const handleBack = () => setStep(step - 1);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (validateStep3()) {
-            try {
-                const domain = domains.find(
-                    (d) => d._id === formData.domainName
-                );
-                const role = allRoles.find(
-                    (r) => r._id === formData.roleUnderDomain
-                );
-                const submitData = {
-                    ...formData,
-                    domainName: domain ? domain.name : "",
-                    roleUnderDomain: role ? role.name : "",
-                    skills: formData.skills.map((skill) => skill.name),
-                    workBasis: Object.keys(formData.workBasis).filter(
-                        (key) => formData.workBasis[key]
-                    ),
-                    workMode: Object.keys(formData.workMode)
-                        .filter((key) => formData.workMode[key])
-                        .at(),
-                    call: formData.contact_methods.call.selected
-                        ? formData.contact_methods.call.value
-                        : "",
-                    whatsapp: formData.contact_methods.whatsapp.selected
-                        ? formData.contact_methods.whatsapp.value
-                        : "",
-                    instagram: formData.contact_methods.instagram.selected
-                        ? formData.contact_methods.instagram.value
-                        : "",
-                    linkedin: formData.contact_methods.linkedin.selected
-                        ? formData.contact_methods.linkedin.value
-                        : "",
-                    facebook: formData.contact_methods.facebook.selected
-                        ? formData.contact_methods.facebook.value
-                        : "",
-                    otherContact: formData.contact_methods.other.selected
-                        ? formData.contact_methods.other.value
-                        : "",
-                    workCountry: formData.workLocation.country,
-                    workState: formData.workLocation.state,
-                    workCity: formData.workLocation.district,
-                    internshipTimeType: formData.internshipTimeType || "",
-                    jobTimeType: formData.jobTimeType || "", // Add this line
-                    internshipDuration:
-                        formData.workBasis.Internship &&
-                        formData.internshipDuration.value &&
-                        formData.internshipDuration.unit
-                            ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-                            : "",
-                    freelancePaymentRange:
-                        formData.workBasis.Freelance &&
-                        formData.freelancePaymentRange.min &&
-                        formData.freelancePaymentRange.max
-                            ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-                            : "",
-                    internshipStipendRange:
-                        formData.internshipType === "Paid" &&
-                        formData.internshipStipendRange.min &&
-                        formData.internshipStipendRange.max
-                            ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-                            : "",
-                    experience: formData.experience.years ||
-                        formData.experience.months ||
-                        formData.experience.days
-                            ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
-                            : "",
-                    jobAmountRange:
-                        formData.workBasis.Job &&
-                        formData.jobAmountRange.min &&
-                        formData.jobAmountRange.max
-                            ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
-                            : "",
-                };
-                delete submitData.contact_methods;
-                const response = await fetch(
-                    "http://localhost:3333/api/get-discovered/add-listing",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(submitData),
-                        credentials: "include",
-                    }
-                );
-                if (response.ok) {
-                    console.log("Form submitted:", submitData);
-                    onClose();
-                } else {
-                    setErrors({
-                        submit: "Failed to submit the form. Please try again.",
-                    });
-                }
-            } catch (err) {
-                setErrors({ submit: "An error occurred. Please try again." });
-            }
-        }
-    };
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     if (validateStep3()) {
+    //         try {
+    //             const domain = domains.find(
+    //                 (d) => d._id === formData.domainName
+    //             );
+    //             const role = allRoles.find(
+    //                 (r) => r._id === formData.roleUnderDomain
+    //             );
+    //             const submitData = {
+    //                 ...formData,
+    //                 domainName: domain ? domain.name : "",
+    //                 roleUnderDomain: role ? role.name : "",
+    //                 skills: formData.skills.map((skill) => skill.name),
+    //                 workBasis: Object.keys(formData.workBasis).filter(
+    //                     (key) => formData.workBasis[key]
+    //                 ),
+    //                 workMode: Object.keys(formData.workMode)
+    //                     .filter((key) => formData.workMode[key])
+    //                     .at(),
+    //                 call: formData.contact_methods.call.selected
+    //                     ? formData.contact_methods.call.value
+    //                     : "",
+    //                 whatsapp: formData.contact_methods.whatsapp.selected
+    //                     ? formData.contact_methods.whatsapp.value
+    //                     : "",
+    //                 instagram: formData.contact_methods.instagram.selected
+    //                     ? formData.contact_methods.instagram.value
+    //                     : "",
+    //                 linkedin: formData.contact_methods.linkedin.selected
+    //                     ? formData.contact_methods.linkedin.value
+    //                     : "",
+    //                 facebook: formData.contact_methods.facebook.selected
+    //                     ? formData.contact_methods.facebook.value
+    //                     : "",
+    //                 otherContact: formData.contact_methods.other.selected
+    //                     ? formData.contact_methods.other.value
+    //                     : "",
+    //                 workCountry: formData.workLocation.country,
+    //                 workState: formData.workLocation.state,
+    //                 workCity: formData.workLocation.district,
+    //                 internshipTimeType: formData.internshipTimeType || "",
+    //                 jobTimeType: formData.jobTimeType || "", // Add this line
+    //                 internshipDuration:
+    //                     formData.workBasis.Internship &&
+    //                     formData.internshipDuration.value &&
+    //                     formData.internshipDuration.unit
+    //                         ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
+    //                         : "",
+    //                 freelancePaymentRange:
+    //                     formData.workBasis.Freelance &&
+    //                     formData.freelancePaymentRange.min &&
+    //                     formData.freelancePaymentRange.max
+    //                         ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
+    //                         : "",
+    //                 internshipStipendRange:
+    //                     formData.internshipType === "Paid" &&
+    //                     formData.internshipStipendRange.min &&
+    //                     formData.internshipStipendRange.max
+    //                         ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
+    //                         : "",
+    //                 experience: formData.experience.years ||
+    //                     formData.experience.months ||
+    //                     formData.experience.days
+    //                         ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
+    //                         : "",
+    //                 jobAmountRange:
+    //                     formData.workBasis.Job &&
+    //                     formData.jobAmountRange.min &&
+    //                     formData.jobAmountRange.max
+    //                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
+    //                         : "",
+    //                           otherLinks: formData.otherLinks.map((url, index) => ({
+    //                     url,
+    //                     title: `Link ${index + 1}`,
+    //                 })),
+    //             };
+                
+    //             delete submitData.contact_methods;
+    //             const response = await fetch(
+    //                 "http://localhost:3333/api/get-discovered/add-listing",
+    //                 {
+    //                     method: "POST",
+    //                     headers: { "Content-Type": "application/json" },
+    //                     body: JSON.stringify(submitData),
+    //                     credentials: "include",
+    //                 }
+    //             );
+    //             if (response.ok) {
+    //                 console.log("Form submitted:", submitData);
+    //                 onClose();
+    //             } else {
+    //                 setErrors({
+    //                     submit: "Failed to submit the form. Please try again.",
+    //                 });
+    //             }
+    //         } catch (err) {
+    //             setErrors({ submit: "An error occurred. Please try again." });
+    //         }
+    //     }
+    // };
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateStep3()) {
+        try {
+            const domain = domains.find((d) => d._id === formData.domainName);
+            const role = allRoles.find((r) => r._id === formData.roleUnderDomain);
 
+            const submitData = {
+                ...formData,
+                domainName: domain ? domain.name : formData.domainName,
+                roleUnderDomain: role ? role.name : formData.roleUnderDomain,
+                skills: formData.skills.map((skill) => skill.name),
+                workBasis: formData.workBasis, // Keep the full workBasis object
+                workMode: formData.workMode, // Keep the full workMode object
+                contact_methods: {
+                    call: formData.contact_methods.call,
+                    whatsapp: formData.contact_methods.whatsapp,
+                    instagram: formData.contact_methods.instagram,
+                    linkedin: formData.contact_methods.linkedin,
+                    facebook: formData.contact_methods.facebook,
+                    other: formData.contact_methods.other,
+                },
+                workCountry: formData.workLocation.country,
+                workState: formData.workLocation.state,
+                workCity: formData.workLocation.district,
+                internshipDuration: formData.internshipDuration.value && formData.internshipDuration.unit
+                    ? { value: formData.internshipDuration.value, unit: formData.internshipDuration.unit }
+                    : { value: "", unit: "" },
+                freelancePaymentRange: formData.freelancePaymentRange.min && formData.freelancePaymentRange.max
+                    ? { min: formData.freelancePaymentRange.min, max: formData.freelancePaymentRange.max }
+                    : { min: "", max: "" },
+                internshipStipendRange: formData.internshipType === "Paid" && formData.internshipStipendRange.min && formData.internshipStipendRange.max
+                    ? { min: formData.internshipStipendRange.min, max: formData.internshipStipendRange.max }
+                    : { min: "", max: "" },
+                jobAmountRange: formData.jobAmountRange.min && formData.jobAmountRange.max
+                    ? { min: formData.jobAmountRange.min, max: formData.jobAmountRange.max }
+                    : { min: "", max: "" },
+                experience: {
+                    years: formData.experience.years || "",
+                    months: formData.experience.months || "",
+                    days: formData.experience.days || "",
+                },
+                otherLinks: formData.otherLinks.map((url, index) => ({
+                    url,
+                    title: `Link ${index + 1}`,
+                })),
+            };
+
+            // Remove individual contact method fields if backend expects contact_methods object
+            delete submitData.call;
+            delete submitData.whatsapp;
+            delete submitData.instagram;
+            delete submitData.linkedin;
+            delete submitData.facebook;
+            delete submitData.otherContact;
+
+            const response = await fetch(
+                "http://localhost:3333/api/get-discovered/add-listing",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(submitData),
+                    credentials: "include",
+                }
+            );
+
+            if (response.ok) {
+                console.log("Form submitted:", submitData);
+                onClose();
+            } else {
+                const errorData = await response.json();
+                setErrors({
+                    submit: errorData.message || "Failed to submit the form. Please try again.",
+                });
+            }
+        } catch (err) {
+            console.error("Submission error:", err);
+            setErrors({ submit: "An error occurred. Please try again." });
+        }
+    }
+};
     const handleCancel = () => {
         setFormData({
             first_name: formData.first_name,
