@@ -113,7 +113,7 @@ const ForgotPassword = () => {
 
         try {
             if (method === "email") {
-                const response = await fetch(`http://localhost:3333/api/otp/change-password/verify-otp`, {
+                const response = await fetch(`http://localhost:3333/api/otp/verify-otp`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email: emailOrPhone, otp }),
