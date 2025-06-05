@@ -9,6 +9,7 @@ import ViewTalentPostModal from "./ViewTalentPostModal";
 import { CiEdit } from "react-icons/ci";
 
 const NewCard = ({ post }) => {
+  console.log(post);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 	const [listingId, setListingId] = useState(null);
