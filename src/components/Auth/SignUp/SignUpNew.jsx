@@ -38,6 +38,7 @@ const SignUpNew = () => {
     const [gender, setGender] = useState(null);
     const [phoneTimer, setPhoneTimer] = useState(0);
     const [emailTimer, setEmailTimer] = useState(0);
+    const [agreed, setAgreed] = useState(false);
 
     // Regex for name validation
     const nameRegex = /^[A-Za-z\s\-]*$/;
@@ -116,6 +117,11 @@ const SignUpNew = () => {
         setErrors((prev) => ({ ...prev, confirmPassword: "" }));
     };
 
+    const handleAgreedChange = (e) => {
+        setAgreed(e.target.checked);
+        setErrors((prev) => ({ ...prev, agreed: "" }));
+    };
+
     // Timer for OTP resend
     useEffect(() => {
         if (phoneTimer > 0) {
@@ -175,7 +181,7 @@ const SignUpNew = () => {
 
     const handleSendPhoneOTP = () => {
         setShowOTPInput(true)
-        setPhoneTimer(true)
+        setPhoneTimer(60)
     };
 
     // Fetch countries
@@ -496,7 +502,9 @@ const SignUpNew = () => {
                         email,
                         country: country?.label,
                         state: state?.label,
-                        city: district?.label,})
+                        city: district?.label,
+                        agreed,
+                    })
         try {
             const response = await fetch(
                 "http://localhost:3333/api/auth/signup",
@@ -518,6 +526,7 @@ const SignUpNew = () => {
                         country: country?.label,
                         state: state?.label,
                         city: district?.label,
+                        agreed,
                     }),
                 }
             );
@@ -1184,6 +1193,32 @@ const SignUpNew = () => {
                                         {errors.confirmPassword && (
                                             <p className="text-red-500 text-xs mt-1">
                                                 {errors.confirmPassword}
+                                            </p>
+                                        )}
+                                    </div>
+                                    {/* Chackbox of Agreed to Terms and Conditons */}
+                                    <div className="text-left">
+                                        <label className="flex items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                checked={agreed}
+                                                onChange={handleAgreedChange}
+                                                className="h-4 w-4 text-violet-500 focus:ring-violet-500 border-gray-300 rounded"
+                                            />
+                                            <span className="text-sm text-gray-600">
+                                                I agree to the{" "}
+                                                <a
+                                                    href="/"
+                                                    className="text-[#A100FF] underline"
+                                                    target="_blank"
+                                                >
+                                                    terms and conditions
+                                                </a>
+                                            </span>
+                                        </label>
+                                        {errors.agreed && (
+                                            <p className="text-red-500 text-xs mt-1">
+                                                {errors.agreed}
                                             </p>
                                         )}
                                     </div>

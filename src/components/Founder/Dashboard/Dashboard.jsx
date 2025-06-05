@@ -22,7 +22,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import NewCard from "./NewCard";
 import Aos from "aos";
+import { IoMdAddCircleOutline } from "react-icons/io";
 import "aos/dist/aos.css";
+import './Dashboard.css';
 // Initialize AOS for animations
 
 
@@ -126,9 +128,9 @@ const Dashboard = () => {
     }, [isSidebarOpen]);
 
     // Initialize AOS for animations
-    useEffect(() => {
-        Aos.init({ duration: 900 });
-    }, []);
+    // useEffect(() => {
+    //     Aos.init({ duration: 900 });
+    // }, []);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -136,6 +138,8 @@ const Dashboard = () => {
 
     const postsFiltered =
         filter === "All" ? posts : posts.filter((post) => post.status === filter);
+
+    console.log("postFiltered: ",postsFiltered)
 
     return (
         <div className=" flex flex-col bg-gray-100 h-fit min-h-screen poppins-medium items-center">
@@ -165,7 +169,7 @@ const Dashboard = () => {
                             </button> */}
                             <button
                                 onClick={openModal}
-                                className="bg-violet-600 px-2 py-1 xs:px-2 sm:px-3 md:px-4 xs:py-1 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 xs:gap-1 sm:gap-2 text-white text-xs xs:text-xs sm:text-sm md:text-base"
+                                className="bg-[#A100FF] px-2 py-1 xs:px-2 sm:px-3 md:px-4 xs:py-1 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 xs:gap-1 sm:gap-2 text-white text-xs xs:text-xs sm:text-sm md:text-base"
                             >
                                 <MdOutlineAddToPhotos className="text-lg xs:text-lg sm:text-xl md:text-2xl" />
                                 Add Post
@@ -239,7 +243,7 @@ const Dashboard = () => {
                     <div className="flex flex-col items-center h-full px-4 py-4 gap-4 overflow-y-auto">
                         {/* <div className="h-[1px] w-full bg-black opacity-30"></div> */}
                         <div className="flex flex-col w-full items-center gap-1">
-                            <button className="bg-violet-500 text-white font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base"><AiOutlineShop className="text-xl " /> Market Place</button>
+                            <button className="bg-[#A100FF] text-white font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base"><AiOutlineShop className="text-xl " /> Market Place</button>
                         </div>
 
                         <div className="h-[1px] w-full bg-black opacity-30"></div>
@@ -311,6 +315,12 @@ const Dashboard = () => {
                                 />
                             </div>
                         ))} */}
+                        {filter === "All" && postsFiltered.length === 0 && (
+                            <button className="border-[3px] border-dashed border-gray-400 text-2xl text-gray-700 font-semibold flex items-center justify-center transition-all duration-300 flex-col h-[250px] w-[650px] bg-gray-100 rounded-3xl p-5 gap-0.5 hover:cursor-pointer" onClick={openModal}>
+                                {/* <img src="./FindPeople.svg" className="h-[200px]" alt="" /> */}
+                                <IoMdAddCircleOutline className="text-4xl" /> create a new post
+                            </button>
+                        )}
                         {postsFiltered.map((card) => (
                             <div key={card.id} className="w-full">
                                 <NewCard post={card} />

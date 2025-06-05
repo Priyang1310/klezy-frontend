@@ -120,7 +120,7 @@ const Dashboard = () => {
             <div className="hidden lg:flex items-center gap-2 sm:gap-4">
               <button
                 onClick={openModal}
-                className="bg-violet-600 px-2 py-1 sm:px-3 md:px-4 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 sm:gap-2 text-white text-xs sm:text-sm md:text-base"
+                className="bg-[#A100FF] px-2 py-1 sm:px-3 md:px-4 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 sm:gap-2 text-white text-xs sm:text-sm md:text-base"
               >
                 <MdOutlineAddToPhotos className="text-lg sm:text-xl md:text-2xl" />
                 Add Post
@@ -150,7 +150,7 @@ const Dashboard = () => {
         >
           <div className="flex flex-col items-center h-full px-4 py-4 gap-4 overflow-y-auto">
             <div className="flex flex-col w-full items-center gap-1">
-              <button className="bg-violet-500 text-white font-medium flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base">
+              <button className="bg-[#A100FF] text-white font-medium flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base">
                 <AiOutlineShop className="text-xl" /> Market Place
               </button>
             </div>
