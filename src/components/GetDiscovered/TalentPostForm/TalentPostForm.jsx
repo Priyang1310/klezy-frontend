@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
+
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
 function GetDiscoveredForm({ onClose }) {
+    const animatedComponents = makeAnimated();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         first_name: "",
@@ -45,7 +49,7 @@ function GetDiscoveredForm({ onClose }) {
         partnershipCriteria: "",
         internshipType: null,
         internshipTimeType: null,
-        jobTimeType:null,
+        jobTimeType: "",
         internshipDuration: { value: "", unit: "" },
         internshipStipendRange: { min: "", max: "" },
         internshipPerformanceCriteria: "",
@@ -59,16 +63,17 @@ function GetDiscoveredForm({ onClose }) {
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
         workLocation: { country: "", state: "", district: "" },
-        experience: { years: "", months: "", days: "" },
+        experience: { min: "", max: "", unit: "" },
         portfolioLink: "",
         resumeLink: "",
         projects: [],
         workExperience: [],
-        otherLinks: [],
+        otherLinks: [{ title: "", url: "" }],
         expectations: "",
         anyOtherInfo: "",
     });
 
+    const [resumeFile, setResumeFile] = useState(null);
     const [errors, setErrors] = useState({});
     const [domains, setDomains] = useState([]);
     const [allRoles, setAllRoles] = useState([]);
@@ -157,20 +162,34 @@ function GetDiscoveredForm({ onClose }) {
                 );
                 if (!response.ok) throw new Error("Failed to fetch domains");
                 const data = await response.json();
-                const sortedDomains = (data.domains || []).sort((a, b) =>
-                    a.name.localeCompare(b.name)
-                );
+
+                // Transform domains into react-select format
+                const sortedDomains = (data.domains || [])
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((domain) => ({
+                        value: domain._id,
+                        label: domain.name,
+                        roles: domain.roles,
+                    }));
+
+                // Set domains for react-select
                 setDomains(sortedDomains);
                 setFilteredDomains(sortedDomains);
-
+                console.log(sortedDomains);
+                // Transform roles into react-select format
                 const rolesFromAllDomains = sortedDomains.reduce(
                     (acc, domain) => {
                         if (Array.isArray(domain.roles)) {
                             return [
                                 ...acc,
                                 ...domain.roles.map((role) => ({
-                                    ...role,
-                                    domainId: domain._id,
+                                    value: role._id,
+                                    label: role.name || role.title, // Adjust based on your role's name field
+                                    domainId: domain.value, // Reference domain by its _id
+                                    // Optional: Add color or other properties if needed
+                                    // color: '#someColor',
+                                    // isFixed: false,
+                                    // isDisabled: false,
                                 })),
                             ];
                         }
@@ -178,13 +197,19 @@ function GetDiscoveredForm({ onClose }) {
                     },
                     []
                 );
-                const uniqueRoles = Array.from(
-                    new Map(
-                        rolesFromAllDomains.map((role) => [role._id, role])
-                    ).values()
-                );
-                setAllRoles(uniqueRoles);
-                setFilteredRoles(uniqueRoles);
+
+                console.log(rolesFromAllDomains);
+
+                // Remove duplicates by role._id
+                // const uniqueRoles = Array.from(
+                //     new Map(
+                //         rolesFromAllDomains.map((role) => [role.value, role])
+                //     ).values()
+                // );
+
+                // Set roles for react-select
+                setAllRoles(rolesFromAllDomains);
+                setFilteredRoles(rolesFromAllDomains);
             } catch (error) {
                 console.error("Error fetching domains:", error);
                 setDomains([]);
@@ -202,7 +227,7 @@ function GetDiscoveredForm({ onClose }) {
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
-            roleUnderDomain: "",
+            // roleUnderDomain: "",
             skills: [],
         }));
         setRoleSearchText("");
@@ -305,13 +330,22 @@ function GetDiscoveredForm({ onClose }) {
     };
 
     const handleNestedChange = (field, subField, value) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: { ...prev[field], [subField]: value },
-        }));
+        if (subField === null) {
+            // Handle top-level fields like jobTimeType
+            setFormData((prev) => ({
+                ...prev,
+                [field]: value,
+            }));
+        } else {
+            // Handle nested fields
+            setFormData((prev) => ({
+                ...prev,
+                [field]: { ...prev[field], [subField]: value },
+            }));
+        }
         setErrors((prev) => ({
             ...prev,
-            [field]: { ...prev[field], [subField]: "" },
+            [field]: subField ? { ...prev[field], [subField]: "" } : "",
         }));
     };
 
@@ -400,7 +434,7 @@ function GetDiscoveredForm({ onClose }) {
             partnershipCriteria: "",
             internshipType: "",
             internshipTimeType: "",
-            jobTimeType:"",
+            jobTimeType: "",
             internshipDuration: { value: "", unit: "" },
             internshipStipendRange: { min: "", max: "" },
             internshipPerformanceCriteria: "",
@@ -433,7 +467,6 @@ function GetDiscoveredForm({ onClose }) {
         setFormData((prev) => ({
             ...prev,
             internshipType: value,
-            internshipTimeType: null,
             internshipDuration: value
                 ? prev.internshipDuration
                 : { value: "", unit: "" },
@@ -449,7 +482,6 @@ function GetDiscoveredForm({ onClose }) {
         setErrors((prev) => ({
             ...prev,
             internshipType: "",
-            internshipTimeType: "",
             internshipStipendRange: { min: "", max: "" },
             internshipPerformanceCriteria: "",
         }));
@@ -472,17 +504,17 @@ function GetDiscoveredForm({ onClose }) {
     const handleDomainBlur = () =>
         setTimeout(() => setShowDomainSuggestions(false), 200);
 
-    const handleDomainSelect = (domain) => {
+    const handleDomainSelect = (selectedDomain) => {
         setFormData((prev) => ({
             ...prev,
-            domainName: domain._id,
+            domainName: selectedDomain.value,
             roleUnderDomain: "",
-            skills: [],
+            skills: [], // Reset skills when domain changes
         }));
-        setDomainSearchText(domain.name);
+        setDomainSearchText(selectedDomain.label);
         setRoleSearchText("");
         setFilteredRoles(
-            allRoles.filter((role) => role.domainId === domain._id)
+            allRoles.filter((role) => role.domainId === selectedDomain.value)
         );
         setShowDomainSuggestions(false);
         setErrors((prev) => ({ ...prev, domainName: "" }));
@@ -496,21 +528,25 @@ function GetDiscoveredForm({ onClose }) {
     const handleRoleFocus = () => setShowRoleSuggestions(true);
     const handleRoleBlur = () =>
         setTimeout(() => setShowRoleSuggestions(false), 200);
-    const handleRoleSelect = (role) => {
+    const handleRoleSelect = (selectedRole) => {
         const associatedDomain = domains.find(
-            (domain) => domain._id === role.domainId
+            (domain) => domain.value === selectedRole.domainId
         );
-        if (associatedDomain) {
-            setFormData((prev) => ({
-                ...prev,
-                roleUnderDomain: role._id,
-                domainName: associatedDomain._id,
-            }));
-            setDomainSearchText(associatedDomain.name);
-        } else {
-            setFormData((prev) => ({ ...prev, roleUnderDomain: role._id }));
-        }
-        setRoleSearchText(role.name);
+        setFormData((prev) => ({
+            ...prev,
+            roleUnderDomain: selectedRole.value,
+            domainName: associatedDomain ? associatedDomain.value : "",
+            skills: [], // Reset skills when role changes
+        }));
+        setDomainSearchText(associatedDomain ? associatedDomain.label : "");
+        setRoleSearchText(selectedRole.label);
+        setFilteredRoles(
+            associatedDomain
+                ? allRoles.filter(
+                      (role) => role.domainId === associatedDomain.value
+                  )
+                : allRoles
+        );
         setShowRoleSuggestions(false);
         setErrors((prev) => ({ ...prev, roleUnderDomain: "", domainName: "" }));
     };
@@ -542,7 +578,10 @@ function GetDiscoveredForm({ onClose }) {
     const handleProjectChange = (index, field, value) => {
         setFormData((prev) => {
             const updatedProjects = [...prev.projects];
-            updatedProjects[index] = { ...updatedProjects[index], [field]: value };
+            updatedProjects[index] = {
+                ...updatedProjects[index],
+                [field]: value,
+            };
             return { ...prev, projects: updatedProjects };
         });
     };
@@ -550,7 +589,10 @@ function GetDiscoveredForm({ onClose }) {
     const handleAddProject = () => {
         setFormData((prev) => ({
             ...prev,
-            projects: [...prev.projects, { title: "", description: "", link: "" }],
+            projects: [
+                ...prev.projects,
+                { title: "", description: "", link: "" },
+            ],
         }));
     };
 
@@ -564,7 +606,10 @@ function GetDiscoveredForm({ onClose }) {
     const handleWorkExperienceChange = (index, field, value) => {
         setFormData((prev) => {
             const updatedWorkExperience = [...prev.workExperience];
-            updatedWorkExperience[index] = { ...updatedWorkExperience[index], [field]: value };
+            updatedWorkExperience[index] = {
+                ...updatedWorkExperience[index],
+                [field]: value,
+            };
             return { ...prev, workExperience: updatedWorkExperience };
         });
     };
@@ -574,7 +619,13 @@ function GetDiscoveredForm({ onClose }) {
             ...prev,
             workExperience: [
                 ...prev.workExperience,
-                { startDate: "", endDate: "", role: "",companyName: "", description: "" },
+                {
+                    startDate: "",
+                    endDate: "",
+                    role: "",
+                    companyName: "",
+                    description: "",
+                },
             ],
         }));
     };
@@ -586,25 +637,23 @@ function GetDiscoveredForm({ onClose }) {
         }));
     };
 
-    
-
-    
-
-   
-
     const handleAddOtherLink = () => {
         setFormData((prev) => ({
             ...prev,
-            otherLinks: [...prev.otherLinks, ""],
+            otherLinks: [...prev.otherLinks, { title: "", url: "" }],
         }));
     };
 
-    const handleOtherLinkChange = (index, value) => {
+    const handleOtherLinkChange = (index, field, value) => {
         setFormData((prev) => {
             const updatedLinks = [...prev.otherLinks];
-            updatedLinks[index] = value;
+            updatedLinks[index] = { ...updatedLinks[index], [field]: value };
             return { ...prev, otherLinks: updatedLinks };
         });
+        setErrors((prev) => ({
+            ...prev,
+            [`${field}Link${index}`]: "",
+        }));
     };
 
     const handleRemoveOtherLink = (index) => {
@@ -612,9 +661,20 @@ function GetDiscoveredForm({ onClose }) {
             ...prev,
             otherLinks: prev.otherLinks.filter((_, i) => i !== index),
         }));
+        setErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[`titleLink${index}`];
+            delete newErrors[`link${index}`];
+            return newErrors;
+        });
     };
 
-    const enhanceField = async (fieldName, value, index = null, nestedField = null) => {
+    const enhanceField = async (
+        fieldName,
+        value,
+        index = null,
+        nestedField = null
+    ) => {
         setEnhanceLoading((prev) => ({
             ...prev,
             [`${fieldName}${index !== null ? index : ""}`]: true,
@@ -637,7 +697,8 @@ function GetDiscoveredForm({ onClose }) {
                     const updatedArray = [...prev[fieldName]];
                     updatedArray[index] = {
                         ...updatedArray[index],
-                        [nestedField]: response.data[fieldName]?.[nestedField] || value,
+                        [nestedField]:
+                            response.data[fieldName]?.[nestedField] || value,
                     };
                     return { ...prev, [fieldName]: updatedArray };
                 } else if (index !== null) {
@@ -671,7 +732,7 @@ function GetDiscoveredForm({ onClose }) {
         if (
             formData.email &&
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-   )
+        )
             newErrors.email = "Invalid email format";
         if (!formData.country) newErrors.country = "Country is required";
         if (!formData.state) newErrors.state = "State is required";
@@ -679,7 +740,8 @@ function GetDiscoveredForm({ onClose }) {
         if (!formData.userType) newErrors.userType = "User type is required";
         if (formData.userType === "Other" && !formData.otherUserType.trim())
             newErrors.otherUserType = "Please specify user type";
-        
+        if (!formData.aboutSelf)
+            newErrors.aboutSelf = "About yourself is required";
 
         const selectedContacts = Object.values(formData.contact_methods).filter(
             (method) => method.selected
@@ -796,31 +858,31 @@ function GetDiscoveredForm({ onClose }) {
             newErrors.collaborationDescription =
                 "Collaboration description is required";
         if (formData.workBasis.Job) {
-  if (!formData.jobTimeType)
-    newErrors.jobTimeType = "Please specify job time type";
-  const min = Number(formData.jobAmountRange.min);
-  const max = Number(formData.jobAmountRange.max);
-  if (
-    !formData.jobAmountRange.min.trim() ||
-    isNaN(min) ||
-    min < 0 ||
-    !Number.isInteger(min)
-  )
-    newErrors.jobAmountRange = {
-      ...newErrors.jobAmountRange,
-      min: "Valid whole number minimum amount is required",
-    };
-  if (
-    !formData.jobAmountRange.max.trim() ||
-    isNaN(max) ||
-    max < min ||
-    !Number.isInteger(max)
-  )
-    newErrors.jobAmountRange = {
-      ...newErrors.jobAmountRange,
-      max: "Valid whole number maximum amount must be at least the minimum",
-    };
-}
+            if (!formData.jobTimeType)
+                newErrors.jobTimeType = "Please specify job time type";
+            const min = Number(formData.jobAmountRange.min);
+            const max = Number(formData.jobAmountRange.max);
+            if (
+                !formData.jobAmountRange.min.trim() ||
+                isNaN(min) ||
+                min < 0 ||
+                !Number.isInteger(min)
+            )
+                newErrors.jobAmountRange = {
+                    ...newErrors.jobAmountRange,
+                    min: "Valid whole number minimum amount is required",
+                };
+            if (
+                !formData.jobAmountRange.max.trim() ||
+                isNaN(max) ||
+                max < min ||
+                !Number.isInteger(max)
+            )
+                newErrors.jobAmountRange = {
+                    ...newErrors.jobAmountRange,
+                    max: "Valid whole number maximum amount must be at least the minimum",
+                };
+        }
         if (formData.workBasis.Freelance) {
             if (
                 !formData.freelancePaymentRange.min.trim() ||
@@ -875,44 +937,36 @@ function GetDiscoveredForm({ onClose }) {
                     district: "District is required",
                 };
         }
+
         if (
-            !formData.experience.years.trim() &&
-            !formData.experience.months.trim() &&
-            !formData.experience.days.trim()
+            !formData.experience.min.trim() ||
+            !formData.experience.max.trim() ||
+            !formData.experience.unit
         ) {
             newErrors.experience = {
-                years: "At least one experience field is required",
+                min: !formData.experience.min.trim()
+                    ? "Minimum experience is required"
+                    : "",
+                max: !formData.experience.max.trim()
+                    ? "Maximum experience is required"
+                    : "",
+                unit: !formData.experience.unit ? "Unit is required" : "",
             };
         } else {
-            if (
-                formData.experience.years &&
-                (isNaN(formData.experience.years) ||
-                    Number(formData.experience.years) < 0)
-            )
+            const min = Number(formData.experience.min);
+            const max = Number(formData.experience.max);
+            if (isNaN(min) || min < 0) {
                 newErrors.experience = {
                     ...newErrors.experience,
-                    years: "Valid years are required",
+                    min: "Valid minimum experience is required",
                 };
-            if (
-                formData.experience.months &&
-                (isNaN(formData.experience.months) ||
-                    Number(formData.experience.months) < 0 ||
-                    Number(formData.experience.months) > 11)
-            )
+            }
+            if (isNaN(max) || max < min) {
                 newErrors.experience = {
                     ...newErrors.experience,
-                    months: "Valid months (0-11) are required",
+                    max: "Maximum must be greater than or equal to minimum",
                 };
-            if (
-                formData.experience.days &&
-                (isNaN(formData.experience.days) ||
-                    Number(formData.experience.days) < 0 ||
-                    Number(formData.experience.days) > 30)
-            )
-                newErrors.experience = {
-                    ...newErrors.experience,
-                    days: "Valid days (0-30) are required",
-                };
+            }
         }
 
         setErrors(newErrors);
@@ -936,14 +990,31 @@ function GetDiscoveredForm({ onClose }) {
         )
             newErrors.resumeLink = "Invalid URL (must start with https://)";
         formData.projects.forEach((project, index) => {
-            if (project.link && !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(project.link)) {
-                newErrors[`projectLink${index}`] = "Invalid URL (must start with https://)";
+            if (
+                project.link &&
+                !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+                    project.link
+                )
+            ) {
+                newErrors[`projectLink${index}`] =
+                    "Invalid URL (must start with https://)";
             }
         });
-        
-        formData.otherLinks.forEach((link, index) => {
-            if (link && !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(link)) {
-                newErrors[`otherLink${index}`] = "Invalid URL (must start with https://)";
+
+        formData.otherLinks.forEach((linkObj, index) => {
+            if (
+                linkObj.url &&
+                !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%\+.~#?&//=]*)$/.test(
+                    linkObj.url
+                )
+            ) {
+                newErrors[`link${index}`] =
+                    "Invalid URL (must start with https://)";
+            }
+            // Optional: Validate title if required
+            if (!linkObj.title.trim() && linkObj.url.trim()) {
+                newErrors[`titleLink${index}`] =
+                    "Title is required if URL is provided";
             }
         });
 
@@ -964,189 +1035,204 @@ function GetDiscoveredForm({ onClose }) {
 
     const handleBack = () => setStep(step - 1);
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     if (validateStep3()) {
-    //         try {
-    //             const domain = domains.find(
-    //                 (d) => d._id === formData.domainName
-    //             );
-    //             const role = allRoles.find(
-    //                 (r) => r._id === formData.roleUnderDomain
-    //             );
-    //             const submitData = {
-    //                 ...formData,
-    //                 domainName: domain ? domain.name : "",
-    //                 roleUnderDomain: role ? role.name : "",
-    //                 skills: formData.skills.map((skill) => skill.name),
-    //                 workBasis: Object.keys(formData.workBasis).filter(
-    //                     (key) => formData.workBasis[key]
-    //                 ),
-    //                 workMode: Object.keys(formData.workMode)
-    //                     .filter((key) => formData.workMode[key])
-    //                     .at(),
-    //                 call: formData.contact_methods.call.selected
-    //                     ? formData.contact_methods.call.value
-    //                     : "",
-    //                 whatsapp: formData.contact_methods.whatsapp.selected
-    //                     ? formData.contact_methods.whatsapp.value
-    //                     : "",
-    //                 instagram: formData.contact_methods.instagram.selected
-    //                     ? formData.contact_methods.instagram.value
-    //                     : "",
-    //                 linkedin: formData.contact_methods.linkedin.selected
-    //                     ? formData.contact_methods.linkedin.value
-    //                     : "",
-    //                 facebook: formData.contact_methods.facebook.selected
-    //                     ? formData.contact_methods.facebook.value
-    //                     : "",
-    //                 otherContact: formData.contact_methods.other.selected
-    //                     ? formData.contact_methods.other.value
-    //                     : "",
-    //                 workCountry: formData.workLocation.country,
-    //                 workState: formData.workLocation.state,
-    //                 workCity: formData.workLocation.district,
-    //                 internshipTimeType: formData.internshipTimeType || "",
-    //                 jobTimeType: formData.jobTimeType || "", // Add this line
-    //                 internshipDuration:
-    //                     formData.workBasis.Internship &&
-    //                     formData.internshipDuration.value &&
-    //                     formData.internshipDuration.unit
-    //                         ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-    //                         : "",
-    //                 freelancePaymentRange:
-    //                     formData.workBasis.Freelance &&
-    //                     formData.freelancePaymentRange.min &&
-    //                     formData.freelancePaymentRange.max
-    //                         ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-    //                         : "",
-    //                 internshipStipendRange:
-    //                     formData.internshipType === "Paid" &&
-    //                     formData.internshipStipendRange.min &&
-    //                     formData.internshipStipendRange.max
-    //                         ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-    //                         : "",
-    //                 experience: formData.experience.years ||
-    //                     formData.experience.months ||
-    //                     formData.experience.days
-    //                         ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
-    //                         : "",
-    //                 jobAmountRange:
-    //                     formData.workBasis.Job &&
-    //                     formData.jobAmountRange.min &&
-    //                     formData.jobAmountRange.max
-    //                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
-    //                         : "",
-    //                           otherLinks: formData.otherLinks.map((url, index) => ({
-    //                     url,
-    //                     title: `Link ${index + 1}`,
-    //                 })),
-    //             };
-                
-    //             delete submitData.contact_methods;
-    //             const response = await fetch(
-    //                 "http://localhost:3333/api/get-discovered/add-listing",
-    //                 {
-    //                     method: "POST",
-    //                     headers: { "Content-Type": "application/json" },
-    //                     body: JSON.stringify(submitData),
-    //                     credentials: "include",
-    //                 }
-    //             );
-    //             if (response.ok) {
-    //                 console.log("Form submitted:", submitData);
-    //                 onClose();
-    //             } else {
-    //                 setErrors({
-    //                     submit: "Failed to submit the form. Please try again.",
-    //                 });
-    //             }
-    //         } catch (err) {
-    //             setErrors({ submit: "An error occurred. Please try again." });
-    //         }
-    //     }
-    // };
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validateStep3()) {
+    const uploadResume = async (file) => {
+        //Add commentMore actions
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+        const ALLOWED_TYPES = [
+            "application/pdf",
+            "application/msword", // .doc
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+        ];
+
+        // Validate file
+        if (!file) {
+            setErrors((prev) => ({
+                ...prev,
+                resumeFile: "Please select a file.",
+            }));
+            setResumeFile(null);
+            return;
+        }
+
+        // Size check
+        if (file.size > MAX_SIZE) {
+            setErrors((prev) => ({
+                ...prev,
+                resumeFile: "File is too large. Max allowed size is 10MB.",
+            }));
+            setResumeFile(null);
+            return;
+        }
+
+        // Type check
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            setErrors((prev) => ({
+                ...prev,
+                resumeFile: "Only PDF, DOC, and DOCX files are allowed.",
+            }));
+            setResumeFile(null);
+            return;
+        }
+
+        // Prepare FormData for upload
+        const formDataToSend = new FormData();
+        formDataToSend.append("media", file);
+
         try {
-            const domain = domains.find((d) => d._id === formData.domainName);
-            const role = allRoles.find((r) => r._id === formData.roleUnderDomain);
+            const res = await fetch("http://localhost:3333/api/media/upload", {
+                method: "POST",
+                body: formDataToSend,
+            });
 
-            const submitData = {
-                ...formData,
-                domainName: domain ? domain.name : formData.domainName,
-                roleUnderDomain: role ? role.name : formData.roleUnderDomain,
-                skills: formData.skills.map((skill) => skill.name),
-                workBasis: formData.workBasis, // Keep the full workBasis object
-                workMode: formData.workMode, // Keep the full workMode object
-                contact_methods: {
-                    call: formData.contact_methods.call,
-                    whatsapp: formData.contact_methods.whatsapp,
-                    instagram: formData.contact_methods.instagram,
-                    linkedin: formData.contact_methods.linkedin,
-                    facebook: formData.contact_methods.facebook,
-                    other: formData.contact_methods.other,
-                },
-                workCountry: formData.workLocation.country,
-                workState: formData.workLocation.state,
-                workCity: formData.workLocation.district,
-                internshipDuration: formData.internshipDuration.value && formData.internshipDuration.unit
-                    ? { value: formData.internshipDuration.value, unit: formData.internshipDuration.unit }
-                    : { value: "", unit: "" },
-                freelancePaymentRange: formData.freelancePaymentRange.min && formData.freelancePaymentRange.max
-                    ? { min: formData.freelancePaymentRange.min, max: formData.freelancePaymentRange.max }
-                    : { min: "", max: "" },
-                internshipStipendRange: formData.internshipType === "Paid" && formData.internshipStipendRange.min && formData.internshipStipendRange.max
-                    ? { min: formData.internshipStipendRange.min, max: formData.internshipStipendRange.max }
-                    : { min: "", max: "" },
-                jobAmountRange: formData.jobAmountRange.min && formData.jobAmountRange.max
-                    ? { min: formData.jobAmountRange.min, max: formData.jobAmountRange.max }
-                    : { min: "", max: "" },
-                experience: {
-                    years: formData.experience.years || "",
-                    months: formData.experience.months || "",
-                    days: formData.experience.days || "",
-                },
-                otherLinks: formData.otherLinks.map((url, index) => ({
-                    url,
-                    title: `Link ${index + 1}`,
-                })),
-            };
+            const data = await res.json();
 
-            // Remove individual contact method fields if backend expects contact_methods object
-            delete submitData.call;
-            delete submitData.whatsapp;
-            delete submitData.instagram;
-            delete submitData.linkedin;
-            delete submitData.facebook;
-            delete submitData.otherContact;
-
-            const response = await fetch(
-                "http://localhost:3333/api/get-discovered/add-listing",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(submitData),
-                    credentials: "include",
-                }
-            );
-
-            if (response.ok) {
-                console.log("Form submitted:", submitData);
-                onClose();
+            if (res.ok && data.success) {
+                // Store the returned URL in formData.resumeLink
+                setFormData((prev) => ({
+                    ...prev,
+                    resumeLink: data.url,
+                }));
+                setErrors((prev) => ({ ...prev, resumeFile: "" }));
+                setResumeFile(null); // Clear the temporary file state
             } else {
-                const errorData = await response.json();
-                setErrors({
-                    submit: errorData.message || "Failed to submit the form. Please try again.",
-                });
+                setErrors((prev) => ({
+                    ...prev,
+                    resumeFile:
+                        data.error || "Upload failed. Please try again.",
+                }));
+                setResumeFile(null);
             }
         } catch (err) {
-            console.error("Submission error:", err);
-            setErrors({ submit: "An error occurred. Please try again." });
+            console.error("Upload error:", err);
+            setErrors((prev) => ({
+                ...prev,
+                resumeFile: "Something went wrong while uploading.",
+            }));
+            setResumeFile(null);
         }
-    }
-};
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (validateStep3()) {
+            try {
+                const domain = domains.find(
+                    (d) => d._id === formData.domainName
+                );
+                const role = allRoles.find(
+                    (r) => r._id === formData.roleUnderDomain
+                );
+                console.log(role)
+                console.log(domain)
+                const submitData = {
+                    ...formData,
+                    domainName: domain ? domain.name : formData.domainName,
+                    roleUnderDomain: role
+                        ? role.name
+                        : formData.roleUnderDomain,
+                    skills: formData.skills.map((skill) => skill.name),
+                    workBasis: formData.workBasis, // Keep the full workBasis object
+                    workMode: formData.workMode, // Keep the full workMode object
+                    contact_methods: {
+                        call: formData.contact_methods.call,
+                        whatsapp: formData.contact_methods.whatsapp,
+                        instagram: formData.contact_methods.instagram,
+                        linkedin: formData.contact_methods.linkedin,
+                        facebook: formData.contact_methods.facebook,
+                        other: formData.contact_methods.other,
+                    },
+                    workCountry: formData.workLocation.country,
+                    workState: formData.workLocation.state,
+                    workCity: formData.workLocation.district,
+                    internshipDuration:
+                        formData.internshipDuration.value &&
+                        formData.internshipDuration.unit
+                            ? {
+                                  value: formData.internshipDuration.value,
+                                  unit: formData.internshipDuration.unit,
+                              }
+                            : { value: "", unit: "" },
+                    freelancePaymentRange:
+                        formData.freelancePaymentRange.min &&
+                        formData.freelancePaymentRange.max
+                            ? {
+                                  min: formData.freelancePaymentRange.min,
+                                  max: formData.freelancePaymentRange.max,
+                              }
+                            : { min: "", max: "" },
+                    internshipStipendRange:
+                        formData.internshipType === "Paid" &&
+                        formData.internshipStipendRange.min &&
+                        formData.internshipStipendRange.max
+                            ? {
+                                  min: formData.internshipStipendRange.min,
+                                  max: formData.internshipStipendRange.max,
+                              }
+                            : { min: "", max: "" },
+                    jobAmountRange:
+                        formData.jobAmountRange.min &&
+                        formData.jobAmountRange.max
+                            ? {
+                                  min: formData.jobAmountRange.min,
+                                  max: formData.jobAmountRange.max,
+                              }
+                            : { min: "", max: "" },
+                    experience: {
+                        years:
+                            formData.experience.unit === "Years"
+                                ? `${formData.experience.min}-${formData.experience.max} Years`
+                                : "",
+                        months:
+                            formData.experience.unit === "Months"
+                                ? `${formData.experience.min}-${formData.experience.max} Months`
+                                : "",
+                        days:
+                            formData.experience.unit === "Days"
+                                ? `${formData.experience.min}-${formData.experience.max} Days`
+                                : "",
+                    },
+                    otherLinks: formData.otherLinks.map((linkObj, index) => ({
+                        url: linkObj.url,
+                        title: linkObj.title || `Link ${index + 1}`,
+                    })),
+                    jobTimeType: formData.jobTimeType || "",
+                };
+
+                // Remove individual contact method fields if backend expects contact_methods object
+                delete submitData.call;
+                delete submitData.whatsapp;
+                delete submitData.instagram;
+                delete submitData.linkedin;
+                delete submitData.facebook;
+                delete submitData.otherContact;
+
+                const response = await fetch(
+                    "http://localhost:3333/api/get-discovered/add-listing",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(submitData),
+                        credentials: "include",
+                    }
+                );
+
+                if (response.ok) {
+                    console.log("Form submitted:", submitData);
+                    onClose();
+                } else {
+                    const errorData = await response.json();
+                    setErrors({
+                        submit:
+                            errorData.message ||
+                            "Failed to submit the form. Please try again.",
+                    });
+                }
+            } catch (err) {
+                console.error("Submission error:", err);
+                setErrors({ submit: "An error occurred. Please try again." });
+            }
+        }
+    };
     const handleCancel = () => {
         setFormData({
             first_name: formData.first_name,
@@ -1204,10 +1290,11 @@ const handleSubmit = async (e) => {
             resumeLink: "",
             projects: [],
             workExperience: [],
-            otherLinks: [],
+            otherLinks: [{ title: "", url: "" }],
             expectations: "",
             anyOtherInfo: "",
         });
+        setResumeFile(null);
         setDomainSearchText("");
         setRoleSearchText("");
         setSkillSearchText("");
@@ -1306,7 +1393,8 @@ const handleSubmit = async (e) => {
                             Tell Your Story
                         </p>
                         <p className="text-violet-400">
-                            Share who you are and how to reach you — keep it real, no corporate fluff needed.
+                            Share who you are and how to reach you — keep it
+                            real, no corporate fluff needed.
                         </p>
                     </div>
                     <img src="./FormImage1.svg" alt="" className="scale-150" />
@@ -1320,7 +1408,8 @@ const handleSubmit = async (e) => {
                             Show Your Strengths
                         </p>
                         <p className="text-violet-400">
-                            Highlight your skills and what you’re open to — make it clear what you bring to the table.
+                            Highlight your skills and what you’re open to — make
+                            it clear what you bring to the table.
                         </p>
                     </div>
                     <img src="./FormImage2.svg" alt="" className="" />
@@ -1334,7 +1423,8 @@ const handleSubmit = async (e) => {
                             Build Your Portfolio
                         </p>
                         <p className="text-violet-400">
-                            Showcase your work, experience, and what others can expect from you — make it shine.
+                            Showcase your work, experience, and what others can
+                            expect from you — make it shine.
                         </p>
                     </div>
                     <img src="./FormImage3.svg" alt="" className="" />
@@ -1515,13 +1605,18 @@ const handleSubmit = async (e) => {
                             </p>
                         )}
                     </div>
-                    
+
                     <div className="relative col-span-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             You are a <span className="text-red-500">*</span>
                         </label>
                         <div className="flex flex-wrap gap-4">
-                            {["Working Professional","Freelancer", "Student", "Other"].map((type) => (
+                            {[
+                                "Working Professional",
+                                "Freelancer",
+                                "Student",
+                                "Other",
+                            ].map((type) => (
                                 <label key={type} className="flex items-center">
                                     <input
                                         type="radio"
@@ -1580,6 +1675,7 @@ const handleSubmit = async (e) => {
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
                             About Yourself
+                            <span className="text-red-500"> *</span>
                         </label>
                         <div className="relative">
                             <textarea
@@ -1589,16 +1685,25 @@ const handleSubmit = async (e) => {
                                 onChange={handleChange}
                                 maxLength={300}
                                 placeholder="Briefly describe yourself"
-                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.aboutSelf
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
                             />
                             <button
                                 type="button"
                                 onClick={() =>
-                                    enhanceField("aboutSelf", formData.aboutSelf)
+                                    enhanceField(
+                                        "aboutSelf",
+                                        formData.aboutSelf
+                                    )
                                 }
                                 disabled={enhanceLoading.aboutSelf}
                                 className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.aboutSelf ? "animate-pulse" : ""
+                                    enhanceLoading.aboutSelf
+                                        ? "animate-pulse"
+                                        : ""
                                 }`}
                                 title={
                                     enhanceLoading.aboutSelf
@@ -1609,10 +1714,16 @@ const handleSubmit = async (e) => {
                                 <FaMagic className="w-5 h-5" />
                             </button>
                         </div>
+                        {errors.aboutSelf && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.aboutSelf}
+                            </p>
+                        )}
                     </div>
                     <div className="relative col-span-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            How people can reach out to you (select at least two) <span className="text-red-500">*</span>
+                            How people can reach out to you (select at least
+                            two) <span className="text-red-500">*</span>
                         </label>
                         <div className="flex flex-wrap gap-4">
                             {[
@@ -1627,15 +1738,21 @@ const handleSubmit = async (e) => {
                                     <input
                                         type="checkbox"
                                         id={method}
-                                        checked={formData.contact_methods[method].selected}
-                                        onChange={() => handleContactMethodChange(method)}
+                                        checked={
+                                            formData.contact_methods[method]
+                                                .selected
+                                        }
+                                        onChange={() =>
+                                            handleContactMethodChange(method)
+                                        }
                                         className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                     />
                                     <label
                                         htmlFor={method}
                                         className="ml-2 text-gray-700"
                                     >
-                                        {method.charAt(0).toUpperCase() + method.slice(1)}
+                                        {method.charAt(0).toUpperCase() +
+                                            method.slice(1)}
                                     </label>
                                 </div>
                             ))}
@@ -1654,25 +1771,36 @@ const handleSubmit = async (e) => {
                                                 htmlFor={`${method}Value`}
                                                 className="block font-medium mb-1 text-black opacity-[73%]"
                                             >
-                                                {method.charAt(0).toUpperCase() +
+                                                {method
+                                                    .charAt(0)
+                                                    .toUpperCase() +
                                                     method.slice(1)}{" "}
-                                                {method === "whatsapp" || method === "call"
+                                                {method === "whatsapp" ||
+                                                method === "call"
                                                     ? "Number"
                                                     : "URL"}{" "}
-                                                <span className="text-red-500">*</span>
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </label>
                                             <div className="gap-2">
-                                                {method === "call" || method === "whatsapp" ? (
+                                                {method === "call" ||
+                                                method === "whatsapp" ? (
                                                     <div className="text-left">
                                                         <PhoneInput
                                                             country="in"
                                                             value={value}
                                                             onChange={(phone) =>
-                                                                handleContactValueChange(method, phone)
+                                                                handleContactValueChange(
+                                                                    method,
+                                                                    phone
+                                                                )
                                                             }
                                                             containerClass="w-full"
                                                             inputClass={`w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 ${
-                                                                errors[`${method}Value`]
+                                                                errors[
+                                                                    `${method}Value`
+                                                                ]
                                                                     ? "border-red-500"
                                                                     : ""
                                                             } `}
@@ -1687,12 +1815,14 @@ const handleSubmit = async (e) => {
                                                                 width: "100%",
                                                             }}
                                                             buttonStyle={{
-                                                                position: "absolute",
+                                                                position:
+                                                                    "absolute",
                                                                 left: "5px",
                                                                 top: "1px",
                                                                 height: "40px",
                                                                 width: "40px",
-                                                                backgroundColor: "transparent",
+                                                                backgroundColor:
+                                                                    "transparent",
                                                                 border: "none",
                                                                 outline: "none",
                                                             }}
@@ -1704,11 +1834,16 @@ const handleSubmit = async (e) => {
                                                         type="url"
                                                         value={value}
                                                         onChange={(e) =>
-                                                            handleContactValueChange(method, e.target.value)
+                                                            handleContactValueChange(
+                                                                method,
+                                                                e.target.value
+                                                            )
                                                         }
                                                         placeholder={`Enter your ${method} URL (https://)`}
                                                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors[`${method}Value`]
+                                                            errors[
+                                                                `${method}Value`
+                                                            ]
                                                                 ? "border-red-500"
                                                                 : "border-gray-300"
                                                         }`}
@@ -1766,17 +1901,27 @@ const handleSubmit = async (e) => {
                                 maxLength={80}
                                 placeholder="Enter a catchy headline"
                                 className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.headline ? "border-red-500" : "border-gray-300"
+                                    errors.headline
+                                        ? "border-red-500"
+                                        : "border-gray-300"
                                 }`}
                             />
                             <button
                                 type="button"
-                                onClick={() => enhanceField("headline", formData.headline)}
+                                onClick={() =>
+                                    enhanceField("headline", formData.headline)
+                                }
                                 disabled={enhanceLoading.headline}
                                 className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.headline ? "animate-pulse" : ""
+                                    enhanceLoading.headline
+                                        ? "animate-pulse"
+                                        : ""
                                 }`}
-                                title={enhanceLoading.headline ? "Enhancing..." : "Enhance"}
+                                title={
+                                    enhanceLoading.headline
+                                        ? "Enhancing..."
+                                        : "Enhance"
+                                }
                             >
                                 <FaMagic className="w-5 h-5" />
                             </button>
@@ -1794,31 +1939,18 @@ const handleSubmit = async (e) => {
                         >
                             Your Role <span className="text-red-500">*</span>
                         </label>
-                        <input
-                            id="roleUnderDomain"
-                            name="roleUnderDomainInput"
-                            value={roleSearchText}
-                            onChange={handleRoleInput}
-                            onFocus={handleRoleFocus}
-                            onBlur={handleRoleBlur}
-                            placeholder="Type to search roles"
-                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                errors.roleUnderDomain ? "border-red-500" : "border-gray-300"
-                            }`}
+                        <Select
+                            closeMenuOnSelect={true}
+                            components={animatedComponents}
+                            options={filteredRoles}
+                            value={filteredRoles.find(
+                                (role) =>
+                                    role.value === formData.roleUnderDomain
+                            )}
+                            onChange={handleRoleSelect}
+                            placeholder="Select a role"
+                            classNamePrefix="react-select"
                         />
-                        {showRoleSuggestions && filteredRoles.length > 0 && (
-                            <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                {filteredRoles.map((role) => (
-                                    <li
-                                        key={role._id}
-                                        onMouseDown={() => handleRoleSelect(role)}
-                                        className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                    >
-                                        {role.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
                         {errors.roleUnderDomain && (
                             <p className="text-red-500 text-sm mt-1">
                                 {errors.roleUnderDomain}
@@ -1835,33 +1967,18 @@ const handleSubmit = async (e) => {
                         {loadingDomains ? (
                             <p className="text-gray-500">Loading domains...</p>
                         ) : (
-                            <>
-                                <input
-                                    id="domainName"
-                                    name="domainNameInput"
-                                    value={domainSearchText}
-                                    onChange={handleDomainInput}
-                                    onFocus={handleDomainFocus}
-                                    onBlur={handleDomainBlur}
-                                    placeholder="Type to search domains"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.domainName ? "border-red-500" : "border-gray-300"
-                                    }`}
-                                />
-                                {showDomainSuggestions && filteredDomains.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                        {filteredDomains.map((domain) => (
-                                            <li
-                                                key={domain._id}
-                                                onMouseDown={() => handleDomainSelect(domain)}
-                                                className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                            >
-                                                {domain.name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            <Select
+                                closeMenuOnSelect={true}
+                                components={animatedComponents}
+                                options={domains} // Use all domains to allow selecting other domains
+                                value={domains.find(
+                                    (domain) =>
+                                        domain.value === formData.domainName
                                 )}
-                            </>
+                                onChange={handleDomainSelect}
+                                placeholder="Select a domain"
+                                classNamePrefix="react-select"
+                            />
                         )}
                         {errors.domainName && (
                             <p className="text-red-500 text-sm mt-1">
@@ -1885,26 +2002,30 @@ const handleSubmit = async (e) => {
                                 placeholder="Type to search skills"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
                             />
-                            {showSkillSuggestions && filteredSkills.length > 0 && (
-                                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                    {filteredSkills
-                                        .filter(
-                                            (skill) =>
-                                                !formData.skills.some(
-                                                    (s) => s._id === skill._id
-                                                )
-                                        )
-                                        .map((skill) => (
-                                            <li
-                                                key={skill._id}
-                                                onClick={() => handleSkillSelect(skill)}
-                                                className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                            >
-                                                {skill.name}
-                                            </li>
-                                        ))}
-                                </ul>
-                            )}
+                            {showSkillSuggestions &&
+                                filteredSkills.length > 0 && (
+                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
+                                        {filteredSkills
+                                            .filter(
+                                                (skill) =>
+                                                    !formData.skills.some(
+                                                        (s) =>
+                                                            s._id === skill._id
+                                                    )
+                                            )
+                                            .map((skill) => (
+                                                <li
+                                                    key={skill._id}
+                                                    onClick={() =>
+                                                        handleSkillSelect(skill)
+                                                    }
+                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
+                                                >
+                                                    {skill.name}
+                                                </li>
+                                            ))}
+                                    </ul>
+                                )}
                             <div className="mt-2 flex flex-wrap gap-2">
                                 {formData.skills.map((skill) => (
                                     <span
@@ -1914,7 +2035,9 @@ const handleSubmit = async (e) => {
                                         {skill.name}
                                         <button
                                             type="button"
-                                            onClick={() => handleSkillRemove(skill._id)}
+                                            onClick={() =>
+                                                handleSkillRemove(skill._id)
+                                            }
                                             className="ml-2 text-purple-600 hover:text-purple-800"
                                         >
                                             ×
@@ -1950,14 +2073,18 @@ const handleSubmit = async (e) => {
                                         type="checkbox"
                                         id={basis}
                                         checked={formData.workBasis[basis]}
-                                        onChange={() => handleWorkBasisChange(basis)}
+                                        onChange={() =>
+                                            handleWorkBasisChange(basis)
+                                        }
                                         className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                     />
                                     <label
                                         htmlFor={basis}
                                         className="ml-2 text-gray-700"
                                     >
-                                        {basis.replace(/([A-Z])/g, " $1").trim()}
+                                        {basis
+                                            .replace(/([A-Z])/g, " $1")
+                                            .trim()}
                                     </label>
                                 </div>
                             ))}
@@ -1998,7 +2125,9 @@ const handleSubmit = async (e) => {
                                                     formData.partnershipCriteria
                                                 )
                                             }
-                                            disabled={enhanceLoading.partnershipCriteria}
+                                            disabled={
+                                                enhanceLoading.partnershipCriteria
+                                            }
                                             className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
                                                 enhanceLoading.partnershipCriteria
                                                     ? "animate-pulse"
@@ -2025,33 +2154,41 @@ const handleSubmit = async (e) => {
                                     <div className="relative">
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Internship Time Type{" "}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="flex gap-4">
-                                            {["FullTime", "PartTime"].map((type) => (
-                                                <label
-                                                    key={type}
-                                                    className="flex items-center"
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        name="internshipTimeType"
-                                                        value={type}
-                                                        checked={
-                                                            formData.internshipTimeType === type
-                                                        }
-                                                        onChange={() =>
-                                                            handleInternshipTimeTypeChange(type)
-                                                        }
-                                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                                    />
-                                                    <span className="ml-2 text-gray-700">
-                                                        {type === "FullTime"
-                                                            ? "Full-time"
-                                                            : "Part-time"}
-                                                    </span>
-                                                </label>
-                                            ))}
+                                            {["Full-time", "Part-time"].map(
+                                                (type) => (
+                                                    <label
+                                                        key={type}
+                                                        className="flex items-center"
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="internshipTimeType"
+                                                            value={type}
+                                                            checked={
+                                                                formData.internshipTimeType ===
+                                                                type
+                                                            }
+                                                            onChange={() =>
+                                                                handleInternshipTimeTypeChange(
+                                                                    type
+                                                                )
+                                                            }
+                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                                        />
+                                                        <span className="ml-2 text-gray-700">
+                                                            {type ===
+                                                            "Full-time"
+                                                                ? "Full-time"
+                                                                : "Part-time"}
+                                                        </span>
+                                                    </label>
+                                                )
+                                            )}
                                         </div>
                                         {errors.internshipTimeType && (
                                             <p className="text-red-500 text-sm mt-1">
@@ -2062,35 +2199,45 @@ const handleSubmit = async (e) => {
                                     <div className="relative">
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Internship Type{" "}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="flex gap-4">
-                                            {["Paid", "Unpaid", "PerformanceBased"].map(
-                                                (type) => (
-                                                    <label
-                                                        key={type}
-                                                        className="flex items-center"
-                                                    >
-                                                        <input
-                                                            type="radio"
-                                                            name="internshipType"
-                                                            value={type}
-                                                            checked={
-                                                                formData.internshipType === type
-                                                            }
-                                                            onChange={() =>
-                                                                handleInternshipTypeChange(type)
-                                                            }
-                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                                        />
-                                                        <span className="ml-2 text-gray-700">
-                                                            {type
-                                                                .replace(/([A-Z])/g, " $1")
-                                                                .trim()}
-                                                        </span>
-                                                    </label>
-                                                )
-                                            )}
+                                            {[
+                                                "Paid",
+                                                "Unpaid",
+                                                "PerformanceBased",
+                                            ].map((type) => (
+                                                <label
+                                                    key={type}
+                                                    className="flex items-center"
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        name="internshipType"
+                                                        value={type}
+                                                        checked={
+                                                            formData.internshipType ===
+                                                            type
+                                                        }
+                                                        onChange={() =>
+                                                            handleInternshipTypeChange(
+                                                                type
+                                                            )
+                                                        }
+                                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                                    />
+                                                    <span className="ml-2 text-gray-700">
+                                                        {type
+                                                            .replace(
+                                                                /([A-Z])/g,
+                                                                " $1"
+                                                            )
+                                                            .trim()}
+                                                    </span>
+                                                </label>
+                                            ))}
                                         </div>
                                         {errors.internshipType && (
                                             <p className="text-red-500 text-sm mt-1">
@@ -2105,13 +2252,19 @@ const handleSubmit = async (e) => {
                                                 className="block text-sm font-medium text-gray-700 mb-1"
                                             >
                                                 Internship Duration{" "}
-                                                <span className="text-red-500">*</span>
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </label>
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     id="internshipDurationValue"
                                                     name="internshipDurationValue"
-                                                    value={formData.internshipDuration.value}
+                                                    value={
+                                                        formData
+                                                            .internshipDuration
+                                                            .value
+                                                    }
                                                     onChange={(e) =>
                                                         handleNestedChange(
                                                             "internshipDuration",
@@ -2123,7 +2276,9 @@ const handleSubmit = async (e) => {
                                                     min="0"
                                                     placeholder="Duration"
                                                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors.internshipDuration?.value
+                                                        errors
+                                                            .internshipDuration
+                                                            ?.value
                                                             ? "border-red-500"
                                                             : "border-gray-300"
                                                     }`}
@@ -2131,7 +2286,11 @@ const handleSubmit = async (e) => {
                                                 <select
                                                     id="internshipDurationUnit"
                                                     name="internshipDurationUnit"
-                                                    value={formData.internshipDuration.unit}
+                                                    value={
+                                                        formData
+                                                            .internshipDuration
+                                                            .unit
+                                                    }
                                                     onChange={(e) =>
                                                         handleNestedChange(
                                                             "internshipDuration",
@@ -2140,24 +2299,48 @@ const handleSubmit = async (e) => {
                                                         )
                                                     }
                                                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors.internshipDuration?.unit
+                                                        errors
+                                                            .internshipDuration
+                                                            ?.unit
                                                             ? "border-red-500"
                                                             : "border-gray-300"
                                                     }`}
                                                 >
-                                                    <option value="">Select Unit</option>
-                                                    <option value="Days">Days</option>
-                                                    <option value="Weeks">Weeks</option>
-                                                    <option value="Months">Months</option>
+                                                    <option value="">
+                                                        Select Unit
+                                                    </option>
+                                                    <option value="Weeks">
+                                                        Weeks
+                                                    </option>
+                                                    <option value="Months">
+                                                        Months
+                                                    </option>
+                                                    <option value="Years">
+                                                        Years
+                                                    </option>
                                                 </select>
                                             </div>
                                             {errors.internshipDuration && (
                                                 <div className="text-red-500 text-sm mt-1">
-                                                    {errors.internshipDuration.value && (
-                                                        <p>{errors.internshipDuration.value}</p>
+                                                    {errors.internshipDuration
+                                                        .value && (
+                                                        <p>
+                                                            {
+                                                                errors
+                                                                    .internshipDuration
+                                                                    .value
+                                                            }
+                                                        </p>
                                                     )}
-                                                    {errors.internshipDuration.unit && (
-                                                        <p>{errors.internshipDuration.unit}</p>
+                                                    {errors.internshipDuration
+                                                        .unit && (
+                                                        <p>
+                                                            {
+                                                                errors
+                                                                    .internshipDuration
+                                                                    .unit
+                                                            }
+                                                        </p>
                                                     )}
                                                 </div>
                                             )}
@@ -2171,13 +2354,19 @@ const handleSubmit = async (e) => {
                                                     className="block text-sm font-medium text-gray-700 mb-1"
                                                 >
                                                     Stipend Range (₹){" "}
-                                                    <span className="text-red-500">*</span>
+                                                    <span className="text-red-500">
+                                                        *
+                                                    </span>
                                                 </label>
                                                 <div className="flex items-center gap-2">
                                                     <input
                                                         id="internshipStipendRangeMin"
                                                         name="internshipStipendRangeMin"
-                                                        value={formData.internshipStipendRange.min}
+                                                        value={
+                                                            formData
+                                                                .internshipStipendRange
+                                                                .min
+                                                        }
                                                         onChange={(e) =>
                                                             handleNestedChange(
                                                                 "internshipStipendRange",
@@ -2189,7 +2378,9 @@ const handleSubmit = async (e) => {
                                                         min="0"
                                                         placeholder="Min"
                                                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors.internshipStipendRange?.min
+                                                            errors
+                                                                .internshipStipendRange
+                                                                ?.min
                                                                 ? "border-red-500"
                                                                 : "border-gray-300"
                                                         }`}
@@ -2197,7 +2388,11 @@ const handleSubmit = async (e) => {
                                                     <input
                                                         id="internshipStipendRangeMax"
                                                         name="internshipStipendRangeMax"
-                                                        value={formData.internshipStipendRange.max}
+                                                        value={
+                                                            formData
+                                                                .internshipStipendRange
+                                                                .max
+                                                        }
                                                         onChange={(e) =>
                                                             handleNestedChange(
                                                                 "internshipStipendRange",
@@ -2209,7 +2404,9 @@ const handleSubmit = async (e) => {
                                                         min="0"
                                                         placeholder="Max"
                                                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors.internshipStipendRange?.max
+                                                            errors
+                                                                .internshipStipendRange
+                                                                ?.max
                                                                 ? "border-red-500"
                                                                 : "border-gray-300"
                                                         }`}
@@ -2217,14 +2414,26 @@ const handleSubmit = async (e) => {
                                                 </div>
                                                 {errors.internshipStipendRange && (
                                                     <div className="text-red-500 text-sm mt-1">
-                                                        {errors.internshipStipendRange.min && (
+                                                        {errors
+                                                            .internshipStipendRange
+                                                            .min && (
                                                             <p>
-                                                                {errors.internshipStipendRange.min}
+                                                                {
+                                                                    errors
+                                                                        .internshipStipendRange
+                                                                        .min
+                                                                }
                                                             </p>
                                                         )}
-                                                        {errors.internshipStipendRange.max && (
+                                                        {errors
+                                                            .internshipStipendRange
+                                                            .max && (
                                                             <p>
-                                                                {errors.internshipStipendRange.max}
+                                                                {
+                                                                    errors
+                                                                        .internshipStipendRange
+                                                                        .max
+                                                                }
                                                             </p>
                                                         )}
                                                     </div>
@@ -2232,20 +2441,25 @@ const handleSubmit = async (e) => {
                                             </div>
                                         </div>
                                     )}
-                                    {formData.internshipType === "PerformanceBased" && (
+                                    {formData.internshipType ===
+                                        "PerformanceBased" && (
                                         <div className="relative">
                                             <label
                                                 htmlFor="internshipPerformanceCriteria"
                                                 className="block text-sm font-medium text-gray-700 mb-1"
                                             >
                                                 Performance Criteria{" "}
-                                                <span className="text-red-500">*</span>
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
                                             </label>
                                             <div className="relative">
                                                 <textarea
                                                     id="internshipPerformanceCriteria"
                                                     name="internshipPerformanceCriteria"
-                                                    value={formData.internshipPerformanceCriteria}
+                                                    value={
+                                                        formData.internshipPerformanceCriteria
+                                                    }
                                                     onChange={handleChange}
                                                     placeholder="Describe performance-based criteria"
                                                     className={`w-full pr-10 px-4 py-5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y-$ min-h-[100px] ${
@@ -2281,7 +2495,9 @@ const handleSubmit = async (e) => {
                                             </div>
                                             {errors.internshipPerformanceCriteria && (
                                                 <p className="text-red-500 text-sm mt-1">
-                                                    {errors.internshipPerformanceCriteria}
+                                                    {
+                                                        errors.internshipPerformanceCriteria
+                                                    }
                                                 </p>
                                             )}
                                         </div>
@@ -2301,7 +2517,9 @@ const handleSubmit = async (e) => {
                                         <textarea
                                             id="collaborationDescription"
                                             name="collaborationDescription"
-                                            value={formData.collaborationDescription}
+                                            value={
+                                                formData.collaborationDescription
+                                            }
                                             onChange={handleChange}
                                             placeholder="Describe the collaboration"
                                             className={`w-full pr-10 px-4 py-5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y-$ min-h-[100px] ${
@@ -2318,7 +2536,9 @@ const handleSubmit = async (e) => {
                                                     formData.collaborationDescription
                                                 )
                                             }
-                                            disabled={enhanceLoading.collaborationDescription}
+                                            disabled={
+                                                enhanceLoading.collaborationDescription
+                                            }
                                             className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-300 ${
                                                 enhanceLoading.collaborationDescription
                                                     ? "animate-pulse"
@@ -2341,82 +2561,144 @@ const handleSubmit = async (e) => {
                                 </div>
                             )}
                             {formData.workBasis.Job && (
-  <div className="space-y-4">
-    <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Job Time Type <span className="text-red-500">*</span>
-      </label>
-      <div className="flex gap-4">
-        {["FullTime", "PartTime"].map((type) => (
-          <label key={type} className="flex items-center">
-            <input
-              type="radio"
-              name="jobTimeType"
-              value={type}
-              checked={formData.jobTimeType === type}
-              onChange={(e) => handleNestedChange("jobTimeType", null, e.target.value)}
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-            />
-            <span className="ml-2 text-gray-700">
-              {type === "FullTime" ? "Full-time" : "Part-time"}
-            </span>
-          </label>
-        ))}
-      </div>
-      {errors.jobTimeType && (
-        <p className="text-red-500 text-sm mt-1">
-          {errors.jobTimeType}
-        </p>
-      )}
-    </div>
-    <div className="relative flex gap-4">
-      <div className="w-1/2">
-        <label
-          htmlFor="jobAmountRangeMin"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Job Amount Range (₹) <span className="text-red-500">*</span>
-        </label>
-        <div className="flex items-center gap-2">
-          <input
-            id="jobAmountRangeMin"
-            name="jobAmountRangeMin"
-            value={formData.jobAmountRange.min}
-            onChange={(e) =>
-              handleNestedChange("jobAmountRange", "min", e.target.value)
-            }
-            type="number"
-            min="0"
-            placeholder="Min"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-              errors.jobAmountRange?.min ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          <input
-            id="jobAmountRangeMax"
-            name="jobAmountRangeMax"
-            value={formData.jobAmountRange.max}
-            onChange={(e) =>
-              handleNestedChange("jobAmountRange", "max", e.target.value)
-            }
-            type="number"
-            min="0"
-            placeholder="Max"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-              errors.jobAmountRange?.max ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-        </div>
-        {errors.jobAmountRange && (
-          <div className="text-red-500 text-sm mt-1">
-            {errors.jobAmountRange.min && <p>{errors.jobAmountRange.min}</p>}
-            {errors.jobAmountRange.max && <p>{errors.jobAmountRange.max}</p>}
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-)}
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Job Time Type{" "}
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </label>
+                                        <div className="flex gap-4">
+                                            {["Full-time", "Part-time"].map(
+                                                (type) => (
+                                                    <label
+                                                        key={type}
+                                                        className="flex items-center"
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="jobTimeType"
+                                                            value={type}
+                                                            checked={
+                                                                formData.jobTimeType ===
+                                                                type
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleNestedChange(
+                                                                    "jobTimeType",
+                                                                    null,
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                                        />
+                                                        <span className="ml-2 text-gray-700">
+                                                            {type ===
+                                                            "Full-time"
+                                                                ? "Full-time"
+                                                                : "Part-time"}
+                                                        </span>
+                                                    </label>
+                                                )
+                                            )}
+                                        </div>
+                                        {errors.jobTimeType && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {errors.jobTimeType}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="relative flex gap-4">
+                                        <div className="w-1/2">
+                                            <label
+                                                htmlFor="jobAmountRangeMin"
+                                                className="block text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                Job Amount Range (₹){" "}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
+                                            </label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    id="jobAmountRangeMin"
+                                                    name="jobAmountRangeMin"
+                                                    value={
+                                                        formData.jobAmountRange
+                                                            .min
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNestedChange(
+                                                            "jobAmountRange",
+                                                            "min",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    type="number"
+                                                    min="0"
+                                                    placeholder="Min"
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                        errors.jobAmountRange
+                                                            ?.min
+                                                            ? "border-red-500"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                />
+                                                <input
+                                                    id="jobAmountRangeMax"
+                                                    name="jobAmountRangeMax"
+                                                    value={
+                                                        formData.jobAmountRange
+                                                            .max
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNestedChange(
+                                                            "jobAmountRange",
+                                                            "max",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    type="number"
+                                                    min="0"
+                                                    placeholder="Max"
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                        errors.jobAmountRange
+                                                            ?.max
+                                                            ? "border-red-500"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                />
+                                            </div>
+                                            {errors.jobAmountRange && (
+                                                <div className="text-red-500 text-sm mt-1">
+                                                    {errors.jobAmountRange
+                                                        .min && (
+                                                        <p>
+                                                            {
+                                                                errors
+                                                                    .jobAmountRange
+                                                                    .min
+                                                            }
+                                                        </p>
+                                                    )}
+                                                    {errors.jobAmountRange
+                                                        .max && (
+                                                        <p>
+                                                            {
+                                                                errors
+                                                                    .jobAmountRange
+                                                                    .max
+                                                            }
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             {formData.workBasis.Freelance && (
                                 <div className="relative flex gap-4">
                                     <div className="w-1/2">
@@ -2425,13 +2707,19 @@ const handleSubmit = async (e) => {
                                             className="block text-sm font-medium text-gray-700 mb-1"
                                         >
                                             Freelance Payment Range (₹){" "}
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </label>
                                         <div className="flex items-center gap-2">
                                             <input
                                                 id="freelancePaymentRangeMin"
                                                 name="freelancePaymentRangeMin"
-                                                value={formData.freelancePaymentRange.min}
+                                                value={
+                                                    formData
+                                                        .freelancePaymentRange
+                                                        .min
+                                                }
                                                 onChange={(e) =>
                                                     handleNestedChange(
                                                         "freelancePaymentRange",
@@ -2443,7 +2731,8 @@ const handleSubmit = async (e) => {
                                                 min="0"
                                                 placeholder="Min"
                                                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.freelancePaymentRange?.min
+                                                    errors.freelancePaymentRange
+                                                        ?.min
                                                         ? "border-red-500"
                                                         : "border-gray-300"
                                                 }`}
@@ -2451,7 +2740,11 @@ const handleSubmit = async (e) => {
                                             <input
                                                 id="freelancePaymentRangeMax"
                                                 name="freelancePaymentRangeMax"
-                                                value={formData.freelancePaymentRange.max}
+                                                value={
+                                                    formData
+                                                        .freelancePaymentRange
+                                                        .max
+                                                }
                                                 onChange={(e) =>
                                                     handleNestedChange(
                                                         "freelancePaymentRange",
@@ -2463,7 +2756,8 @@ const handleSubmit = async (e) => {
                                                 min="0"
                                                 placeholder="Max"
                                                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.freelancePaymentRange?.max
+                                                    errors.freelancePaymentRange
+                                                        ?.max
                                                         ? "border-red-500"
                                                         : "border-gray-300"
                                                 }`}
@@ -2471,11 +2765,25 @@ const handleSubmit = async (e) => {
                                         </div>
                                         {errors.freelancePaymentRange && (
                                             <div className="text-red-500 text-sm mt-1">
-                                                {errors.freelancePaymentRange.min && (
-                                                    <p>{errors.freelancePaymentRange.min}</p>
+                                                {errors.freelancePaymentRange
+                                                    .min && (
+                                                    <p>
+                                                        {
+                                                            errors
+                                                                .freelancePaymentRange
+                                                                .min
+                                                        }
+                                                    </p>
                                                 )}
-                                                {errors.freelancePaymentRange.max && (
-                                                    <p>{errors.freelancePaymentRange.max}</p>
+                                                {errors.freelancePaymentRange
+                                                    .max && (
+                                                    <p>
+                                                        {
+                                                            errors
+                                                                .freelancePaymentRange
+                                                                .max
+                                                        }
+                                                    </p>
                                                 )}
                                             </div>
                                         )}
@@ -2512,7 +2820,9 @@ const handleSubmit = async (e) => {
                                                     formData.projectDescription
                                                 )
                                             }
-                                            disabled={enhanceLoading.projectDescription}
+                                            disabled={
+                                                enhanceLoading.projectDescription
+                                            }
                                             className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-300 ${
                                                 enhanceLoading.projectDescription
                                                     ? "animate-pulse"
@@ -2637,7 +2947,9 @@ const handleSubmit = async (e) => {
                                         type="checkbox"
                                         id={mode}
                                         checked={formData.workMode[mode]}
-                                        onChange={() => handleWorkModeChange(mode)}
+                                        onChange={() =>
+                                            handleWorkModeChange(mode)
+                                        }
                                         className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                     />
                                     <label
@@ -2654,14 +2966,16 @@ const handleSubmit = async (e) => {
                                 {errors.workMode}
                             </p>
                         )}
-                        {(formData.workMode.Hybrid || formData.workMode.Onsite) && (
+                        {(formData.workMode.Hybrid ||
+                            formData.workMode.Onsite) && (
                             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div className="relative">
                                     <label
                                         htmlFor="workLocationCountry"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Country <span className="text-red-500">*</span>
+                                        Country{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         id="workLocationCountry"
@@ -2701,7 +3015,8 @@ const handleSubmit = async (e) => {
                                         htmlFor="workLocationState"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        State <span className="text-red-500">*</span>
+                                        State{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         id="workLocationState"
@@ -2741,7 +3056,8 @@ const handleSubmit = async (e) => {
                                         htmlFor="workLocationDistrict"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        City <span className="text-red-500">*</span>
+                                        City{" "}
+                                        <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         id="workLocationDistrict"
@@ -2762,7 +3078,10 @@ const handleSubmit = async (e) => {
                                     >
                                         <option value="">Select City</option>
                                         {districts.map((city) => (
-                                            <option key={city.name} value={city.name}>
+                                            <option
+                                                key={city.name}
+                                                value={city.name}
+                                            >
                                                 {city.name}
                                             </option>
                                         ))}
@@ -2796,91 +3115,83 @@ const handleSubmit = async (e) => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Experience <span className="text-red-500">*</span>
                         </label>
-                        <div className="grid grid-cols-3 gap-4">
-                            <div>
-                                <input
-                                    id="experienceYears"
-                                    name="experienceYears"
-                                    value={formData.experience.years}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "experience",
-                                            "years",
-                                            e.target.value
-                                        )
-                                    }
-                                    type="number"
-                                    min="0"
-                                    placeholder="Years"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experience?.years
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                                {errors.experience?.years && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.experience.years}
-                                    </p>
-                                )}
-                            </div>
-                            <div>
-                                <input
-                                    id="experienceMonths"
-                                    name="experienceMonths"
-                                    value={formData.experience.months}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "experience",
-                                            "months",
-                                            e.target.value
-                                        )
-                                    }
-                                    type="number"
-                                    min="0"
-                                    max="11"
-                                    placeholder="Months"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experience?.months
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                                {errors.experience?.months && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.experience.months}
-                                    </p>
-                                )}
-                            </div>
-                            <div>
-                                <input
-                                    id="experienceDays"
-                                    name="experienceDays"
-                                    value={formData.experience.days}
-                                    onChange={(e) =>
-                                        handleNestedChange(
-                                            "experience",
-                                            "days",
-                                            e.target.value
-                                        )
-                                    }
-                                    type="number"
-                                    min="0"
-                                    max="30"
-                                    placeholder="Days"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experience?.days
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                                {errors.experience?.days && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.experience.days}
-                                    </p>
-                                )}
-                            </div>
+                        <div className="flex gap-4 items-center">
+                            <input
+                                id="experienceMin"
+                                name="experienceMin"
+                                value={formData.experience.min}
+                                onChange={(e) =>
+                                    handleNestedChange(
+                                        "experience",
+                                        "min",
+                                        e.target.value
+                                    )
+                                }
+                                type="number"
+                                min="0"
+                                placeholder="Min"
+                                className={`w-1/3 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.experience?.min
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                            <input
+                                id="experienceMax"
+                                name="experienceMax"
+                                value={formData.experience.max}
+                                onChange={(e) =>
+                                    handleNestedChange(
+                                        "experience",
+                                        "max",
+                                        e.target.value
+                                    )
+                                }
+                                type="number"
+                                min="0"
+                                placeholder="Max"
+                                className={`w-1/3 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.experience?.max
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                            <select
+                                id="experienceUnit"
+                                name="experienceUnit"
+                                value={formData.experience.unit}
+                                onChange={(e) =>
+                                    handleNestedChange(
+                                        "experience",
+                                        "unit",
+                                        e.target.value
+                                    )
+                                }
+                                className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.experience?.unit
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            >
+                                <option value="">Select Unit</option>
+                                <option value="Years">Years</option>
+                                <option value="Months">Months</option>
+                                <option value="Days">Days</option>
+                            </select>
                         </div>
+                        {errors.experience && (
+                            <div className="text-red-500 text-sm mt-1">
+                                {errors.experience.min && (
+                                    <p>{errors.experience.min}</p>
+                                )}
+                                {errors.experience.max && (
+                                    <p>{errors.experience.max}</p>
+                                )}
+                                {errors.experience.unit && (
+                                    <p>{errors.experience.unit}</p>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="col-span-2 flex justify-between space-x-4 mt-6">
                         <button
@@ -2902,7 +3213,10 @@ const handleSubmit = async (e) => {
             )}
 
             {step === 3 && (
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <form
+                    onSubmit={handleSubmit}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+                >
                     <h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
                         Build your portfolio to stand out.
                     </h3>
@@ -2921,7 +3235,9 @@ const handleSubmit = async (e) => {
                             type="url"
                             placeholder="Enter portfolio URL (https://)"
                             className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                errors.portfolioLink ? "border-red-500" : "border-gray-300"
+                                errors.portfolioLink
+                                    ? "border-red-500"
+                                    : "border-gray-300"
                             }`}
                         />
                         {errors.portfolioLink && (
@@ -2932,25 +3248,44 @@ const handleSubmit = async (e) => {
                     </div>
                     <div className="relative col-span-2">
                         <label
-                            htmlFor="resumeLink"
+                            htmlFor="resumeFile"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                            Resume Link
+                            Upload Resume{" "}
+                            <span className="text-red-500">*</span>
                         </label>
                         <input
-                            id="resumeLink"
-                            name="resumeLink"
-                            value={formData.resumeLink}
-                            onChange={handleChange}
-                            type="url"
-                            placeholder="Enter resume URL (https://)"
+                            id="resumeFile"
+                            name="resumeFile"
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                setResumeFile(file);
+                                if (file) {
+                                    uploadResume(file); // Trigger the upload immediately
+                                }
+                            }}
                             className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                errors.resumeLink ? "border-red-500" : "border-gray-300"
+                                errors.resumeFile
+                                    ? "border-red-500"
+                                    : "border-gray-300"
                             }`}
                         />
-                        {errors.resumeLink && (
+                        {resumeFile && (
+                            <p className="text-gray-600 text-sm mt-1">
+                                Selected file: {resumeFile.name}
+                            </p>
+                        )}
+                        {formData.resumeLink && (
+                            <p className="text-green-600 text-sm mt-1">
+                                Resume Uploaded!
+                                {/* Uploaded: <a href={formData.resumeLink} target="_blank" rel="noopener noreferrer">{formData.resumeLink}</a> */}
+                            </p>
+                        )}
+                        {errors.resumeFile && (
                             <p className="text-red-500 text-sm mt-1">
-                                {errors.resumeLink}
+                                {errors.resumeFile}
                             </p>
                         )}
                     </div>
@@ -2959,14 +3294,19 @@ const handleSubmit = async (e) => {
                             Projects
                         </label>
                         {formData.projects.map((project, index) => (
-                            <div key={index} className="mb-4 p-4 border rounded-lg bg-gray-50">
+                            <div
+                                key={index}
+                                className="mb-4 p-4 border rounded-lg bg-gray-50"
+                            >
                                 <div className="flex justify-between items-center">
                                     <h4 className="text-sm font-medium text-gray-700">
                                         Project {index + 1}
                                     </h4>
                                     <button
                                         type="button"
-                                        onClick={() => handleRemoveProject(index)}
+                                        onClick={() =>
+                                            handleRemoveProject(index)
+                                        }
                                         className="text-red-500 hover:text-red-700"
                                     >
                                         <FaTimes />
@@ -2977,7 +3317,11 @@ const handleSubmit = async (e) => {
                                         type="text"
                                         value={project.title}
                                         onChange={(e) =>
-                                            handleProjectChange(index, "title", e.target.value)
+                                            handleProjectChange(
+                                                index,
+                                                "title",
+                                                e.target.value
+                                            )
                                         }
                                         placeholder="Project Title"
                                         className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
@@ -3005,14 +3349,22 @@ const handleSubmit = async (e) => {
                                                     "description"
                                                 )
                                             }
-                                            disabled={enhanceLoading[`projects${index}`]}
+                                            disabled={
+                                                enhanceLoading[
+                                                    `projects${index}`
+                                                ]
+                                            }
                                             className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-300 ${
-                                                enhanceLoading[`projects${index}`]
+                                                enhanceLoading[
+                                                    `projects${index}`
+                                                ]
                                                     ? "animate-pulse"
                                                     : ""
                                             }`}
                                             title={
-                                                enhanceLoading[`projects${index}`]
+                                                enhanceLoading[
+                                                    `projects${index}`
+                                                ]
                                                     ? "Enhancing..."
                                                     : "Enhance"
                                             }
@@ -3024,7 +3376,11 @@ const handleSubmit = async (e) => {
                                         type="url"
                                         value={project.link}
                                         onChange={(e) =>
-                                            handleProjectChange(index, "link", e.target.value)
+                                            handleProjectChange(
+                                                index,
+                                                "link",
+                                                e.target.value
+                                            )
                                         }
                                         placeholder="Project Link (https://)"
                                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
@@ -3054,14 +3410,19 @@ const handleSubmit = async (e) => {
                             Work Experience
                         </label>
                         {formData.workExperience.map((experience, index) => (
-                            <div key={index} className="mb-4 p-4 border rounded-lg bg-gray-50">
+                            <div
+                                key={index}
+                                className="mb-4 p-4 border rounded-lg bg-gray-50"
+                            >
                                 <div className="flex justify-between items-center">
                                     <h4 className="text-sm font-medium text-gray-700">
                                         Experience {index + 1}
                                     </h4>
                                     <button
                                         type="button"
-                                        onClick={() => handleRemoveWorkExperience(index)}
+                                        onClick={() =>
+                                            handleRemoveWorkExperience(index)
+                                        }
                                         className="text-red-500 hover:text-red-700"
                                     >
                                         <FaTimes />
@@ -3113,7 +3474,7 @@ const handleSubmit = async (e) => {
                                         onChange={(e) =>
                                             handleWorkExperienceChange(
                                                 index,
-                                                "Role",
+                                                "role",
                                                 e.target.value
                                             )
                                         }
@@ -3143,14 +3504,22 @@ const handleSubmit = async (e) => {
                                                     "description"
                                                 )
                                             }
-                                            disabled={enhanceLoading[`workExperience${index}`]}
+                                            disabled={
+                                                enhanceLoading[
+                                                    `workExperience${index}`
+                                                ]
+                                            }
                                             className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-300 ${
-                                                enhanceLoading[`workExperience${index}`]
+                                                enhanceLoading[
+                                                    `workExperience${index}`
+                                                ]
                                                     ? "animate-pulse"
                                                     : ""
                                             }`}
                                             title={
-                                                enhanceLoading[`workExperience${index}`]
+                                                enhanceLoading[
+                                                    `workExperience${index}`
+                                                ]
                                                     ? "Enhancing..."
                                                     : "Enhance"
                                             }
@@ -3169,38 +3538,73 @@ const handleSubmit = async (e) => {
                             <FaPlus className="mr-2" /> Add Work Experience
                         </button>
                     </div>
-                    
+
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Other Links
                         </label>
-                        {formData.otherLinks.map((link, index) => (
-                            <div key={index} className="mb-4 flex items-center gap-2">
-                                <input
-                                    type="url"
-                                    value={link}
-                                    onChange={(e) =>
-                                        handleOtherLinkChange(index, e.target.value)
-                                    }
-                                    placeholder="Enter link (https://)"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors[`otherLink${index}`]
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveOtherLink(index)}
-                                    className="text-red-500 hover:text-red-700"
-                                >
-                                    <FaTimes />
-                                </button>
-                                {errors[`otherLink${index}`] && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors[`otherLink${index}`]}
-                                    </p>
-                                )}
+                        {formData.otherLinks.map((linkObj, index) => (
+                            <div
+                                key={index}
+                                className="mb-6 flex flex-col gap-4"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        value={linkObj.title}
+                                        onChange={(e) =>
+                                            handleOtherLinkChange(
+                                                index,
+                                                "title",
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Enter link title"
+                                        className={`w-1/2 px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                            errors[`titleLink${index}`]
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                    />
+                                    <input
+                                        type="url"
+                                        value={linkObj.url}
+                                        onChange={(e) =>
+                                            handleOtherLinkChange(
+                                                index,
+                                                "url",
+                                                e.target.value
+                                            )
+                                        }
+                                        placeholder="Enter URL (https://)"
+                                        className={`w-1/2 px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                            errors[`link${index}`]
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            handleRemoveOtherLink(index)
+                                        }
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                                <div className="flex gap-4">
+                                    {errors[`titleLink${index}`] && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors[`titleLink${index}`]}
+                                        </p>
+                                    )}
+                                    {errors[`link${index}`] && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors[`link${index}`]}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         ))}
                         <button
@@ -3230,14 +3634,21 @@ const handleSubmit = async (e) => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    enhanceField("expectations", formData.expectations)
+                                    enhanceField(
+                                        "expectations",
+                                        formData.expectations
+                                    )
                                 }
                                 disabled={enhanceLoading.expectations}
                                 className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-300 ${
-                                    enhanceLoading.expectations ? "animate-pulse" : ""
+                                    enhanceLoading.expectations
+                                        ? "animate-pulse"
+                                        : ""
                                 }`}
                                 title={
-                                    enhanceLoading.expectations ? "Enhancing..." : "Enhance"
+                                    enhanceLoading.expectations
+                                        ? "Enhancing..."
+                                        : "Enhance"
                                 }
                             >
                                 <FaMagic className="w-5 h-5" />
@@ -3263,14 +3674,21 @@ const handleSubmit = async (e) => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    enhanceField("anyOtherInfo", formData.anyOtherInfo)
+                                    enhanceField(
+                                        "anyOtherInfo",
+                                        formData.anyOtherInfo
+                                    )
                                 }
                                 disabled={enhanceLoading.anyOtherInfo}
                                 className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-300 ${
-                                    enhanceLoading.anyOtherInfo ? "animate-pulse" : ""
+                                    enhanceLoading.anyOtherInfo
+                                        ? "animate-pulse"
+                                        : ""
                                 }`}
                                 title={
-                                    enhanceLoading.anyOtherInfo ? "Enhancing..." : "Enhance"
+                                    enhanceLoading.anyOtherInfo
+                                        ? "Enhancing..."
+                                        : "Enhance"
                                 }
                             >
                                 <FaMagic className="w-5 h-5" />
