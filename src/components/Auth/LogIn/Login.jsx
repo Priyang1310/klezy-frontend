@@ -4,22 +4,22 @@ import { ToastContainer, toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import {FaEyeSlash, FaEye} from "react-icons/fa"
 
 const Login = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState(""); // New state for role
-  const [errors, setErrors] = useState({}); // New state for validation errors
+  const [role, setRole] = useState("");
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const [loginMethod, setLoginMethod] = useState("phone"); // 'phone' or 'email'
+  const [loginMethod, setLoginMethod] = useState("phone");
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Email validation function
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // Phone validation function
   const validatePhone = (phone) => {
     const cleanedPhone = phone.replace(/[^\d+]/g, '');
     const phoneRegex = /^\+?\d{10,15}$/;
@@ -28,22 +28,18 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate inputs
     const newErrors = {
       emailOrPhone: !emailOrPhone,
       password: !password,
-      role: !role, // Validate role
+      role: !role,
     };
 
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error)) {
       toast.error("All fields are required!");
       return;
     }
 
-    // Validate based on login method
     if (loginMethod === "email" && !validateEmail(emailOrPhone)) {
       toast.error("Please enter a valid email address!");
       return;
@@ -64,22 +60,19 @@ const Login = () => {
         body: JSON.stringify({
           emailOrPhone,
           password,
-          role, // Include role in the request
+          role,
         }),
       });
 
       const data = await response.json();
-
       if (data.success) {
         toast.success("Login successful!");
-
         localStorage.setItem("role", JSON.stringify(data.role));
         localStorage.setItem("firstName", data.firstName);
         localStorage.setItem("middleName", data.middleName);
         localStorage.setItem("lastName", data.lastName);
         localStorage.setItem("email", data.email);
 
-        // Redirect based on role
         console.log("User role:", data.role);
         if (data.role === "GetDiscovered") {
           navigate("/dashboad-getDiscovered");
@@ -166,7 +159,6 @@ const Login = () => {
                 </p>
               </div>
               <div>
-                {/* Role Selection */}
                 <div className="mb-4 text-left">
                   <label className="block font-medium mb-1 text-black opacity-[73%]">
                     Who you are
@@ -206,8 +198,6 @@ const Login = () => {
                     </label>
                   </div>
                 </div>
-
-                {/* Login Method Selection */}
                 <div className="mb-4 text-left">
                   <label className="block font-medium mb-1 text-black opacity-[73%]">
                     Login using
@@ -241,9 +231,8 @@ const Login = () => {
                     </label>
                   </div>
                 </div>
-
                 {loginMethod === "phone" ? (
-                  <div className="text-left mb-4">
+                  <div className="text-left mb-1">
                     <label className="block font-medium mb-1 text-black opacity-[73%]">
                       Phone number
                     </label>
@@ -252,9 +241,8 @@ const Login = () => {
                       value={emailOrPhone}
                       onChange={(value) => setEmailOrPhone(value)}
                       containerClass="w-full"
-                      inputClass={`w-full h-12 px-4 text-gray-900 border ${
-                        errors.emailOrPhone ? "border-red-500" : "border-gray-300"
-                      } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                      inputClass={`w-full h-12 px-4 text-gray-900 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                        } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                       buttonClass="border-gray-300 h-14 w-16"
                       dropdownClass="h-28"
                       containerStyle={{
@@ -278,7 +266,7 @@ const Login = () => {
                     />
                   </div>
                 ) : (
-                  <div className="text-left mb-4">
+                  <div className="text-left mb-2">
                     <label className="block font-medium mb-1 text-black opacity-[73%]">
                       Email address
                     </label>
@@ -286,29 +274,41 @@ const Login = () => {
                       type="email"
                       value={emailOrPhone}
                       onChange={(e) => setEmailOrPhone(e.target.value)}
-                      className={`w-full h-10 px-3 border ${
-                        errors.emailOrPhone ? "border-red-500" : "border-gray-300"
-                      } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                      className={`w-full h-10 px-3 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                        } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                       placeholder="Enter your email"
                     />
                   </div>
                 )}
-
-                <div className="text-left mb-4">
+                <div className="text-left relative mb-4">
                   <label className="block font-medium mb-1 text-black opacity-[73%]">
                     Password
                   </label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full h-10 px-2 border ${
-                      errors.password ? "border-red-500" : "border-gray-300"
-                    } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                    className={`w-full h-10 px-2 border ${errors.password ? "border-red-500" : "border-gray-300"
+                      } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                     placeholder="Enter Password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-[35px] text-gray-500"
+                  >
+                    {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                  </button>
                 </div>
-
+                <div className="w-full flex items-center justify-start mb-4">
+                  <a
+                    href="#"
+                    className="text-[#A100FF] font-medium underline"
+                    onClick={() => navigate("/forgot-password")}
+                  >
+                    Forgot Password?
+                  </a>
+                </div>
                 <button
                   onClick={handleSubmit}
                   className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 mx-auto transition-all duration-300"

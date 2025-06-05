@@ -8,7 +8,7 @@ import { Country, State, City } from "country-state-city";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-const SignUpRequest = () => {
+const SignUpNew = () => {
     const navigate = useNavigate();
 
     const [firstName, setFirstName] = useState("");
@@ -1225,4 +1225,4 @@ const SignUpRequest = () => {
     );
 };
 
-export default SignUpRequest;
+export default SignUpNew;
