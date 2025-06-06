@@ -68,7 +68,7 @@ function GetDiscoveredForm({ onClose }) {
         resumeLink: "",
         projects: [],
         workExperience: [],
-        otherLinks: [{ title: "", url: "" }],
+        otherLinks: [],
         expectations: "",
         anyOtherInfo: "",
     });
@@ -1113,126 +1113,118 @@ function GetDiscoveredForm({ onClose }) {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (validateStep3()) {
-            try {
-                const domain = domains.find(
-                    (d) => d._id === formData.domainName
-                );
-                const role = allRoles.find(
-                    (r) => r._id === formData.roleUnderDomain
-                );
-                console.log(role)
-                console.log(domain)
-                const submitData = {
-                    ...formData,
-                    domainName: domain ? domain.name : formData.domainName,
-                    roleUnderDomain: role
-                        ? role.name
-                        : formData.roleUnderDomain,
-                    skills: formData.skills.map((skill) => skill.name),
-                    workBasis: formData.workBasis, // Keep the full workBasis object
-                    workMode: formData.workMode, // Keep the full workMode object
-                    contact_methods: {
-                        call: formData.contact_methods.call,
-                        whatsapp: formData.contact_methods.whatsapp,
-                        instagram: formData.contact_methods.instagram,
-                        linkedin: formData.contact_methods.linkedin,
-                        facebook: formData.contact_methods.facebook,
-                        other: formData.contact_methods.other,
-                    },
-                    workCountry: formData.workLocation.country,
-                    workState: formData.workLocation.state,
-                    workCity: formData.workLocation.district,
-                    internshipDuration:
-                        formData.internshipDuration.value &&
-                        formData.internshipDuration.unit
-                            ? {
-                                  value: formData.internshipDuration.value,
-                                  unit: formData.internshipDuration.unit,
-                              }
-                            : { value: "", unit: "" },
-                    freelancePaymentRange:
-                        formData.freelancePaymentRange.min &&
-                        formData.freelancePaymentRange.max
-                            ? {
-                                  min: formData.freelancePaymentRange.min,
-                                  max: formData.freelancePaymentRange.max,
-                              }
-                            : { min: "", max: "" },
-                    internshipStipendRange:
-                        formData.internshipType === "Paid" &&
-                        formData.internshipStipendRange.min &&
-                        formData.internshipStipendRange.max
-                            ? {
-                                  min: formData.internshipStipendRange.min,
-                                  max: formData.internshipStipendRange.max,
-                              }
-                            : { min: "", max: "" },
-                    jobAmountRange:
-                        formData.jobAmountRange.min &&
-                        formData.jobAmountRange.max
-                            ? {
-                                  min: formData.jobAmountRange.min,
-                                  max: formData.jobAmountRange.max,
-                              }
-                            : { min: "", max: "" },
-                    experience: {
-                        years:
-                            formData.experience.unit === "Years"
-                                ? `${formData.experience.min}-${formData.experience.max} Years`
-                                : "",
-                        months:
-                            formData.experience.unit === "Months"
-                                ? `${formData.experience.min}-${formData.experience.max} Months`
-                                : "",
-                        days:
-                            formData.experience.unit === "Days"
-                                ? `${formData.experience.min}-${formData.experience.max} Days`
-                                : "",
-                    },
-                    otherLinks: formData.otherLinks.map((linkObj, index) => ({
-                        url: linkObj.url,
-                        title: linkObj.title || `Link ${index + 1}`,
-                    })),
-                    jobTimeType: formData.jobTimeType || "",
-                };
+    e.preventDefault();
+    if (validateStep3()) {
+        try {
+            const domain = domains.find((d) => d.value === formData.domainName);
+            const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
+            const submitData = {
+                ...formData,
+                domainName: domain ? domain.label : formData.domainName, // Use label instead of name
+                roleUnderDomain: role ? role.label : formData.roleUnderDomain, // Use label instead of name
+                skills: formData.skills.map((skill) => skill.name),
+                workBasis: formData.workBasis,
+                workMode: formData.workMode,
+                contact_methods: {
+                    call: formData.contact_methods.call,
+                    whatsapp: formData.contact_methods.whatsapp,
+                    instagram: formData.contact_methods.instagram,
+                    linkedin: formData.contact_methods.linkedin,
+                    facebook: formData.contact_methods.facebook,
+                    other: formData.contact_methods.other,
+                },
+                workCountry: formData.workLocation.country,
+                workState: formData.workLocation.state,
+                workCity: formData.workLocation.district,
+                internshipDuration:
+                    formData.internshipDuration.value &&
+                    formData.internshipDuration.unit
+                        ? {
+                              value: formData.internshipDuration.value,
+                              unit: formData.internshipDuration.unit,
+                          }
+                        : { value: "", unit: "" },
+                freelancePaymentRange:
+                    formData.freelancePaymentRange.min &&
+                    formData.freelancePaymentRange.max
+                        ? {
+                              min: formData.freelancePaymentRange.min,
+                              max: formData.freelancePaymentRange.max,
+                          }
+                        : { min: "", max: "" },
+                internshipStipendRange:
+                    formData.internshipType === "Paid" &&
+                    formData.internshipStipendRange.min &&
+                    formData.internshipStipendRange.max
+                        ? {
+                              min: formData.internshipStipendRange.min,
+                              max: formData.internshipStipendRange.max,
+                          }
+                        : { min: "", max: "" },
+                jobAmountRange:
+                    formData.jobAmountRange.min &&
+                    formData.jobAmountRange.max
+                        ? {
+                              min: formData.jobAmountRange.min,
+                              max: formData.jobAmountRange.max,
+                          }
+                        : { min: "", max: "" },
+                experience: {
+                    years:
+                        formData.experience.unit === "Years"
+                            ? `${formData.experience.min}-${formData.experience.max} Years`
+                            : "",
+                    months:
+                        formData.experience.unit === "Months"
+                            ? `${formData.experience.min}-${formData.experience.max} Months`
+                            : "",
+                    days:
+                        formData.experience.unit === "Days"
+                            ? `${formData.experience.min}-${formData.experience.max} Days`
+                            : "",
+                },
+                otherLinks: formData.otherLinks.map((linkObj, index) => ({
+                    url: linkObj.url,
+                    title: linkObj.title || `Link ${index + 1}`,
+                })),
+                jobTimeType: formData.jobTimeType || "",
+            };
 
-                // Remove individual contact method fields if backend expects contact_methods object
-                delete submitData.call;
-                delete submitData.whatsapp;
-                delete submitData.instagram;
-                delete submitData.linkedin;
-                delete submitData.facebook;
-                delete submitData.otherContact;
+            // Remove individual contact method fields
+            delete submitData.call;
+            delete submitData.whatsapp;
+            delete submitData.instagram;
+            delete submitData.linkedin;
+            delete submitData.facebook;
+            delete submitData.otherContact;
 
-                const response = await fetch(
-                    "http://localhost:3333/api/get-discovered/add-listing",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(submitData),
-                        credentials: "include",
-                    }
-                );
-
-                if (response.ok) {
-                    console.log("Form submitted:", submitData);
-                    onClose();
-                } else {
-                    const errorData = await response.json();
-                    setErrors({
-                        submit:
-                            errorData.message ||
-                            "Failed to submit the form. Please try again.",
-                    });
+            const response = await fetch(
+                "http://localhost:3333/api/get-discovered/add-listing",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(submitData),
+                    credentials: "include",
                 }
-            } catch (err) {
-                console.error("Submission error:", err);
-                setErrors({ submit: "An error occurred. Please try again." });
+            );
+
+            if (response.ok) {
+                console.log("Form submitted:", submitData);
+                onClose();
+            } else {
+                const errorData = await response.json();
+                setErrors({
+                    submit:
+                        errorData.message ||
+                        "Failed to submit the form. Please try again.",
+                });
             }
+        } catch (err) {
+            console.error("Submission error:", err);
+            setErrors({ submit: "An error occurred. Please try again." });
         }
-    };
+    }
+};
     const handleCancel = () => {
         setFormData({
             first_name: formData.first_name,
@@ -1290,7 +1282,7 @@ function GetDiscoveredForm({ onClose }) {
             resumeLink: "",
             projects: [],
             workExperience: [],
-            otherLinks: [{ title: "", url: "" }],
+            otherLinks: [],
             expectations: "",
             anyOtherInfo: "",
         });
