@@ -355,13 +355,22 @@ function FounderPostForm({ onClose }) {
     };
 
     const handleNestedChange = (field, subField, value) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: { ...prev[field], [subField]: value },
-        }));
+        if (subField === null) {
+            // Handle top-level fields like jobTimeType
+            setFormData((prev) => ({
+                ...prev,
+                [field]: value,
+            }));
+        } else {
+            // Handle nested fields
+            setFormData((prev) => ({
+                ...prev,
+                [field]: { ...prev[field], [subField]: value },
+            }));
+        }
         setErrors((prev) => ({
             ...prev,
-            [field]: { ...prev[field], [subField]: "" },
+            [field]: subField ? { ...prev[field], [subField]: "" } : "",
         }));
     };
 
@@ -480,31 +489,21 @@ function FounderPostForm({ onClose }) {
     };
 
     const handleInternshipTypeChange = (value) => {
-        setFormData((prev) => ({
-            ...prev,
-            internshipType: value,
-            internshipTimeType: null,
-            internshipDuration: value
-                ? prev.internshipDuration
-                : { value: "", unit: "" },
-            internshipStipendRange:
-                value === "Paid"
-                    ? prev.internshipStipendRange
-                    : { min: "", max: "" },
-            internshipPerformanceCriteria:
-                value === "PerformanceBased"
-                    ? prev.internshipPerformanceCriteria
-                    : "",
-        }));
-        setErrors((prev) => ({
-            ...prev,
-            internshipType: "",
-            internshipTimeType: "",
-            internshipStipendRange: { min: "", max: "" },
-            internshipPerformanceCriteria: "",
-        }));
-    };
-
+    setFormData((prev) => ({
+        ...prev,
+        internshipType: value,
+        internshipDuration: value ? prev.internshipDuration : { value: "", unit: "" },
+        internshipStipendRange: value === "Paid" ? prev.internshipStipendRange : { min: "", max: "" },
+        internshipPerformanceCriteria: value === "PerformanceBased" ? prev.internshipPerformanceCriteria : "",
+    }));
+    setErrors((prev) => ({
+        ...prev,
+        internshipType: "",
+        internshipTimeType: "",
+        internshipStipendRange: { min: "", max: "" },
+        internshipPerformanceCriteria: "",
+    }));
+};
     const handleInternshipTimeTypeChange = (value) => {
         setFormData((prev) => ({
             ...prev,
@@ -530,7 +529,7 @@ function FounderPostForm({ onClose }) {
                 roleUnderDomain: "", // Reset roleUnderDomain to clear role Select
                 skills: [], // Reset skills
             }));
-			allRoles.sort()
+            allRoles.sort();
             setFilteredRoles(allRoles); // Reset to all roles
             setDomainSearchText(""); // Clear domain search text
             setRoleSearchText(""); // Clear role search text
@@ -597,15 +596,15 @@ function FounderPostForm({ onClose }) {
                     : prev.domainName, // Preserve domainName
                 skills: [], // Reset skills
             }));
-            setDomainSearchText(
-                associatedDomain
-                    ? associatedDomain.label
-                    : ""
-            );
+            setDomainSearchText(associatedDomain ? associatedDomain.label : "");
             setRoleSearchText(""); // Reset search text
             setFilteredRoles(
                 allRoles.filter(
-                    (role) => role.domainId === (associatedDomain ? associatedDomain.value : formData.domainName)
+                    (role) =>
+                        role.domainId ===
+                        (associatedDomain
+                            ? associatedDomain.value
+                            : formData.domainName)
                 )
             ); // Show all roles for the domain
             setShowRoleSuggestions(false);
@@ -1052,103 +1051,109 @@ function FounderPostForm({ onClose }) {
 
     const handleBack = () => setStep(step - 1);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (validateStep3()) {
-            try {
-                const domain = domains.find(
-                    (d) => d._id === formData.domainName
-                );
-                const role = allRoles.find(
-                    (r) => r._id === formData.roleUnderDomain
-                );
-                const submitData = {
-                    ...formData,
-                    domainName: domain ? domain.name : "",
-                    roleUnderDomain: role ? role.name : "",
-                    skills: formData.skills.map((skill) => skill.name),
-                    workBasis: Object.keys(formData.workBasis).filter(
-                        (key) => formData.workBasis[key]
-                    ),
-                    workMode: Object.keys(formData.workMode)
-                        .filter((key) => formData.workMode[key])
-                        .at(),
-                    call: formData.contact_methods.call.selected
-                        ? formData.contact_methods.call.value
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateStep3()) {
+        try {
+            const domain = domains.find((d) => d.value === formData.domainName);
+            const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
+
+            // Map country ISO code to full name
+            const countryObj = countries.find((c) => c.isoCode === formData.workLocation.country);
+            const countryName = countryObj ? countryObj.name : formData.workLocation.country;
+
+            // Map state ISO code to full name
+            const stateObj = states.find((s) => s.isoCode === formData.workLocation.state);
+            const stateName = stateObj ? stateObj.name : formData.workLocation.state;
+
+            const submitData = {
+                ...formData,
+                domainName: domain ? domain.label : formData.domainName,
+                roleUnderDomain: role ? role.label : formData.roleUnderDomain,
+                skills: formData.skills.map((skill) => skill.name),
+                workBasis: Object.keys(formData.workBasis).filter(
+                    (key) => formData.workBasis[key]
+                ),
+                workMode: Object.keys(formData.workMode)
+                    .filter((key) => formData.workMode[key])
+                    .at(),
+                call: formData.contact_methods.call.selected
+                    ? formData.contact_methods.call.value
+                    : "",
+                whatsapp: formData.contact_methods.whatsapp.selected
+                    ? formData.contact_methods.whatsapp.value
+                    : "",
+                instagram: formData.contact_methods.instagram.selected
+                    ? formData.contact_methods.instagram.value
+                    : "",
+                linkedin: formData.contact_methods.linkedin.selected
+                    ? formData.contact_methods.linkedin.value
+                    : "",
+                facebook: formData.contact_methods.facebook.selected
+                    ? formData.contact_methods.facebook.value
+                    : "",
+                otherContact: formData.contact_methods.other.selected
+                    ? formData.contact_methods.other.value
+                    : "",
+                workCountry: countryName, // Use full country name
+                workState: stateName, // Use full state name
+                workCity: formData.workLocation.district,
+                internshipTimeType: formData.internshipTimeType || "",
+                jobTimeType: formData.jobTimeType || "",
+                internshipDuration:
+                    formData.workBasis.Internship &&
+                    formData.internshipDuration.value &&
+                    formData.internshipDuration.unit
+                        ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
                         : "",
-                    whatsapp: formData.contact_methods.whatsapp.selected
-                        ? formData.contact_methods.whatsapp.value
+                freelancePaymentRange:
+                    formData.workBasis.Freelance &&
+                    formData.freelancePaymentRange.min &&
+                    formData.freelancePaymentRange.max
+                        ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
                         : "",
-                    instagram: formData.contact_methods.instagram.selected
-                        ? formData.contact_methods.instagram.value
+                internshipStipendRange:
+                    formData.internshipType === "Paid" &&
+                    formData.internshipStipendRange.min &&
+                    formData.internshipStipendRange.max
+                        ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
                         : "",
-                    linkedin: formData.contact_methods.linkedin.selected
-                        ? formData.contact_methods.linkedin.value
+                experienceRange:
+                    formData.experienceRange.min &&
+                    formData.experienceRange.max
+                        ? `${formData.experienceRange.min}-${formData.experienceRange.max} years`
                         : "",
-                    facebook: formData.contact_methods.facebook.selected
-                        ? formData.contact_methods.facebook.value
+                jobAmountRange:
+                    formData.workBasis.Job &&
+                    formData.jobAmountRange.min &&
+                    formData.jobAmountRange.max
+                        ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
                         : "",
-                    otherContact: formData.contact_methods.other.selected
-                        ? formData.contact_methods.other.value
-                        : "",
-                    workCountry: formData.workLocation.country,
-                    workState: formData.workLocation.state,
-                    workCity: formData.workLocation.district,
-                    internshipTimeType: formData.internshipTimeType || "",
-                    jobTimeType: formData.jobTimeType || "",
-                    internshipDuration:
-                        formData.workBasis.Internship &&
-                        formData.internshipDuration.value &&
-                        formData.internshipDuration.unit
-                            ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-                            : "",
-                    freelancePaymentRange:
-                        formData.workBasis.Freelance &&
-                        formData.freelancePaymentRange.min &&
-                        formData.freelancePaymentRange.max
-                            ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-                            : "",
-                    internshipStipendRange:
-                        formData.internshipType === "Paid" &&
-                        formData.internshipStipendRange.min &&
-                        formData.internshipStipendRange.max
-                            ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-                            : "",
-                    experienceRange:
-                        formData.experienceRange.min &&
-                        formData.experienceRange.max
-                            ? `${formData.experienceRange.min}-${formData.experienceRange.max} years`
-                            : "",
-                    jobAmountRange:
-                        formData.workBasis.Job &&
-                        formData.jobAmountRange.min &&
-                        formData.jobAmountRange.max
-                            ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
-                            : "",
-                };
-                delete submitData.contact_methods;
-                const response = await fetch(
-                    "http://localhost:3333/api/founder/add-listing/",
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(submitData),
-                        credentials: "include",
-                    }
-                );
-                if (response.ok) {
-                    console.log("Form submitted:", submitData);
-                    onClose();
-                } else {
-                    setErrors({
-                        submit: "Failed to submit the form. Please try again.",
-                    });
+            };
+            delete submitData.contact_methods;
+
+            const response = await fetch(
+                "http://localhost:3333/api/founder/add-listing/",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(submitData),
+                    credentials: "include",
                 }
-            } catch (err) {
-                setErrors({ submit: "An error occurred. Please try again." });
+            );
+            if (response.ok) {
+                console.log("Form submitted:", submitData);
+                onClose();
+            } else {
+                setErrors({
+                    submit: "Failed to submit the form. Please try again.",
+                });
             }
+        } catch (err) {
+            setErrors({ submit: "An error occurred. Please try again." });
         }
-    };
+    }
+};
 
     const handleCancel = () => {
         setFormData({
@@ -2028,12 +2033,10 @@ function FounderPostForm({ onClose }) {
                             closeMenuOnSelect={true}
                             components={animatedComponents}
                             options={filteredRoles}
-                            value={
-                                filteredRoles.find(
-                                    (role) =>
-                                        role.value === formData.roleUnderDomain
-                                )
-                            }
+                            value={filteredRoles.find(
+                                (role) =>
+                                    role.value === formData.roleUnderDomain
+                            )}
                             onChange={handleRoleSelect}
                             placeholder="Select a role"
                             isClearable
@@ -2060,12 +2063,10 @@ function FounderPostForm({ onClose }) {
                                 closeMenuOnSelect={true}
                                 components={animatedComponents}
                                 options={domains}
-                                value={
-                                    domains.find(
-                                        (domain) =>
-                                            domain.value === formData.domainName
-                                    )
-                                }
+                                value={domains.find(
+                                    (domain) =>
+                                        domain.value === formData.domainName
+                                )}
                                 onChange={handleDomainSelect}
                                 placeholder="Select a domain"
                                 isClearable
