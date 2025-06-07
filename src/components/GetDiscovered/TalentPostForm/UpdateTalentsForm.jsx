@@ -3,11 +3,14 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 import "react-phone-input-2/lib/style.css";
 // import { useParams } from "react-router-dom";
 
 function UpdateGetDiscoveredForm({ listingId, onClose }) {
     // const { id } = useParams();
+    const animatedComponents = makeAnimated();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         gender: "",
@@ -317,26 +320,41 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     // Fetch domains and roles
     useEffect(() => {
         const fetchDomains = async () => {
+            console.log("Hi!");
             try {
+                console.log("Response");
                 const response = await fetch(
                     "http://localhost:3333/api/domain/get-all-domains"
                 );
-                if (!response.ok) throw new Error("Failed to fetch domains");
                 const data = await response.json();
-                const sortedDomains = (data.domains || []).sort((a, b) =>
-                    a.name.localeCompare(b.name)
-                );
+                if (!data.success) throw new Error("Failed to fetch domains");
+                // Transform domains into react-select format
+                const sortedDomains = (data.domains || [])
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((domain) => ({
+                        value: domain._id,
+                        label: domain.name,
+                        roles: domain.roles,
+                    }));
+
+                // Set domains for react-select
                 setDomains(sortedDomains);
                 setFilteredDomains(sortedDomains);
-
+                console.log(sortedDomains);
+                // Transform roles into react-select format
                 const rolesFromAllDomains = sortedDomains.reduce(
                     (acc, domain) => {
                         if (Array.isArray(domain.roles)) {
                             return [
                                 ...acc,
                                 ...domain.roles.map((role) => ({
-                                    ...role,
-                                    domainId: domain._id,
+                                    value: role._id,
+                                    label: role.name || role.title, // Adjust based on your role's name field
+                                    domainId: domain.value, // Reference domain by its _id
+                                    // Optional: Add color or other properties if needed
+                                    // color: '#someColor',
+                                    // isFixed: false,
+                                    // isDisabled: false,
                                 })),
                             ];
                         }
@@ -344,13 +362,19 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                     },
                     []
                 );
-                const uniqueRoles = Array.from(
-                    new Map(
-                        rolesFromAllDomains.map((role) => [role._id, role])
-                    ).values()
-                );
-                setAllRoles(uniqueRoles);
-                setFilteredRoles(uniqueRoles);
+
+                console.log(rolesFromAllDomains);
+
+                // Remove duplicates by role._id
+                // const uniqueRoles = Array.from(
+                //     new Map(
+                //         rolesFromAllDomains.map((role) => [role.value, role])
+                //     ).values()
+                // );
+
+                // Set roles for react-select
+                setAllRoles(rolesFromAllDomains);
+                setFilteredRoles(rolesFromAllDomains);
             } catch (error) {
                 console.error("Error fetching domains:", error);
                 setDomains([]);
@@ -366,6 +390,17 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
 
     // Fetch skills when domainName changes
     useEffect(() => {
+        setFormData((prev) => ({
+            ...prev,
+            // roleUnderDomain: "",
+            skills: [],
+        }));
+        setRoleSearchText("");
+        setSkills([]);
+        setFilteredSkills([]);
+        setSkillSearchText("");
+        setShowSkillSuggestions(false);
+
         const fetchSkills = async () => {
             if (formData.domainName) {
                 try {
@@ -390,17 +425,6 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                     setSkills([]);
                     setFilteredSkills([]);
                 }
-            } else {
-                setSkills([]);
-                setFilteredSkills([]);
-                setFormData((prev) => ({
-                    ...prev,
-                    roleUnderDomain: "",
-                    skills: [],
-                }));
-                setRoleSearchText("");
-                setSkillSearchText("");
-                setShowSkillSuggestions(false);
             }
         };
         fetchSkills();
@@ -408,21 +432,26 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
 
     // Filter domains, roles, and skills
     useEffect(() => {
-        setFilteredDomains(
-            domainSearchText.trim()
-                ? domains.filter((domain) =>
-                      domain.name
-                          ?.toLowerCase()
-                          .startsWith(domainSearchText.toLowerCase())
-                  )
-                : domains
-        );
+        if (!domainSearchText.trim()) {
+            setFilteredDomains(domains);
+        } else {
+            setFilteredDomains(
+                domains.filter((domain) =>
+                    domain.name
+                        ?.toLowerCase()
+                        .startsWith(domainSearchText.toLowerCase())
+                )
+            );
+        }
     }, [domainSearchText, domains]);
 
     useEffect(() => {
-        let filtered = formData.domainName
-            ? allRoles.filter((role) => role.domainId === formData.domainName)
-            : allRoles;
+        let filtered = allRoles;
+        if (formData.domainName) {
+            filtered = allRoles.filter(
+                (role) => role.domainId === formData.domainName
+            );
+        }
         if (roleSearchText.trim()) {
             filtered = filtered.filter((role) =>
                 role.name
@@ -434,15 +463,17 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     }, [roleSearchText, allRoles, formData.domainName]);
 
     useEffect(() => {
-        setFilteredSkills(
-            skillSearchText.trim()
-                ? skills.filter((skill) =>
-                      skill.name
-                          ?.toLowerCase()
-                          .startsWith(skillSearchText.toLowerCase())
-                  )
-                : skills
-        );
+        if (!skillSearchText.trim()) {
+            setFilteredSkills(skills);
+        } else {
+            setFilteredSkills(
+                skills.filter((skill) =>
+                    skill.name
+                        ?.toLowerCase()
+                        .startsWith(skillSearchText.toLowerCase())
+                )
+            );
+        }
     }, [skillSearchText, skills]);
 
     const handleChange = (e) => {
@@ -628,20 +659,44 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     const handleDomainBlur = () =>
         setTimeout(() => setShowDomainSuggestions(false), 200);
 
-    const handleDomainSelect = (domain) => {
-        setFormData((prev) => ({
-            ...prev,
-            domainName: domain._id,
-            roleUnderDomain: "",
-            skills: [],
-        }));
-        setDomainSearchText(domain.name);
-        setRoleSearchText("");
-        setFilteredRoles(
-            allRoles.filter((role) => role.domainId === domain._id)
-        );
-        setShowDomainSuggestions(false);
-        setErrors((prev) => ({ ...prev, domainName: "" }));
+    const handleDomainSelect = (selectedDomain) => {
+        if (selectedDomain === null) {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: "", // Reset domainName
+                roleUnderDomain: "", // Reset roleUnderDomain to clear role Select
+                skills: [], // Reset skills
+            }));
+            setFilteredRoles(allRoles); // Reset to all roles
+            setDomainSearchText(""); // Clear domain search text
+            setRoleSearchText(""); // Clear role search text
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: selectedDomain.value,
+                roleUnderDomain: "", // Reset roleUnderDomain when domain changes
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(selectedDomain.label);
+            setRoleSearchText("");
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === selectedDomain.value
+                )
+            );
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        }
     };
 
     const handleRoleInput = (e) => {
@@ -653,23 +708,49 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     const handleRoleBlur = () =>
         setTimeout(() => setShowRoleSuggestions(false), 200);
 
-    const handleRoleSelect = (role) => {
-        const associatedDomain = domains.find(
-            (domain) => domain._id === role.domainId
-        );
-        if (associatedDomain) {
+    const handleRoleSelect = (selectedRole) => {
+        if (selectedRole === null) {
             setFormData((prev) => ({
                 ...prev,
-                roleUnderDomain: role._id,
-                domainName: associatedDomain._id,
+                roleUnderDomain: "", // Reset roleUnderDomain
+                skills: [], // Reset skills
             }));
-            setDomainSearchText(associatedDomain.name);
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter((role) => role.domainId === formData.domainName)
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({ ...prev, roleUnderDomain: "" }));
         } else {
-            setFormData((prev) => ({ ...prev, roleUnderDomain: role._id }));
+            const associatedDomain = domains.find(
+                (domain) => domain.value === selectedRole.domainId
+            );
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: selectedRole.value,
+                domainName: associatedDomain
+                    ? associatedDomain.value
+                    : prev.domainName, // Preserve domainName
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(
+                associatedDomain
+                    ? associatedDomain.label
+                    : ""
+            );
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === (associatedDomain ? associatedDomain.value : formData.domainName)
+                )
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                roleUnderDomain: "",
+                domainName: "",
+            }));
         }
-        setRoleSearchText(role.name);
-        setShowRoleSuggestions(false);
-        setErrors((prev) => ({ ...prev, roleUnderDomain: "", domainName: "" }));
     };
 
     const handleSkillInput = (e) => {
@@ -1510,7 +1591,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         </p>
                         <p className="text-violet-400">
                             Refine your skills and work preferences — show what
-                            you’re capable of.
+                            you're capable of.
                         </p>
                     </div>
                     <img src="./FormImage2.svg" alt="" className="" />
@@ -1871,34 +1952,20 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         >
                             Your Role <span className="text-red-500">*</span>
                         </label>
-                        <input
-                            id="roleUnderDomain"
-                            value={roleSearchText}
-                            onChange={handleRoleInput}
-                            onFocus={handleRoleFocus}
-                            onBlur={handleRoleBlur}
-                            placeholder="Type to search roles"
-                            className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-600 hover:border-blue-400 ${
-                                errors.roleUnderDomain
-                                    ? "border-red-500"
-                                    : "border-gray-300"
-                            }`}
+                        <Select
+                            key={formData.domainName} // Force re-mount when domain changes
+                            closeMenuOnSelect={true}
+                            components={animatedComponents}
+                            options={filteredRoles}
+                            value={filteredRoles.find(
+                                (role) =>
+                                    role.value === formData.roleUnderDomain
+                            )}
+                            onChange={handleRoleSelect}
+                            isClearable
+                            placeholder="Select a role"
+                            classNamePrefix="react-select"
                         />
-                        {showRoleSuggestions && filteredRoles.length > 0 && (
-                            <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
-                                {filteredRoles.map((role) => (
-                                    <li
-                                        key={role._id}
-                                        onMouseDown={() =>
-                                            handleRoleSelect(role)
-                                        }
-                                        className="px-4 py-1 hover:bg-blue-100 cursor-pointer"
-                                    >
-                                        {role.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
                         {errors.roleUnderDomain && (
                             <p className="text-red-500 text-sm mt-1">
                                 {errors.roleUnderDomain}
@@ -1915,39 +1982,20 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         {loadingDomains ? (
                             <p className="text-gray-500">Loading domains...</p>
                         ) : (
-                            <>
-                                <input
-                                    id="domainName"
-                                    value={domainSearchText}
-                                    onChange={handleDomainInput}
-                                    onFocus={handleDomainFocus}
-                                    onBlur={handleDomainBlur}
-                                    placeholder="Type to search domains"
-                                    className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-600 hover:border-blue-400 ${
-                                        errors.domainName
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                                {showDomainSuggestions &&
-                                    filteredDomains.length > 0 && (
-                                        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
-                                            {filteredDomains.map((domain) => (
-                                                <li
-                                                    key={domain._id}
-                                                    onMouseDown={() =>
-                                                        handleDomainSelect(
-                                                            domain
-                                                        )
-                                                    }
-                                                    className="px-4 py-1 hover:bg-blue-100 cursor-pointer"
-                                                >
-                                                    {domain.name}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                            </>
+                            <Select
+                            key={formData.domainName}
+                                closeMenuOnSelect={true}
+                                components={animatedComponents}
+                                options={domains} // Use all domains to allow selecting other domains
+                                value={domains.find(
+                                    (domain) =>
+                                        domain.value === formData.domainName
+                                )}
+                                isClearable
+                                onChange={handleDomainSelect}
+                                placeholder="Select a domain"
+                                classNamePrefix="react-select"
+                            />
                         )}
                         {errors.domainName && (
                             <p className="text-red-500 text-sm mt-1">
@@ -1965,18 +2013,15 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             </label>
                             <input
                                 id="skills"
+                                name="skillsInput"
                                 value={skillSearchText}
                                 onChange={handleSkillInput}
                                 placeholder="Type to search skills"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                    errors.skills
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
                             />
                             {showSkillSuggestions &&
                                 filteredSkills.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
+                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
                                         {filteredSkills
                                             .filter(
                                                 (skill) =>
@@ -1991,7 +2036,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                     onClick={() =>
                                                         handleSkillSelect(skill)
                                                     }
-                                                    className="px-4 py-1 hover:bg-blue-100 cursor-pointer"
+                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
                                                 >
                                                     {skill.name}
                                                 </li>
@@ -2002,7 +2047,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                 {formData.skills.map((skill) => (
                                     <span
                                         key={skill._id}
-                                        className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
                                     >
                                         {skill.name}
                                         <button
@@ -2010,7 +2055,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             onClick={() =>
                                                 handleSkillRemove(skill._id)
                                             }
-                                            className="ml-2 text-blue-600 hover:text-blue-800"
+                                            className="ml-2 text-purple-600 hover:text-purple-800"
                                         >
                                             ×
                                         </button>

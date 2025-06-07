@@ -107,8 +107,8 @@ function FounderPostForm({ onClose }) {
                 );
                 if (!response.ok) throw new Error("Failed to fetch profile");
                 const data = await response.json();
-                console.log(data.user.phoneNumber);
-                console.log(formData.contact_methods);
+
+                console.log(data);
                 setFormData((prev) => ({
                     ...prev,
                     first_name: data.user.firstName || "",
@@ -157,12 +157,12 @@ function FounderPostForm({ onClose }) {
     // Fetch domains and roles
     useEffect(() => {
         const fetchDomains = async () => {
-			console.log("Hi!")
+            console.log("Hi!");
             try {
-				console.log("Response")
+                console.log("Response");
                 const response = await fetch(
                     "http://localhost:3333/api/domain/get-all-domains"
-                )
+                );
                 const data = await response.json();
                 if (!data.success) throw new Error("Failed to fetch domains");
                 // Transform domains into react-select format
@@ -177,6 +177,7 @@ function FounderPostForm({ onClose }) {
                 // Set domains for react-select
                 setDomains(sortedDomains);
                 setFilteredDomains(sortedDomains);
+                console.log(sortedDomains);
                 // Transform roles into react-select format
                 const rolesFromAllDomains = sortedDomains.reduce(
                     (acc, domain) => {
@@ -199,6 +200,7 @@ function FounderPostForm({ onClose }) {
                     []
                 );
 
+                console.log(rolesFromAllDomains);
 
                 // Remove duplicates by role._id
                 // const uniqueRoles = Array.from(
@@ -521,19 +523,44 @@ function FounderPostForm({ onClose }) {
         setTimeout(() => setShowDomainSuggestions(false), 200);
 
     const handleDomainSelect = (selectedDomain) => {
-        setFormData((prev) => ({
-            ...prev,
-            domainName: selectedDomain.value,
-            roleUnderDomain: "",
-            skills: [], // Reset skills when domain changes
-        }));
-        setDomainSearchText(selectedDomain.label);
-        setRoleSearchText("");
-        setFilteredRoles(
-            allRoles.filter((role) => role.domainId === selectedDomain.value)
-        );
-        setShowDomainSuggestions(false);
-        setErrors((prev) => ({ ...prev, domainName: "" }));
+        if (selectedDomain === null) {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: "", // Reset domainName
+                roleUnderDomain: "", // Reset roleUnderDomain to clear role Select
+                skills: [], // Reset skills
+            }));
+			allRoles.sort()
+            setFilteredRoles(allRoles); // Reset to all roles
+            setDomainSearchText(""); // Clear domain search text
+            setRoleSearchText(""); // Clear role search text
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: selectedDomain.value,
+                roleUnderDomain: "", // Reset roleUnderDomain when domain changes
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(selectedDomain.label);
+            setRoleSearchText("");
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === selectedDomain.value
+                )
+            );
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        }
     };
 
     const handleRoleInput = (e) => {
@@ -544,27 +571,50 @@ function FounderPostForm({ onClose }) {
     const handleRoleFocus = () => setShowRoleSuggestions(true);
     const handleRoleBlur = () =>
         setTimeout(() => setShowRoleSuggestions(false), 200);
+
     const handleRoleSelect = (selectedRole) => {
-        const associatedDomain = domains.find(
-            (domain) => domain.value === selectedRole.domainId
-        );
-        setFormData((prev) => ({
-            ...prev,
-            roleUnderDomain: selectedRole.value,
-            domainName: associatedDomain ? associatedDomain.value : "",
-            skills: [], // Reset skills when role changes
-        }));
-        setDomainSearchText(associatedDomain ? associatedDomain.label : "");
-        setRoleSearchText(selectedRole.label);
-        setFilteredRoles(
-            associatedDomain
-                ? allRoles.filter(
-                      (role) => role.domainId === associatedDomain.value
-                  )
-                : allRoles
-        );
-        setShowRoleSuggestions(false);
-        setErrors((prev) => ({ ...prev, roleUnderDomain: "", domainName: "" }));
+        if (selectedRole === null) {
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: "", // Reset roleUnderDomain
+                skills: [], // Reset skills
+            }));
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter((role) => role.domainId === formData.domainName)
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({ ...prev, roleUnderDomain: "" }));
+        } else {
+            const associatedDomain = domains.find(
+                (domain) => domain.value === selectedRole.domainId
+            );
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: selectedRole.value,
+                domainName: associatedDomain
+                    ? associatedDomain.value
+                    : prev.domainName, // Preserve domainName
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(
+                associatedDomain
+                    ? associatedDomain.label
+                    : ""
+            );
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === (associatedDomain ? associatedDomain.value : formData.domainName)
+                )
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                roleUnderDomain: "",
+                domainName: "",
+            }));
+        }
     };
 
     const handleSkillInput = (e) => {
@@ -1290,7 +1340,7 @@ function FounderPostForm({ onClose }) {
                 <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
                     <div className="flex flex-col">
                         <p className="text-violet-700 text-xl">
-                            You’ve made it to the final step!
+                            You've made it to the final step!
                         </p>
                         <p className="text-violet-400">
                             This short form captures who you are, what you need,
@@ -1306,7 +1356,7 @@ function FounderPostForm({ onClose }) {
             {step === 1 && (
                 <form className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <h3 className="col-span-3 text-xl font-semibold text-[#7900BF] mb-4">
-                        Let’s introduce you to the world.
+                        Let's introduce you to the world.
                     </h3>
                     {/* First Name */}
                     <div className="relative">
@@ -1974,15 +2024,19 @@ function FounderPostForm({ onClose }) {
                             <span className="text-red-500">*</span>
                         </label>
                         <Select
+                            key={formData.domainName} // Force re-mount when domain changes
                             closeMenuOnSelect={true}
                             components={animatedComponents}
                             options={filteredRoles}
-                            value={filteredRoles.find(
-                                (role) =>
-                                    role.value === formData.roleUnderDomain
-                            )}
+                            value={
+                                filteredRoles.find(
+                                    (role) =>
+                                        role.value === formData.roleUnderDomain
+                                )
+                            }
                             onChange={handleRoleSelect}
                             placeholder="Select a role"
+                            isClearable
                             classNamePrefix="react-select"
                         />
                         {errors.roleUnderDomain && (
@@ -2005,13 +2059,16 @@ function FounderPostForm({ onClose }) {
                             <Select
                                 closeMenuOnSelect={true}
                                 components={animatedComponents}
-                                options={domains} // Use all domains to allow selecting other domains
-                                value={domains.find(
-                                    (domain) =>
-                                        domain.value === formData.domainName
-                                )}
+                                options={domains}
+                                value={
+                                    domains.find(
+                                        (domain) =>
+                                            domain.value === formData.domainName
+                                    )
+                                }
                                 onChange={handleDomainSelect}
                                 placeholder="Select a domain"
+                                isClearable
                                 classNamePrefix="react-select"
                             />
                         )}

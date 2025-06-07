@@ -153,16 +153,17 @@ function GetDiscoveredForm({ onClose }) {
         }
     }, [formData.workLocation.state]);
 
-    // Fetch domains and roles
-    useEffect(() => {
+     // Fetch domains and roles
+     useEffect(() => {
         const fetchDomains = async () => {
+            console.log("Hi!");
             try {
+                console.log("Response");
                 const response = await fetch(
                     "http://localhost:3333/api/domain/get-all-domains"
                 );
-                if (!response.ok) throw new Error("Failed to fetch domains");
                 const data = await response.json();
-
+                if (!data.success) throw new Error("Failed to fetch domains");
                 // Transform domains into react-select format
                 const sortedDomains = (data.domains || [])
                     .sort((a, b) => a.name.localeCompare(b.name))
@@ -505,19 +506,47 @@ function GetDiscoveredForm({ onClose }) {
         setTimeout(() => setShowDomainSuggestions(false), 200);
 
     const handleDomainSelect = (selectedDomain) => {
-        setFormData((prev) => ({
-            ...prev,
-            domainName: selectedDomain.value,
-            roleUnderDomain: "",
-            skills: [], // Reset skills when domain changes
-        }));
-        setDomainSearchText(selectedDomain.label);
-        setRoleSearchText("");
-        setFilteredRoles(
-            allRoles.filter((role) => role.domainId === selectedDomain.value)
-        );
-        setShowDomainSuggestions(false);
-        setErrors((prev) => ({ ...prev, domainName: "" }));
+        if (selectedDomain === null) {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: "", // Reset domainName
+                roleUnderDomain: "", // Reset roleUnderDomain to clear role Select
+                skills: [], // Reset skills
+            }));
+            allRoles.sort((a, b) => a.label.localeCompare(b.label));
+            
+            const labelArr = allRoles.map((role) => role.label);
+            console.log("Helllpppppppp",labelArr);
+            setFilteredRoles(allRoles); // Reset to all roles
+            setDomainSearchText(""); // Clear domain search text
+            setRoleSearchText(""); // Clear role search text
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: selectedDomain.value,
+                roleUnderDomain: "", // Reset roleUnderDomain when domain changes
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(selectedDomain.label);
+            setRoleSearchText("");
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === selectedDomain.value
+                )
+            );
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        }
     };
 
     const handleRoleInput = (e) => {
@@ -528,27 +557,50 @@ function GetDiscoveredForm({ onClose }) {
     const handleRoleFocus = () => setShowRoleSuggestions(true);
     const handleRoleBlur = () =>
         setTimeout(() => setShowRoleSuggestions(false), 200);
+
     const handleRoleSelect = (selectedRole) => {
-        const associatedDomain = domains.find(
-            (domain) => domain.value === selectedRole.domainId
-        );
-        setFormData((prev) => ({
-            ...prev,
-            roleUnderDomain: selectedRole.value,
-            domainName: associatedDomain ? associatedDomain.value : "",
-            skills: [], // Reset skills when role changes
-        }));
-        setDomainSearchText(associatedDomain ? associatedDomain.label : "");
-        setRoleSearchText(selectedRole.label);
-        setFilteredRoles(
-            associatedDomain
-                ? allRoles.filter(
-                      (role) => role.domainId === associatedDomain.value
-                  )
-                : allRoles
-        );
-        setShowRoleSuggestions(false);
-        setErrors((prev) => ({ ...prev, roleUnderDomain: "", domainName: "" }));
+        if (selectedRole === null) {
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: "", // Reset roleUnderDomain
+                skills: [], // Reset skills
+            }));
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter((role) => role.domainId === formData.domainName)
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({ ...prev, roleUnderDomain: "" }));
+        } else {
+            const associatedDomain = domains.find(
+                (domain) => domain.value === selectedRole.domainId
+            );
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: selectedRole.value,
+                domainName: associatedDomain
+                    ? associatedDomain.value
+                    : prev.domainName, // Preserve domainName
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(
+                associatedDomain
+                    ? associatedDomain.label
+                    : ""
+            );
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === (associatedDomain ? associatedDomain.value : formData.domainName)
+                )
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                roleUnderDomain: "",
+                domainName: "",
+            }));
+        }
     };
 
     const handleSkillInput = (e) => {
@@ -1400,7 +1452,7 @@ function GetDiscoveredForm({ onClose }) {
                             Show Your Strengths
                         </p>
                         <p className="text-violet-400">
-                            Highlight your skills and what you’re open to — make
+                            Highlight your skills and what you're open to — make
                             it clear what you bring to the table.
                         </p>
                     </div>
@@ -1426,7 +1478,7 @@ function GetDiscoveredForm({ onClose }) {
             {step === 1 && (
                 <form className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <h3 className="col-span-3 text-xl font-semibold text-[#7900BF] mb-4">
-                        Let’s introduce you to the world.
+                        Let's introduce you to the world.
                     </h3>
                     <div className="relative">
                         <label
@@ -1874,7 +1926,7 @@ function GetDiscoveredForm({ onClose }) {
             {step === 2 && (
                 <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
-                        Showcase your skills and what you’re open to.
+                        Showcase your skills and what you're open to.
                     </h3>
                     <div className="relative col-span-2">
                         <label
@@ -1932,6 +1984,7 @@ function GetDiscoveredForm({ onClose }) {
                             Your Role <span className="text-red-500">*</span>
                         </label>
                         <Select
+                            key={formData.domainName} // Force re-mount when domain changes
                             closeMenuOnSelect={true}
                             components={animatedComponents}
                             options={filteredRoles}
@@ -1940,6 +1993,7 @@ function GetDiscoveredForm({ onClose }) {
                                     role.value === formData.roleUnderDomain
                             )}
                             onChange={handleRoleSelect}
+                            isClearable
                             placeholder="Select a role"
                             classNamePrefix="react-select"
                         />
@@ -1960,6 +2014,7 @@ function GetDiscoveredForm({ onClose }) {
                             <p className="text-gray-500">Loading domains...</p>
                         ) : (
                             <Select
+                            key={formData.domainName}
                                 closeMenuOnSelect={true}
                                 components={animatedComponents}
                                 options={domains} // Use all domains to allow selecting other domains
@@ -1967,6 +2022,7 @@ function GetDiscoveredForm({ onClose }) {
                                     (domain) =>
                                         domain.value === formData.domainName
                                 )}
+                                isClearable
                                 onChange={handleDomainSelect}
                                 placeholder="Select a domain"
                                 classNamePrefix="react-select"
