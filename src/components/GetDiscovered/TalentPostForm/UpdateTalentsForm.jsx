@@ -355,6 +355,15 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         ...prev,
                         domainName: domain._id,
                     }));
+                    
+                    // Set all roles for this domain
+                    const domainRoles = domain.roles.map(role => ({
+                        value: role._id,
+                        label: role.name,
+                        domainId: domain._id
+                    }));
+                    setFilteredRoles(domainRoles);
+                    
                     const role = domain.roles.find(
                         (r) => r.name === data.roleUnderDomain
                     );
@@ -364,6 +373,34 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             ...prev,
                             roleUnderDomain: role._id,
                         }));
+                    }
+
+                    // Fetch skills for this domain
+                    try {
+                        const skillsResponse = await fetch(
+                            `http://localhost:3333/api/skills/${domain._id}`
+                        );
+                        if (!skillsResponse.ok) throw new Error("Failed to fetch skills");
+                        const skillsData = await skillsResponse.json();
+                        const skills = Array.isArray(skillsData.skills) ? skillsData.skills : [];
+                        setSkills(skills);
+                        setFilteredSkills(skills);
+                        
+                        // Map the skills from the backend data to match the format
+                        const mappedSkills = data.skills.map((skillName, idx) => {
+                            const skill = skills.find(s => s.name === skillName);
+                            return {
+                                _id: skill ? skill._id : `temp-${idx}`,
+                                name: skillName
+                            };
+                        });
+                        
+                        setFormData(prev => ({
+                            ...prev,
+                            skills: mappedSkills
+                        }));
+                    } catch (error) {
+                        console.error("Error fetching skills:", error);
                     }
                 }
             } catch (error) {
@@ -559,16 +596,25 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             filtered = allRoles.filter(
                 (role) => role.domainId === formData.domainName
             );
+            // If we have a selected role, make sure it's included in the filtered list
+            if (formData.roleUnderDomain) {
+                const selectedRole = allRoles.find(
+                    (role) => role.value === formData.roleUnderDomain
+                );
+                if (selectedRole && !filtered.some(role => role.value === selectedRole.value)) {
+                    filtered = [...filtered, selectedRole];
+                }
+            }
         }
         if (roleSearchText.trim()) {
             filtered = filtered.filter((role) =>
-                role.name
+                role.label
                     ?.toLowerCase()
                     .startsWith(roleSearchText.toLowerCase())
             );
         }
         setFilteredRoles(filtered);
-    }, [roleSearchText, allRoles, formData.domainName]);
+    }, [roleSearchText, allRoles, formData.domainName, formData.roleUnderDomain]);
 
     useEffect(() => {
         if (!skillSearchText.trim()) {
@@ -1335,110 +1381,19 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
 
     const handleBack = () => setStep(step - 1);
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     if (validateStep3()) {
-    //         try {
-    //             const domain = domains.find((d) => d._id === formData.domainName);
-    //             const role = allRoles.find((r) => r._id === formData.roleUnderDomain);
-    //             const submitData = {
-    //                 ...formData,
-    //                 domainName: domain ? domain.name : "",
-    //                 roleUnderDomain: role ? role.name : "",
-    //                 skills: formData.skills.map((skill) => skill.name),
-    //                 workBasis: Object.keys(formData.workBasis).filter(
-    //                     (key) => formData.workBasis[key]
-    //                 ),
-    //                 workMode: Object.keys(formData.workMode)
-    //                     .filter((key) => formData.workMode[key])
-    //                     .join(", "),
-    //                 call: formData.contact_methods.call.selected ? formData.contact_methods.call.value : "",
-    //                 whatsapp: formData.contact_methods.whatsapp.selected ? formData.contact_methods.whatsapp.value : "",
-    //                 instagram: formData.contact_methods.instagram.selected ? formData.contact_methods.instagram.value : "",
-    //                 linkedin: formData.contact_methods.linkedin.selected ? formData.contact_methods.linkedin.value : "",
-    //                 facebook: formData.contact_methods.facebook.selected ? formData.contact_methods.facebook.value : "",
-    //                 otherContact: formData.contact_methods.other.selected ? formData.contact_methods.other.value : "",
-    //                 workCountry: formData.workLocation.country,
-    //                 workState: formData.workLocation.state,
-    //                 workCity: formData.workLocation.district,
-    //                 internshipTimeType: formData.internshipTimeType || "",
-    //                 jobTimeType: formData.jobTimeType || "",
-    //                 internshipDuration:
-    //                     formData.workBasis.Internship &&
-    //                     formData.internshipDuration.value &&
-    //                     formData.internshipDuration.unit
-    //                         ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-    //                         : "",
-    //                 freelancePaymentRange:
-    //                     formData.workBasis.Freelance &&
-    //                     formData.freelancePaymentRange.min &&
-    //                     formData.freelancePaymentRange.max
-    //                         ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-    //                         : "",
-    //                 internshipStipendRange:
-    //                     formData.internshipType === "Paid" &&
-    //                     formData.internshipStipendRange.min &&
-    //                     formData.internshipStipendRange.max
-    //                         ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-    //                         : "",
-    //                 experience:
-    //                     formData.experience.years || formData.experience.months || formData.experience.days
-    //                         ? `${formData.experience.years || 0} years, ${formData.experience.months || 0} months, ${formData.experience.days || 0} days`
-    //                         : "",
-    //                 jobAmountRange:
-    //                     formData.workBasis.Job &&
-    //                     formData.jobAmountRange.min &&
-    //                     formData.jobAmountRange.max
-    //                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
-    //                         : "",
-    //                 workExperience: formData.workExperience.map((exp) => ({
-    //                     company: exp.companyName,
-    //                     role: exp.role,
-    //                     duration:
-    //                         exp.startDate && exp.endDate
-    //                             ? `${exp.startDate} - ${exp.endDate}`
-    //                             : exp.startDate || "",
-    //                     description: exp.description,
-    //                 })),
-    //                 // otherLinks: formData.otherLinks,
-    //                 otherLinks: formData.otherLinks.map((url, index) => ({
-    //                     url,
-    //                     title: `Link ${index + 1}`,
-    //                 })),
-    //             };
-    //             delete submitData.contact_methods;
-    //             delete submitData.workLocation;
-    //             const response = await fetch(
-    //                 `http://localhost:3333/api/get-discovered/update-post/${listingId}`,
-    //                 {
-    //                     method: "PUT",
-    //                     headers: { "Content-Type": "application/json" },
-    //                     body: JSON.stringify(submitData),
-    //                     credentials: "include",
-    //                 }
-    //             );
-    //             if (response.ok) {
-    //                 console.log("Form updated:", submitData);
-    //                 onClose();
-    //             } else {
-    //                 setErrors({ submit: "Failed to update the form. Please try again." });
-    //             }
-    //         } catch (err) {
-    //             setErrors({ submit: "An error occurred. Please try again." });
-    //         }
-    //     }
-    // };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateStep3()) {
             try {
-                const domain = domains.find(
-                    (d) => d._id === formData.domainName
-                );
-                const role = allRoles.find(
-                    (r) => r._id === formData.roleUnderDomain
-                );
+                // Find the domain and role objects from their IDs
+                const domain = domains.find(d => d.value === formData.domainName);
+                const role = allRoles.find(r => r.value === formData.roleUnderDomain);
+
+                if (!domain || !role) {
+                    setErrors({ submit: "Domain and Role are required" });
+                    return;
+                }
+
                 const submitData = {
                     ...formData,
                     timeCommitment:
@@ -1446,8 +1401,8 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         formData.timeCommitment.unit
                             ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
                             : "",
-                    domainName: domain ? domain.name : "",
-                    roleUnderDomain: role ? role.name : "",
+                    domainName: domain.label, // Use the domain name instead of ID
+                    roleUnderDomain: role.label, // Use the role name instead of ID
                     skills: formData.skills.map((skill) => skill.name),
                     workBasis: Object.keys(formData.workBasis).filter(
                         (key) => formData.workBasis[key]
@@ -1470,72 +1425,38 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                     facebook: formData.contact_methods.facebook.selected
                         ? formData.contact_methods.facebook.value
                         : "",
-                    otherContact: formData.contact_methods.other.selected
+                    other: formData.contact_methods.other.selected
                         ? formData.contact_methods.other.value
                         : "",
-                    workCountry: formData.workLocation.country,
-                    workState: formData.workLocation.state,
-                    workCity: formData.workLocation.district,
-                    internshipTimeType: formData.internshipTimeType || "",
-                    jobTimeType: formData.jobTimeType || "",
-                    internshipDuration:
-                        formData.workBasis.Internship &&
-                        formData.internshipDuration.value &&
-                        formData.internshipDuration.unit
-                            ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
-                            : "",
-                    freelancePaymentRange:
-                        formData.workBasis.Freelance &&
-                        formData.freelancePaymentRange.min &&
-                        formData.freelancePaymentRange.max
-                            ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
-                            : "",
-                    internshipStipendRange:
-                        formData.internshipType === "Paid" &&
-                        formData.internshipStipendRange.min &&
-                        formData.internshipStipendRange.max
-                            ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
-                            : "",
+                    workLocation: formData.workLocation.country
+                        ? `${formData.workLocation.district}, ${formData.workLocation.state}, ${formData.workLocation.country}`
+                        : "",
                     experience:
                         formData.experience.range && formData.experience.unit
-                            ? {
-                                  years:
-                                      formData.experience.unit === "Years"
-                                          ? `${formData.experience.range} Years`
-                                          : "",
-                                  months:
-                                      formData.experience.unit === "Months"
-                                          ? `${formData.experience.range} Months`
-                                          : "",
-                                  days:
-                                      formData.experience.unit === "Days"
-                                          ? `${formData.experience.range} Days`
-                                          : "",
-                              }
-                            : { years: "", months: "", days: "" },
-                    jobAmountRange:
-                        formData.workBasis.Job &&
-                        formData.jobAmountRange.min &&
-                        formData.jobAmountRange.max
-                            ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees`
+                            ? `${formData.experience.range} ${formData.experience.unit}`
                             : "",
+                    projects: formData.projects.map((project) => ({
+                        title: project.title,
+                        description: project.description,
+                        link: project.link,
+                    })),
                     workExperience: formData.workExperience.map((exp) => ({
-                        company: exp.companyName,
+                        companyName: exp.companyName,
                         role: exp.role,
-                        duration:
-                            exp.startDate && exp.endDate
-                                ? `${exp.startDate} - ${exp.endDate}`
-                                : exp.startDate || "",
+                        startDate: exp.startDate,
+                        endDate: exp.endDate,
                         description: exp.description,
                     })),
                     otherLinks: formData.otherLinks.map((link) => ({
-                        url: link.url,
                         title: link.title,
+                        url: link.url,
                     })),
                 };
+
                 delete submitData.contact_methods;
                 delete submitData.workLocation;
-                delete submitData.resumeFile; // No need to include resumeFile since it's already uploaded
+                delete submitData.resumeFile;
+
                 const response = await fetch(
                     `http://localhost:3333/api/get-discovered/update-post/${listingId}`,
                     {
@@ -1559,6 +1480,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             }
         }
     };
+
     const handleCancel = () => {
         setFormData({
             gender: "",
