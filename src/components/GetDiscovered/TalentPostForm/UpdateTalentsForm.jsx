@@ -172,29 +172,37 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                 const data = d.postData;
                 console.log("Talents form",data); // Already present
 
-                let countryCode;
-                let stateCode;
-                let cityName;
+                let countryCode = "";
+            let stateCode = "";
+            let cityName = "";
 
-                if (data.workMode.Hybrid || data.workMode.Onsite) {
-                    const countryObj = Country.getAllCountries().find(
-                        (c) => c.name === data.workLocation.country
+               if (data.workMode.Hybrid || data.workMode.Onsite) {
+                const countryObj = Country.getAllCountries().find(
+                    (c) => c.name === data.workLocation.country
+                );
+
+                if (countryObj) {
+                    countryCode = countryObj.isoCode;
+                    const fetchedStates = State.getStatesOfCountry(countryCode);
+                    setStates(fetchedStates);
+
+                    const stateObj = fetchedStates.find(
+                        (s) => s.name === data.workState
                     );
-                    const stateObj = State.getStatesOfCountry(
-                        countryObj?.isoCode
-                    ).find((s) => s.name === data.workState);
-                    const cityObj = City.getCitiesOfState(
-                        countryObj?.isoCode,
-                        stateObj?.isoCode
-                    ).find((c) => c.name === data.workCity);
 
-                    countryCode = countryObj?.isoCode || "";
-                    stateCode = stateObj?.isoCode || "";
-                    cityName = cityObj?.name || "";
+                    if (stateObj) {
+                        stateCode = stateObj.isoCode;
+                        const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
+                        setDistricts(fetchedCities);
 
-                    setStates(State.getStatesOfCountry(countryCode));
-                    setDistricts(City.getCitiesOfState(countryCode, stateCode));
+                        const cityObj = fetchedCities.find(
+                            (c) => c.name === data.workCity
+                        );
+                        if (cityObj) cityName = cityObj.name;
+                    }
                 }
+            }
+
 
                 // Map prefilled data to formData
                 const newFormData = {
@@ -289,9 +297,9 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         Onsite: data.workMode.Onsite || false,
                     },
                     workLocation: {
-                        country: countryCode || "",
-                        state: stateCode || "",
-                        district: cityName || "",
+                        country: countryCode,
+                        state: stateCode,
+                        district: cityName,
                     },
 
                     experience: (() => {
@@ -346,6 +354,38 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                     `http://localhost:3333/api/domain/get-all-domains`
                 );
                 const domainData = await domainResponse.json();
+                
+                // Transform all domains and roles first
+                const sortedDomains = (domainData.domains || [])
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((domain) => ({
+                        value: domain._id,
+                        label: domain.name,
+                        roles: domain.roles,
+                    }));
+
+                // Set domains for react-select
+                setDomains(sortedDomains);
+                setFilteredDomains(sortedDomains);
+
+                // Transform all roles from all domains
+                const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
+                    if (Array.isArray(domain.roles)) {
+                        return [
+                            ...acc,
+                            ...domain.roles.map((role) => ({
+                                value: role._id,
+                                label: role.name,
+                                domainId: domain.value,
+                            })),
+                        ];
+                    }
+                    return acc;
+                }, []);
+
+                // Set all roles
+                setAllRoles(rolesFromAllDomains);
+
                 const domain = domainData.domains.find(
                     (d) => d.name === data.domainName
                 );
@@ -356,12 +396,10 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         domainName: domain._id,
                     }));
                     
-                    // Set all roles for this domain
-                    const domainRoles = domain.roles.map(role => ({
-                        value: role._id,
-                        label: role.name,
-                        domainId: domain._id
-                    }));
+                    // Set filtered roles for this domain
+                    const domainRoles = rolesFromAllDomains.filter(
+                        role => role.domainId === domain._id
+                    );
                     setFilteredRoles(domainRoles);
                     
                     const role = domain.roles.find(
