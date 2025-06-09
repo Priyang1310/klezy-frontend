@@ -26,7 +26,6 @@ const AccountSettings = ({ onClose }) => {
   const [nameRegex] = useState(/^[A-Za-z\s\-]*$/);
   const [isSendingOTP, setIsSendingOTP] = useState(false);
   const [originalEmail, setOriginalEmail] = useState("");
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Fetch countries
   useEffect(() => {
@@ -39,60 +38,62 @@ const AccountSettings = ({ onClose }) => {
 
   // Fetch states when country changes
   useEffect(() => {
-    if (formData.country && !isInitialLoad) {
+    if (formData.country) {
       const stateData = State.getStatesOfCountry(formData.country).map((s) => ({
         value: s.isoCode,
         label: s.name,
       }));
       setAvailableStates(stateData);
-      setFormData((prev) => ({ ...prev, state: "", city: "" }));
+      // Only reset state and city if they are no longer valid
+      const isValidState = stateData.some((s) => s.value === formData.state);
+      setFormData((prev) => ({
+        ...prev,
+        state: isValidState ? prev.state : "",
+        city: isValidState ? prev.city : "",
+      }));
+      if (!isValidState) {
+        setAvailableCities([]);
+      }
+    } else {
+      setAvailableStates([]);
       setAvailableCities([]);
+      setFormData((prev) => ({ ...prev, state: "", city: "" }));
     }
-  }, [formData.country, isInitialLoad]);
+  }, [formData.country]);
 
   // Fetch cities when state changes
   useEffect(() => {
-    if (formData.state && formData.country && !isInitialLoad) {
+    if (formData.country && formData.state) {
       const cityData = City.getCitiesOfState(formData.country, formData.state).map((d) => ({
         value: d.name,
         label: d.name,
       }));
       setAvailableCities(cityData);
+      // Only reset city if it is no longer valid
+      const isValidCity = cityData.some((c) => c.value === formData.city);
+      setFormData((prev) => ({
+        ...prev,
+        city: isValidCity ? prev.city : "",
+      }));
+    } else {
+      setAvailableCities([]);
       setFormData((prev) => ({ ...prev, city: "" }));
     }
-  }, [formData.state, formData.country, isInitialLoad]);
-  // This ensures states and cities are restored on modal reopen
-  useEffect(() => {
-    if (!loading && !isInitialLoad) {
-      if (formData.country) {
-        const stateData = State.getStatesOfCountry(formData.country).map((s) => ({
-          value: s.isoCode,
-          label: s.name,
-        }));
-        setAvailableStates(stateData);
-      }
-      if (formData.country && formData.state) {
-        const cityData = City.getCitiesOfState(formData.country, formData.state).map((d) => ({
-          value: d.name,
-          label: d.name,
-        }));
-        setAvailableCities(cityData);
-      }
-    }
-  }, [loading, isInitialLoad, formData.country, formData.state]);
+  }, [formData.country, formData.state]);
+
+  // Cleanup on modal close
   useEffect(() => {
     return () => {
       setAvailableStates([]);
       setAvailableCities([]);
-      setIsInitialLoad(true); // Set back to true if you want a clean open
     };
   }, [onClose]);
-
 
   // Fetch user data from API to pre-fill form
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        setLoading(true);
         const response = await fetch("http://localhost:3333/api/edit-profile/get-profile-data", {
           method: "GET",
           credentials: "include",
@@ -102,35 +103,39 @@ const AccountSettings = ({ onClose }) => {
         const data = d.data;
         console.log("Backend Data:", data);
 
-        // Find country ISO code
-        const country = data.country
-          ? Country.getAllCountries().find((c) => c.name.toLowerCase() === data.country.toLowerCase().trim())?.isoCode || ""
-          : "";
+        const countryObj = Country.getAllCountries().find(
+          (c) => c.name.toLowerCase().trim() === data.country?.toLowerCase().trim()
+        );
+        const country = countryObj?.isoCode || "";
 
         let state = "";
         let city = "";
-        let stateData = [];
-        let cityData = [];
 
+        // Populate states if country is valid
         if (country) {
-          stateData = State.getStatesOfCountry(country).map((s) => ({
+          const stateData = State.getStatesOfCountry(country).map((s) => ({
             value: s.isoCode,
             label: s.name,
           }));
           setAvailableStates(stateData);
-          state = data.state
-            ? stateData.find((s) => s.label.toLowerCase() === data.state.toLowerCase().trim())?.value || ""
-            : "";
 
-          if (state && country) {
-            cityData = City.getCitiesOfState(country, state).map((d) => ({
-              value: d.name,
-              label: d.name,
+          const stateObj = stateData.find(
+            (s) => s.label.toLowerCase().trim() === data.state?.toLowerCase().trim()
+          );
+          state = stateObj?.value || "";
+
+          // Populate cities if state is valid
+          if (state) {
+            const cityData = City.getCitiesOfState(country, state).map((c) => ({
+              value: c.name,
+              label: c.name,
             }));
             setAvailableCities(cityData);
-            city = data.city
-              ? cityData.find((c) => c.label.toLowerCase() === data.city.toLowerCase().trim())?.value || ""
-              : "";
+
+            const cityObj = cityData.find(
+              (c) => c.label.toLowerCase().trim() === data.city?.toLowerCase().trim()
+            );
+            city = cityObj?.value || "";
           }
         }
 
@@ -149,7 +154,6 @@ const AccountSettings = ({ onClose }) => {
         toast.error("Failed to load user data");
       } finally {
         setLoading(false);
-        setIsInitialLoad(false);
       }
     };
     fetchUserData();
@@ -293,7 +297,7 @@ const AccountSettings = ({ onClose }) => {
     return !Object.values(newErrors).some((error) => error);
   };
 
-  // Handle form submission
+  // Handle feed submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -380,6 +384,7 @@ const AccountSettings = ({ onClose }) => {
           <input
             type="text"
             name="lastName"
+ Nationwide
             value={formData.lastName}
             onChange={handleChange}
             className={`w-full text-sm px-4 py-2 border ${errors.lastName ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
