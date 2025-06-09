@@ -170,7 +170,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                 if (!response.ok) throw new Error("Failed to fetch listing");
                 const d = await response.json();
                 const data = d.postData;
-                console.log(data); // Already present
+                console.log("Talents form",data); // Already present
 
                 let countryCode;
                 let stateCode;
@@ -178,15 +178,15 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
 
                 if (data.workMode.Hybrid || data.workMode.Onsite) {
                     const countryObj = Country.getAllCountries().find(
-                        (c) => c.name === data.postData.workLocation.country
+                        (c) => c.name === data.workLocation.country
                     );
                     const stateObj = State.getStatesOfCountry(
                         countryObj?.isoCode
-                    ).find((s) => s.name === data.postData.workState);
+                    ).find((s) => s.name === data.workState);
                     const cityObj = City.getCitiesOfState(
                         countryObj?.isoCode,
                         stateObj?.isoCode
-                    ).find((c) => c.name === data.postData.workCity);
+                    ).find((c) => c.name === data.workCity);
 
                     countryCode = countryObj?.isoCode || "";
                     stateCode = stateObj?.isoCode || "";
