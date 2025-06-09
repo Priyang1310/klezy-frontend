@@ -59,9 +59,9 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
     userId: userDetails,
   } = post;
 
-  const { firstName, middleName, lastName, gender, email: userEmail } =
+  const { firstName, middleName, lastName, country,state,city,gender, email: userEmail } =
     userDetails || {};
-
+  console.log(userDetails)
   // Format work location
   const workLocation = {
     country: workCountry,
@@ -92,12 +92,13 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
     Other: workBasis?.includes("Other"),
   };
 
-  // Format work mode
-  const workModeObj = {
-    Remote: workMode?.includes("Remote"),
-    Hybrid: workMode?.includes("Hybrid"),
-    Onsite: workMode?.includes("Onsite"),
-  };
+  const normalizedWorkMode = Array.isArray(workMode) ? workMode : workMode ? [workMode] : [];
+
+const workModeObj = {
+  Remote: normalizedWorkMode.includes("Remote"),
+  Hybrid: normalizedWorkMode.includes("Hybrid"),
+  Onsite: normalizedWorkMode.includes("Onsite"),
+};
 
   // Parse ranges and durations
   const experienceRangeObj = experienceRange
@@ -117,13 +118,12 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
       }
     : { min: "", max: "" };
 
-  const jobAmountRangeObj = jobAmountRange
-    ? {
-        min: jobAmountRange.split("-")[0]?.trim() || "",
-        max: jobAmountRange.split("-")[1]?.trim()?.replace("rupees", "") || "",
-      }
-    : { min: "", max: "" };
-
+const jobAmountRangeObj = jobAmountRange
+  ? {
+      min: jobAmountRange.split("-")[0]?.trim() || "",
+      max: jobAmountRange.split("-")[1]?.trim()?.replace(" ruppes", "") || "", // Change "rupees" to "ruppes"
+    }
+  : { min: "", max: "" };
   const freelancePaymentRangeObj = freelancePaymentRange
     ? {
         min: freelancePaymentRange.split("-")[0]?.trim() || "",
@@ -156,7 +156,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
               Update
             </button>
             <button
-              className="text-red-600 text-sm font-medium px-4 py-2 rounded-full bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+              className="text-red-600 text-sm font-medium px-6 py-3 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
               onClick={onClose}
             >
               Close
@@ -380,7 +380,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 Country
               </label>
               <input
-                value={getCountryName(post.country) || ""}
+                value={country || ""}
                 disabled
                 type="text"
                 className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
@@ -392,7 +392,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 State
               </label>
               <input
-                value={getStateName(post.country, post.state) || ""}
+                value={state || ""}
                 disabled
                 type="text"
                 className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
@@ -404,7 +404,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 District
               </label>
               <input
-                value={getCityName(post.country, post.state, post.district) || ""}
+                value={city || ""}
                 disabled
                 type="text"
                 className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
@@ -725,32 +725,32 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                     />
                   </div>
                 )}
-                {workBasisObj.Job && (
-                  <div className="relative flex gap-4">
-                    <div className="w-1/2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Min Amount (₹)
-                      </label>
-                      <input
-                        value={jobAmountRangeObj.min || ""}
-                        disabled
-                        type="number"
-                        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                      />
-                    </div>
-                    <div className="w-1/2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Max Amount (₹)
-                      </label>
-                      <input
-                        value={jobAmountRangeObj.max || ""}
-                        disabled
-                        type="number"
-                        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                      />
-                    </div>
-                  </div>
-                )}
+               {workBasisObj.Job && (
+  <div className="relative flex gap-4">
+    <div className="w-1/2">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Min Amount (₹)
+      </label>
+      <input
+        value={jobAmountRangeObj.min || ""}
+        disabled
+        type="number"
+        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+      />
+    </div>
+    <div className="w-1/2">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Max Amount (₹)
+      </label>
+      <input
+        value={jobAmountRangeObj.max || ""}
+        disabled
+        type="number"
+        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+      />
+    </div>
+  </div>
+)}
                 {workBasisObj.Freelance && (
                   <div className extraneous="relative flex gap-4">
                     <div className="w-1/2">
@@ -780,7 +780,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 {workBasisObj.ProjectBasis && (
                   <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Project Description
+                      Project Criteria
                     </label>
                     <textarea
                       value={projectDescription || ""}

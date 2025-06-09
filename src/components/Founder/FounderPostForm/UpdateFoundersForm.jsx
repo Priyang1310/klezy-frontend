@@ -1,9 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
+import { FaMagic } from "react-icons/fa";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 
-function UpdateFounderPostForm({ listingId, onClose }) {
+function UpdateFounderPostForm({ listingId,onClose }) {
+    const animatedComponents = makeAnimated();
+    const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
+        
+        userType: "",
+        otherUserType: "",
+        requirementType: "",
+        otherRequirementType: "",
+        startUpName: "",
+        aboutEntity: "",
+       
+        websiteOfStartupLink: "",
+        contact_methods: {
+            call: { selected: false, value: "" },
+            whatsapp: { selected: false, value: "" },
+            instagram: { selected: false, value: "" },
+            linkedin: { selected: false, value: "" },
+            facebook: { selected: false, value: "" },
+            other: { selected: false, value: "" },
+        },
+        headline: "",
+        domainName: "",
+        roleUnderDomain: "",
+        skills: [],
         workBasis: {
             Partnership: false,
             Collaboration: false,
@@ -22,157 +50,289 @@ function UpdateFounderPostForm({ listingId, onClose }) {
         internshipStipendRange: { min: "", max: "" },
         internshipPerformanceCriteria: "",
         collaborationDescription: "",
+        jobTimeType: null,
         jobAmountRange: { min: "", max: "" },
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
         percentageBasisValue: "",
-        timeCommitment: "",
+        timeCommitment: { value: "", unit: "" },
         equityBasisValue: "",
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
         workLocation: { country: "", state: "", district: "" },
         experienceRange: { min: "", max: "" },
+        aboutOpportunity: "",
         responsibilities: "",
         whyShouldJoin: "",
         anyOtherInfo: "",
     });
 
     const [errors, setErrors] = useState({});
+    const [domains, setDomains] = useState([]);
+    const [allRoles, setAllRoles] = useState([]);
+    const [filteredDomains, setFilteredDomains] = useState([]);
+    const [filteredRoles, setFilteredRoles] = useState([]);
+    const [skills, setSkills] = useState([]);
+    const [filteredSkills, setFilteredSkills] = useState([]);
+    const [showDomainSuggestions, setShowDomainSuggestions] = useState(false);
+    const [showRoleSuggestions, setShowRoleSuggestions] = useState(false);
+    const [showSkillSuggestions, setShowSkillSuggestions] = useState(false);
+    const [domainSearchText, setDomainSearchText] = useState("");
+    const [roleSearchText, setRoleSearchText] = useState("");
+    const [skillSearchText, setSkillSearchText] = useState("");
+    const [loadingDomains, setLoadingDomains] = useState(true);
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
     const [districts, setDistricts] = useState([]);
-    const [loadingData, setLoadingData] = useState(true);
-    const [dataError, setDataError] = useState("");
-    const [enhanceLoading, setEnhanceLoading] = useState({});
+    // const [loadingProfile, setLoadingProfile] = useState(true);
+    const [profileError, setProfileError] = useState("");
+    const [enhanceLoading, setEnhanceLoading] = useState({}); // Track loading state for each field
 
-    // Fetch existing post data
-    useEffect(() => {
-        const fetchPostData = async () => {
-            try {
-                const response = await fetch(
-                    `http://localhost:3333/api/founder/get-pre-filled-details-for-update-form/${listingId}`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                    }
+    // Fetch profile data
+    // useEffect(() => {
+    //     const fetchProfile = async () => {
+    //         try {
+    //             const response = await fetch(
+    //                 "http://localhost:3333/api/founder/get-pre-filled-details",
+    //                 {
+    //                     method: "GET",
+    //                     credentials: "include",
+    //                 }
+    //             );
+    //             if (!response.ok) throw new Error("Failed to fetch profile");
+    //             const data = await response.json();
+
+    //             console.log(data);
+    //             setFormData((prev) => ({
+    //                 ...prev,
+    //                 first_name: data.user.firstName || "",
+    //                 middle_name: data.user.middleName || "",
+    //                 last_name: data.user.lastName || "",
+    //                 gender: data.user.gender || "",
+    //                 email: data.user.email || "",
+    //                 country: data.user.country || "",
+    //                 state: data.user.state || "",
+    //                 district: data.user.city || "",
+    //             }));
+    //         } catch (error) {
+    //             setProfileError("Failed to load profile data");
+    //             console.error("Error fetching profile:", error);
+    //         } finally {
+    //             setLoadingProfile(false);
+    //         }
+    //     };
+    //     fetchProfile();
+    // }, []);
+   useEffect(() => {
+    const fetchListing = async () => {
+        try {
+            // setLoadingListing(true);
+            const response = await fetch(
+                `http://localhost:3333/api/founder/get-pre-filled-details-for-update-form/${listingId}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) throw new Error("Failed to fetch listing data");
+            const  {postData}  = await response.json();
+            const data = postData
+            console.log(data)
+            // Map work location codes
+            let countryCode = "";
+            let stateCode = "";
+            let cityName = "";
+
+            if (data.workMode.includes("Hybrid") || data.workMode.includes("Onsite")) {
+                const countryObj = Country.getAllCountries().find(
+                    (c) => c.name === data.workCountry
                 );
-                console.log(response);
-                if (!response.ok) throw new Error("Failed to fetch post data");
-                const data = await response.json();
+                countryCode = countryObj?.isoCode || "";
+                if (countryCode) {
+                    const stateObj = State.getStatesOfCountry(countryCode).find(
+                        (s) => s.name === data.workState
+                    );
+                    stateCode = stateObj?.isoCode || "";
+                    if (stateCode) {
+                        const cityObj = City.getCitiesOfState(countryCode, stateCode).find(
+                            (c) => c.name === data.workCity
+                        );
+                        cityName = cityObj?.name || data.workCity;
+                    }
+                }
+                setStates(State.getStatesOfCountry(countryCode));
+                setDistricts(City.getCitiesOfState(countryCode, stateCode));
+            }
+
+            // Helper to parse range strings (e.g., "1000-2000 rupees" or "1-5 years")
+            const parseRange = (str) => {
+    if (!str) return { min: "", max: "" };
+    const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|years)?$/);
+    return match ? { min: match[1], max: match[2] } : { min: "", max: "" };
+};
+
+            // Helper to parse duration (e.g., "2 Months")
+            const parseDuration = (str) => {
+    if (!str) return { value: "", unit: "" };
+    // Handle formats like "2 hours/month" or "2 Months"
+    const hoursMatch = str.match(/^(\d+)\s*hours\/(\w+)$/);
+    const standardMatch = str.match(/^(\d+)\s*(Weeks|Months|Years)$/);
+    if (hoursMatch) {
+        return { value: hoursMatch[1], unit: `hours/${hoursMatch[2]}` };
+    } else if (standardMatch) {
+        return { value: standardMatch[1], unit: standardMatch[2] };
+    }
+    return { value: "", unit: "" };
+};
+
+            // Map pre-filled data to formData
+            const newFormData = {
+                userType: data.userType || "",
+                otherUserType: data.otherUserType || "",
+                requirementType: data.requirementType || "",
+                otherRequirementType: data.otherRequirementType || "",
+                startUpName: data.startUpName || "",
+                aboutEntity: data.aboutEntity || "",
+                websiteOfStartupLink: data.websiteOfStartupLink || "",
+                contact_methods: {
+                    call: {
+                        selected: !!data.call,
+                        value: data.call || "",
+                    },
+                    whatsapp: {
+                        selected: !!data.whatsapp,
+                        value: data.whatsapp || "",
+                    },
+                    instagram: {
+                        selected: !!data.instagram,
+                        value: data.instagram || "",
+                    },
+                    linkedin: {
+                        selected: !!data.linkedin || "",
+                        value: data.linkedin || "",
+                    },
+                    facebook: {
+                        selected: !!data.facebook,
+                        value: data.facebook || "",
+                    },
+                    other: {
+                        selected: !!data.other,
+                        value: data.email || "",
+                    },
+                },
+                headline: data.headline || "",
+                domainName: "", // To be set after fetching domains
+                roleUnderDomain: "", // To be set after fetching roles
+                skills: data.skills?.map((skill, idx) => ({
+                    _id: `temp-${idx}`,
+                    name: skill,
+                })) || [],
+                workBasis: {
+                    Partnership: data.workBasis?.includes("Partnership") || false,
+                    Collaboration: data.workBasis?.includes("Collaboration") || false,
+                    Internship: data.workBasis?.includes("Internship") || false,
+                    Job: data.workBasis?.includes("Job") || false,
+                    Freelance: data.workBasis?.includes("Freelance") || false,
+                    ProjectBasis: data.workBasis?.includes("ProjectBasis") || false,
+                    PercentageBasis: data.workBasis?.includes("PercentageBasis") || false,
+                    EquityBasis: data.workBasis?.includes("EquityBasis") || false,
+                    Other: data.workBasis?.includes("Other") || false,
+                },
+                partnershipCriteria: data.partnershipCriteria || "",
+                internshipType: data.internshipType || null,
+                internshipTimeType: data.internshipTimeType || null,
+                internshipDuration: parseDuration(data.internshipDuration),
+                internshipStipendRange: parseRange(data.internshipStipendRange),
+                internshipPerformanceCriteria: data.internshipPerformanceCriteria || "",
+                collaborationDescription: data.collaborationDescription || "",
+                jobTimeType: data.jobTimeType || null,
+                jobAmountRange: parseRange(data.jobAmountRange),
+                freelancePaymentRange: parseRange(data.freelancePaymentRange),
+                projectDescription: data.projectDescription || "",
+                percentageBasisValue: data.percentageBasisValue || "",
+                timeCommitment: parseDuration(data.timeCommitment),
+                equityBasisValue: data.equityBasisValue || "",
+                otherWorkBasis: data.otherWorkBasis || "",
+                workMode: {
+                    Remote: data.workMode?.includes("Remote") || false,
+                    Hybrid: data.workMode?.includes("Hybrid") || false,
+                    Onsite: data.workMode?.includes("Onsite") || false,
+                },
+                workLocation: {
+                    country: countryCode,
+                    state: stateCode,
+                    district: cityName,
+                },
+                experienceRange: parseRange(data.experienceRange),
+                aboutOpportunity: data.aboutOpportunity || "",
+                responsibilities: data.responsibilities || "",
+                whyShouldJoin: data.whyShouldJoin || "",
+                anyOtherInfo: data.anyOtherInfo || "",
+            };
+            console.log(formData.experienceRange)
+            setFormData(newFormData);
+
+            // Fetch domains to set domainName and roleUnderDomain
+            const domainResponse = await fetch(
+                "http://localhost:3333/api/domain/get-all-domains",
+                { method: "GET", credentials: "include" }
+            );
+            if (!domainResponse.ok) throw new Error("Failed to fetch domains");
+            const domainData = await domainResponse.json();
+            if (!domainData.success) throw new Error("Failed to fetch domains");
+            const sortedDomains = domainData.domains
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((domain) => ({
+                    value: domain._id,
+                    label: domain.name,
+                    roles: domain.roles,
+                }));
+            setDomains(sortedDomains);
+            setFilteredDomains(sortedDomains);
+
+            const domain = sortedDomains.find((d) => d.label === data.domainName);
+            if (domain) {
+                setDomainSearchText(domain.label);
                 setFormData((prev) => ({
                     ...prev,
-                    workBasis: {
-                        Partnership:
-                            data.postData.workBasis?.includes("Partnership") ||
-                            false,
-                        Collaboration:
-                            data.postData.workBasis?.includes(
-                                "Collaboration"
-                            ) || false,
-                        Internship:
-                            data.postData.workBasis?.includes("Internship") ||
-                            false,
-                        Job: data.postData.workBasis?.includes("Job") || false,
-                        Freelance:
-                            data.postData.workBasis?.includes("Freelance") ||
-                            false,
-                        ProjectBasis:
-                            data.postData.workBasis?.includes("ProjectBasis") ||
-                            false,
-                        PercentageBasis:
-                            data.postData.workBasis?.includes(
-                                "PercentageBasis"
-                            ) || false,
-                        EquityBasis:
-                            data.postData.workBasis?.includes("EquityBasis") ||
-                            false,
-                        Other:
-                            data.postData.workBasis?.includes("Other") || false,
-                    },
-                    partnershipCriteria:
-                        data.postData.partnershipCriteria || "",
-                    internshipType: data.postData.internshipType || null,
-                    internshipTimeType:
-                        data.postData.internshipTimeType || null,
-                    internshipDuration: {
-                        value:
-                            data.postData.internshipDuration?.split(" ")[0] ||
-                            "",
-                        unit:
-                            data.postData.internshipDuration?.split(" ")[1] ||
-                            "",
-                    },
-                    internshipStipendRange: {
-                        min:
-                            data.postData.internshipStipendRange?.split(
-                                "-"
-                            )[0] || "",
-                        max:
-                            data.postData.internshipStipendRange
-                                ?.split("-")[1]
-                                ?.replace(" rupees", "") || "",
-                    },
-                    internshipPerformanceCriteria:
-                        data.postData.internshipPerformanceCriteria || "",
-                    collaborationDescription:
-                        data.postData.collaborationDescription || "",
-                    jobAmountRange: {
-                        min: data.postData.jobAmountRange?.split("-")[0] || "",
-                        max:
-                            data.postData.jobAmountRange
-                                ?.split("-")[1]
-                                ?.replace(" ruppes", "") || "",
-                    },
-                    freelancePaymentRange: {
-                        min:
-                            data.postData.freelancePaymentRange?.split(
-                                "-"
-                            )[0] || "",
-                        max:
-                            data.postData.freelancePaymentRange
-                                ?.split("-")[1]
-                                ?.replace(" rupees", "") || "",
-                    },
-                    projectDescription: data.postData.projectDescription || "",
-                    percentageBasisValue:
-                        data.postData.percentageBasisValue || "",
-                    timeCommitment: data.postData.timeCommitment || "",
-                    equityBasisValue: data.postData.equityBasisValue || "",
-                    otherWorkBasis: data.postData.otherWorkBasis || "",
-                    workMode: {
-                        Remote:
-                            data.postData.workMode?.includes("Remote") || false,
-                        Hybrid:
-                            data.postData.workMode?.includes("Hybrid") || false,
-                        Onsite:
-                            data.postData.workMode?.includes("Onsite") || false,
-                    },
-                    workLocation: {
-                        country: data.postData.workCountry || "",
-                        state: data.postData.workState || "",
-                        district: data.postData.workCity || "",
-                    },
-                    experienceRange: {
-                        min: data.postData.experienceRange?.split("-")[0] || "",
-                        max:
-                            data.postData.experienceRange
-                                ?.split("-")[1]
-                                ?.replace(" years", "") || "",
-                    },
-
-                    responsibilities: data.postData.responsibilities || "",
-                    whyShouldJoin: data.postData.whyShouldJoin || "",
-                    anyOtherInfo: data.postData.anyOtherInfo || "",
+                    domainName: domain.value,
                 }));
-            } catch (error) {
-                setDataError("Failed to load post data");
-                console.error("Error fetching post:", error);
-            } finally {
-                setLoadingData(false);
+                const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
+                if (role) {
+                    setRoleSearchText(role.name);
+                    setFormData((prev) => ({
+                        ...prev,
+                        roleUnderDomain: role._id,
+                    }));
+                }
             }
-        };
-        fetchPostData();
-    }, [listingId]);
+
+            // Set roles
+            const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
+                if (Array.isArray(domain.roles)) {
+                    return [
+                        ...acc,
+                        ...domain.roles.map((role) => ({
+                            value: role._id,
+                            label: role.name,
+                            domainId: domain.value,
+                        })),
+                    ];
+                }
+                return acc;
+            }, []);
+            setAllRoles(rolesFromAllDomains);
+            setFilteredRoles(rolesFromAllDomains);
+        } catch (error) {
+            // setListingError("Failed to load listing data");
+            console.error("Error fetching listing:", error);
+        } finally {
+            // setLoadingListing(false);
+            setLoadingDomains(false);
+        }
+    };
+    fetchListing();
+}, [listingId]);
 
     // Fetch countries
     useEffect(() => {
@@ -183,13 +343,6 @@ function UpdateFounderPostForm({ listingId, onClose }) {
     useEffect(() => {
         if (formData.workLocation.country) {
             setStates(State.getStatesOfCountry(formData.workLocation.country));
-        } else {
-            setStates([]);
-            setDistricts([]);
-            setFormData((prev) => ({
-                ...prev,
-                workLocation: { ...prev.workLocation, state: "", district: "" },
-            }));
         }
     }, [formData.workLocation.country]);
 
@@ -202,30 +355,259 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                     formData.workLocation.state
                 )
             );
-        } else {
-            setDistricts([]);
-            setFormData((prev) => ({
-                ...prev,
-                workLocation: { ...prev.workLocation, district: "" },
-            }));
         }
     }, [formData.workLocation.state]);
 
+    // Fetch domains and roles
+    useEffect(() => {
+        const fetchDomains = async () => {
+            console.log("Hi!");
+            try {
+                console.log("Response");
+                const response = await fetch(
+                    "http://localhost:3333/api/domain/get-all-domains"
+                );
+                const data = await response.json();
+                if (!data.success) throw new Error("Failed to fetch domains");
+                // Transform domains into react-select format
+                const sortedDomains = (data.domains || [])
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((domain) => ({
+                        value: domain._id,
+                        label: domain.name,
+                        roles: domain.roles,
+                    }));
+
+                // Set domains for react-select
+                setDomains(sortedDomains);
+                setFilteredDomains(sortedDomains);
+                console.log(sortedDomains);
+                // Transform roles into react-select format
+                const rolesFromAllDomains = sortedDomains.reduce(
+                    (acc, domain) => {
+                        if (Array.isArray(domain.roles)) {
+                            return [
+                                ...acc,
+                                ...domain.roles.map((role) => ({
+                                    value: role._id,
+                                    label: role.name || role.title, // Adjust based on your role's name field
+                                    domainId: domain.value, // Reference domain by its _id
+                                    // Optional: Add color or other properties if needed
+                                    // color: '#someColor',
+                                    // isFixed: false,
+                                    // isDisabled: false,
+                                })),
+                            ];
+                        }
+                        return acc;
+                    },
+                    []
+                );
+
+                console.log(rolesFromAllDomains);
+
+                // Remove duplicates by role._id
+                // const uniqueRoles = Array.from(
+                //     new Map(
+                //         rolesFromAllDomains.map((role) => [role.value, role])
+                //     ).values()
+                // );
+
+                // Set roles for react-select
+                setAllRoles(rolesFromAllDomains);
+                setFilteredRoles(rolesFromAllDomains);
+            } catch (error) {
+                console.error("Error fetching domains:", error);
+                setDomains([]);
+                setAllRoles([]);
+                setFilteredDomains([]);
+                setFilteredRoles([]);
+            } finally {
+                setLoadingDomains(false);
+            }
+        };
+        fetchDomains();
+    }, []);
+
+    // Fetch skills when domainName changes
+    useEffect(() => {
+        setFormData((prev) => ({
+            ...prev,
+            // roleUnderDomain: "",
+            skills: [],
+        }));
+        setRoleSearchText("");
+        setSkills([]);
+        setFilteredSkills([]);
+        setSkillSearchText("");
+        setShowSkillSuggestions(false);
+
+        const fetchSkills = async () => {
+            if (formData.domainName) {
+                try {
+                    const skillsResponse = await fetch(
+                        `http://localhost:3333/api/skills/${formData.domainName}`
+                    );
+                    if (!skillsResponse.ok)
+                        throw new Error("Failed to fetch skills");
+                    const skillsData = await skillsResponse.json();
+                    setSkills(
+                        Array.isArray(skillsData.skills)
+                            ? skillsData.skills
+                            : []
+                    );
+                    setFilteredSkills(
+                        Array.isArray(skillsData.skills)
+                            ? skillsData.skills
+                            : []
+                    );
+                } catch (error) {
+                    console.error("Error fetching skills:", error);
+                    setSkills([]);
+                    setFilteredSkills([]);
+                }
+            }
+        };
+        fetchSkills();
+    }, [formData.domainName]);
+
+    // Filter domains, roles, and skills
+    useEffect(() => {
+        if (!domainSearchText.trim()) {
+            setFilteredDomains(domains);
+        } else {
+            setFilteredDomains(
+                domains.filter((domain) =>
+                    domain.name
+                        ?.toLowerCase()
+                        .startsWith(domainSearchText.toLowerCase())
+                )
+            );
+        }
+    }, [domainSearchText, domains]);
+
+    useEffect(() => {
+        let filtered = allRoles;
+        if (formData.domainName) {
+            filtered = allRoles.filter(
+                (role) => role.domainId === formData.domainName
+            );
+        }
+        if (roleSearchText.trim()) {
+            filtered = filtered.filter((role) =>
+                role.name
+                    ?.toLowerCase()
+                    .startsWith(roleSearchText.toLowerCase())
+            );
+        }
+        setFilteredRoles(filtered);
+    }, [roleSearchText, allRoles, formData.domainName]);
+
+    useEffect(() => {
+        if (!skillSearchText.trim()) {
+            setFilteredSkills(skills);
+        } else {
+            setFilteredSkills(
+                skills.filter((skill) =>
+                    skill.name
+                        ?.toLowerCase()
+                        .startsWith(skillSearchText.toLowerCase())
+                )
+            );
+        }
+    }, [skillSearchText, skills]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-        setErrors((prev) => ({ ...prev, [name]: "" }));
+
+        setFormData((prev) => {
+            const updatedFormData = { ...prev, [name]: value };
+
+            // Handle userType changes
+            if (name === "userType" && value !== "Other") {
+                updatedFormData.otherUserType = "";
+            }
+
+            // Handle requirementType changes
+            if (name === "requirementType") {
+                if (value !== "Other") {
+                    updatedFormData.otherRequirementType = "";
+                }
+                if (value !== "Business" && value !== "Startup") {
+                    updatedFormData.startUpName = "";
+                }
+            }
+
+            return updatedFormData;
+        });
+
+        setErrors((prev) => ({
+            ...prev,
+            [name]: "",
+            ...(name === "userType" && value !== "Other"
+                ? { otherUserType: "" }
+                : {}),
+            ...(name === "requirementType" && value !== "Other"
+                ? { otherRequirementType: "" }
+                : {}),
+            ...(name === "requirementType" &&
+            value !== "Business" &&
+            value !== "Startup"
+                ? { startUpName: "" }
+                : {}),
+        }));
     };
 
     const handleNestedChange = (field, subField, value) => {
+        if (subField === null) {
+            // Handle top-level fields like jobTimeType
+            setFormData((prev) => ({
+                ...prev,
+                [field]: value,
+            }));
+        } else {
+            // Handle nested fields
+            setFormData((prev) => ({
+                ...prev,
+                [field]: { ...prev[field], [subField]: value },
+            }));
+        }
+        setErrors((prev) => ({
+            ...prev,
+            [field]: subField ? { ...prev[field], [subField]: "" } : "",
+        }));
+    };
+
+    const handleContactMethodChange = (method) => {
         setFormData((prev) => ({
             ...prev,
-            [field]: { ...prev[field], [subField]: value },
+            contact_methods: {
+                ...prev.contact_methods,
+                [method]: {
+                    ...prev.contact_methods[method],
+                    selected: !prev.contact_methods[method].selected,
+                    value: prev.contact_methods[method].selected
+                        ? ""
+                        : prev.contact_methods[method].value,
+                },
+            },
         }));
         setErrors((prev) => ({
             ...prev,
-            [field]: { ...prev[field], [subField]: "" },
+            contact_methods: "",
+            [`${method}Value`]: "",
         }));
+    };
+
+    const handleContactValueChange = (method, value) => {
+        setFormData((prev) => ({
+            ...prev,
+            contact_methods: {
+                ...prev.contact_methods,
+                [method]: { ...prev.contact_methods[method], value },
+            },
+        }));
+        setErrors((prev) => ({ ...prev, [`${method}Value`]: "" }));
     };
 
     const handleWorkBasisChange = (basis) => {
@@ -256,6 +638,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                 } else if (basis === "Collaboration") {
                     updatedFormData.collaborationDescription = "";
                 } else if (basis === "Job") {
+                    updatedFormData.jobTimeType = null;
                     updatedFormData.jobAmountRange = { min: "", max: "" };
                 } else if (basis === "Freelance") {
                     updatedFormData.freelancePaymentRange = {
@@ -284,6 +667,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
             internshipStipendRange: { min: "", max: "" },
             internshipPerformanceCriteria: "",
             collaborationDescription: "",
+            jobTimeType: "",
             jobAmountRange: { min: "", max: "" },
             freelancePaymentRange: { min: "", max: "" },
             projectDescription: "",
@@ -294,23 +678,13 @@ function UpdateFounderPostForm({ listingId, onClose }) {
     };
 
     const handleWorkModeChange = (mode) => {
-        setFormData((prev) => {
-            const isDeselecting = prev.workMode[mode]; // Check if the mode is being deselected
-            return {
-                ...prev,
-                workMode: {
-                    ...prev.workMode,
-                    [mode]: !prev.workMode[mode], // Toggle the selected mode
-                },
-                // Reset workLocation only when deselecting Hybrid or Onsite
-                workLocation:
-                    isDeselecting &&
-                    (mode === "Hybrid" || mode === "Onsite") &&
-                    !prev.workMode[mode]
-                        ? { country: "", state: "", district: "" }
-                        : prev.workLocation,
-            };
-        });
+        setFormData((prev) => ({
+            ...prev,
+            workMode: { ...prev.workMode, [mode]: !prev.workMode[mode] },
+            workLocation: prev.workMode[mode]
+                ? { country: "", state: "", district: "" }
+                : prev.workLocation,
+        }));
         setErrors((prev) => ({
             ...prev,
             workMode: "",
@@ -319,51 +693,188 @@ function UpdateFounderPostForm({ listingId, onClose }) {
     };
 
     const handleInternshipTypeChange = (value) => {
+    setFormData((prev) => ({
+        ...prev,
+        internshipType: value,
+        internshipDuration: value ? prev.internshipDuration : { value: "", unit: "" },
+        internshipStipendRange: value === "Paid" ? prev.internshipStipendRange : { min: "", max: "" },
+        internshipPerformanceCriteria: value === "PerformanceBased" ? prev.internshipPerformanceCriteria : "",
+    }));
+    setErrors((prev) => ({
+        ...prev,
+        internshipType: "",
+        internshipTimeType: "",
+        internshipStipendRange: { min: "", max: "" },
+        internshipPerformanceCriteria: "",
+    }));
+};
+    const handleInternshipTimeTypeChange = (value) => {
         setFormData((prev) => ({
             ...prev,
-            internshipType: value,
-            internshipTimeType: null,
-            internshipDuration: value
-                ? prev.internshipDuration
-                : { value: "", unit: "" },
-            internshipStipendRange:
-                value === "Paid"
-                    ? prev.internshipStipendRange
-                    : { min: "", max: "" },
-            internshipPerformanceCriteria:
-                value === "PerformanceBased"
-                    ? prev.internshipPerformanceCriteria
-                    : "",
+            internshipTimeType: value,
         }));
-        setErrors((prev) => ({
-            ...prev,
-            internshipType: "",
-            internshipTimeType: "",
-            internshipStipendRange: { min: "", max: "" },
-            internshipPerformanceCriteria: "",
-        }));
-    };
-
-    const handleInternshipTimeTypeChange = (value) => {
-        setFormData((prev) => ({ ...prev, internshipTimeType: value }));
         setErrors((prev) => ({ ...prev, internshipTimeType: "" }));
     };
 
-    const enhanceField = async (fieldName, value) => {
+    const handleDomainInput = (e) => {
+        setDomainSearchText(e.target.value);
+        setShowDomainSuggestions(true);
+    };
+    
+    const handleDomainFocus = () => setShowDomainSuggestions(true);
+    const handleDomainBlur = () =>
+        setTimeout(() => setShowDomainSuggestions(false), 200);
+    
+    const handleDomainSelect = (selectedDomain) => {
+        if (selectedDomain === null) {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: "", // Reset domainName
+                roleUnderDomain: "", // Reset roleUnderDomain to clear role Select
+                skills: [], // Reset skills
+            }));
+            allRoles.sort();
+            setFilteredRoles(allRoles); // Reset to all roles
+            setDomainSearchText(""); // Clear domain search text
+            setRoleSearchText(""); // Clear role search text
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                domainName: selectedDomain.value,
+                roleUnderDomain: "", // Reset roleUnderDomain when domain changes
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(selectedDomain.label);
+            setRoleSearchText("");
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) => role.domainId === selectedDomain.value
+                )
+            );
+            setShowDomainSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                domainName: "",
+                roleUnderDomain: "",
+            }));
+        }
+    };
+
+    const handleRoleInput = (e) => {
+        setRoleSearchText(e.target.value);
+        setShowRoleSuggestions(true);
+    };
+
+    const handleRoleFocus = () => setShowRoleSuggestions(true);
+    const handleRoleBlur = () =>
+        setTimeout(() => setShowRoleSuggestions(false), 200);
+
+    const handleRoleSelect = (selectedRole) => {
+        if (selectedRole === null) {
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: "", // Reset roleUnderDomain
+                skills: [], // Reset skills
+            }));
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter((role) => role.domainId === formData.domainName)
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({ ...prev, roleUnderDomain: "" }));
+        } else {
+            const associatedDomain = domains.find(
+                (domain) => domain.value === selectedRole.domainId
+            );
+            setFormData((prev) => ({
+                ...prev,
+                roleUnderDomain: selectedRole.value,
+                domainName: associatedDomain
+                    ? associatedDomain.value
+                    : prev.domainName, // Preserve domainName
+                skills: [], // Reset skills
+            }));
+            setDomainSearchText(associatedDomain ? associatedDomain.label : "");
+            setRoleSearchText(""); // Reset search text
+            setFilteredRoles(
+                allRoles.filter(
+                    (role) =>
+                        role.domainId ===
+                        (associatedDomain
+                            ? associatedDomain.value
+                            : formData.domainName)
+                )
+            ); // Show all roles for the domain
+            setShowRoleSuggestions(false);
+            setErrors((prev) => ({
+                ...prev,
+                roleUnderDomain: "",
+                domainName: "",
+            }));
+        }
+    };
+
+    const handleSkillInput = (e) => {
+        setSkillSearchText(e.target.value);
+        setShowSkillSuggestions(e.target.value.length > 0);
+    };
+
+    const handleSkillSelect = (skill) => {
+        setFormData((prev) => ({
+            ...prev,
+            skills: prev.skills.some((s) => s._id === skill._id)
+                ? prev.skills
+                : [...prev.skills, skill],
+        }));
+        setSkillSearchText("");
+        setShowSkillSuggestions(false);
+        setErrors((prev) => ({ ...prev, skills: "" }));
+    };
+
+    const handleSkillRemove = (skillId) => {
+        setFormData((prev) => ({
+            ...prev,
+            skills: prev.skills.filter((s) => s._id !== skillId),
+        }));
+    };
+
+    // Enhance individual field
+    const enhanceField = async (fieldName, value, nestedField = null) => {
         setEnhanceLoading((prev) => ({ ...prev, [fieldName]: true }));
         try {
             const response = await axios.post(
                 "http://localhost:3333/api/enhance/process-field",
                 {
-                    field: fieldName,
+                    field: nestedField
+                        ? `${fieldName}.${nestedField}`
+                        : fieldName,
                     content: value,
                     enhance: true,
                 }
             );
-            setFormData((prev) => ({
-                ...prev,
-                [fieldName]: response.data[fieldName] || value,
-            }));
+            setFormData((prev) => {
+                if (nestedField) {
+                    return {
+                        ...prev,
+                        [fieldName]: {
+                            ...prev[fieldName],
+                            [nestedField]:
+                                response.data[fieldName]?.[nestedField] ||
+                                value,
+                        },
+                    };
+                }
+                return {
+                    ...prev,
+                    [fieldName]: response.data[fieldName] || value,
+                };
+            });
         } catch (error) {
             alert(`Enhancement failed for ${fieldName}`);
             console.error("Enhance error:", error);
@@ -371,8 +882,85 @@ function UpdateFounderPostForm({ listingId, onClose }) {
         setEnhanceLoading((prev) => ({ ...prev, [fieldName]: false }));
     };
 
-    const validateForm = () => {
+    const validateStep1 = () => {
         const newErrors = {};
+         
+        if (!formData.userType) newErrors.userType = "User type is required";
+        if (formData.userType === "Other" && !formData.otherUserType.trim())
+            newErrors.otherUserType = "Please specify user type";
+        if (!formData.requirementType)
+            newErrors.requirementType = "Requirement type is required";
+        if (
+            formData.requirementType === "Other" &&
+            !formData.otherRequirementType.trim()
+        )
+            newErrors.otherRequirementType = "Please specify requirement type";
+        if (
+            ["Startup", "Business"].includes(formData.requirementType) &&
+            !formData.startUpName.trim()
+        )
+            newErrors.startUpName = "Business/Startup Name is required";
+        if (
+            formData.websiteOfStartupLink &&
+            !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+                formData.websiteOfStartupLink
+            )
+        )
+            newErrors.websiteOfStartupLink =
+                "Invalid URL (must start with https://)";
+
+        const selectedContacts = Object.values(formData.contact_methods).filter(
+            (method) => method.selected
+        ).length;
+        if (selectedContacts < 2)
+            newErrors.contact_methods =
+                "Please select at least two contact methods";
+
+        Object.entries(formData.contact_methods).forEach(
+            ([method, { selected, value }]) => {
+                if (selected && !value.trim()) {
+                    newErrors[
+                        `${method}Value`
+                    ] = `Please provide your ${method} ${
+                        method === "whatsapp" || method === "call"
+                            ? "number"
+                            : "URL"
+                    }`;
+                } else if (
+                    selected &&
+                    (method === "whatsapp" || method === "call") &&
+                    !/^\d{12}$/.test(value)
+                ) {
+                    newErrors[
+                        `${method}Value`
+                    ] = `Please provide a valid 10-digit ${method} number`;
+                } else if (
+                    selected &&
+                    !["whatsapp", "call"].includes(method) &&
+                    !/^https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(
+                        value
+                    )
+                ) {
+                    newErrors[
+                        `${method}Value`
+                    ] = `Please provide a valid ${method} URL (must start with https://)`;
+                }
+            }
+        );
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateStep2 = () => {
+        const newErrors = {};
+        if (!formData.headline.trim())
+            newErrors.headline = "Headline is required";
+        if (!formData.domainName) newErrors.domainName = "Domain is required";
+        if (!formData.roleUnderDomain)
+            newErrors.roleUnderDomain = "Role is required";
+        // if (formData.skills.length === 0)
+        //     newErrors.skills = "At least one skill is required";
         if (!Object.values(formData.workBasis).some((selected) => selected))
             newErrors.workBasis = "At least one work basis is required";
 
@@ -436,6 +1024,8 @@ function UpdateFounderPostForm({ listingId, onClose }) {
             newErrors.collaborationDescription =
                 "Collaboration description is required";
         if (formData.workBasis.Job) {
+            if (!formData.jobTimeType)
+                newErrors.jobTimeType = "Please specify job time type";
             const min = Number(formData.jobAmountRange.min);
             const max = Number(formData.jobAmountRange.max);
             if (
@@ -484,7 +1074,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
             formData.workBasis.ProjectBasis &&
             !formData.projectDescription.trim()
         )
-            newErrors.projectDescription = "Project description is required";
+            newErrors.projectDescription = "Project Criteria is required";
         if (
             formData.workBasis.PercentageBasis &&
             !formData.percentageBasisValue.trim()
@@ -532,32 +1122,192 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                 ...newErrors.experienceRange,
                 max: "Valid maximum experience is required",
             };
-        if (!formData.responsibilities.trim())
-            newErrors.responsibilities = "Responsibilities are required";
-        if (!formData.whyShouldJoin.trim())
-            newErrors.whyShouldJoin = "Value proposition is required";
-
+            // Validate timeCommitment only if at least one field is filled
+if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+    if (
+        !formData.timeCommitment.value.trim() ||
+        isNaN(formData.timeCommitment.value) ||
+        Number(formData.timeCommitment.value) <= 0
+    ) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            value: "Valid time commitment value is required",
+        };
+    }
+    if (!formData.timeCommitment.unit) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            unit: "Time commitment unit is required",
+        };
+    }
+}
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!validateForm()) return;
+    const validateStep3 = () => {
+        const newErrors = {};
 
+        if (!formData.responsibilities.trim())
+            newErrors.responsibilities = "Responsibilities are required";
+        if (!formData.whyShouldJoin.trim())
+            newErrors.whyShouldJoin = "Value proposition is required";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleNext = async () => {
+        let isValid = false;
+        if (step === 1) isValid = validateStep1();
+        else if (step === 2) isValid = validateStep2();
+
+        if (!isValid) return;
+
+        // Sanitize all text fields before proceeding
+        let textFields = [];
+        if (step === 1) {
+            textFields = [
+                { field: "otherUserType", value: formData.otherUserType },
+                {
+                    field: "otherRequirementType",
+                    value: formData.otherRequirementType,
+                },
+                { field: "startUpName", value: formData.startUpName },
+                { field: "aboutEntity", value: formData.aboutEntity },
+                {
+                    field: "websiteOfStartupLink",
+                    value: formData.websiteOfStartupLink,
+                },
+            ];
+            Object.entries(formData.contact_methods).forEach(
+                ([method, { selected, value }]) => {
+                    if (selected) {
+                        textFields.push({
+                            field: `contact_methods.${method}.value`,
+                            value,
+                        });
+                    }
+                }
+            );
+        } else if (step === 2) {
+            textFields = [
+                { field: "headline", value: formData.headline },
+                {
+                    field: "partnershipCriteria",
+                    value: formData.partnershipCriteria,
+                },
+                {
+                    field: "internshipDuration.value",
+                    value: formData.internshipDuration.value,
+                },
+                {
+                    field: "internshipStipendRange.min",
+                    value: formData.internshipStipendRange.min,
+                },
+                {
+                    field: "internshipStipendRange.max",
+                    value: formData.internshipStipendRange.max,
+                },
+                {
+                    field: "internshipPerformanceCriteria",
+                    value: formData.internshipPerformanceCriteria,
+                },
+                {
+                    field: "collaborationDescription",
+                    value: formData.collaborationDescription,
+                },
+                {
+                    field: "jobAmountRange.min",
+                    value: formData.jobAmountRange.min,
+                },
+                {
+                    field: "jobAmountRange.max",
+                    value: formData.jobAmountRange.max,
+                },
+                {
+                    field: "freelancePaymentRange.min",
+                    value: formData.freelancePaymentRange.min,
+                },
+                {
+                    field: "freelancePaymentRange.max",
+                    value: formData.freelancePaymentRange.max,
+                },
+                {
+                    field: "projectDescription",
+                    value: formData.projectDescription,
+                },
+                {
+                    field: "percentageBasisValue",
+                    value: formData.percentageBasisValue,
+                },
+               { field: "timeCommitment.value", value: formData.timeCommitment.value },
+{ field: "timeCommitment.unit", value: formData.timeCommitment.unit },
+                { field: "equityBasisValue", value: formData.equityBasisValue },
+                { field: "otherWorkBasis", value: formData.otherWorkBasis },
+                {
+                    field: "experienceRange.min",
+                    value: formData.experienceRange.min,
+                },
+                {
+                    field: "experienceRange.max",
+                    value: formData.experienceRange.max,
+                },
+            ];
+        }
+
+        if (step === 1) setStep(2);
+        else if (step === 2) setStep(3);
+    };
+
+    const handleBack = () => setStep(step - 1);
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateStep3()) {
         try {
+            const domain = domains.find((d) => d.value === formData.domainName);
+            const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
+
+            // Map country ISO code to full name
+            const countryObj = countries.find((c) => c.isoCode === formData.workLocation.country);
+            const countryName = countryObj ? countryObj.name : formData.workLocation.country;
+
+            // Map state ISO code to full name
+            const stateObj = states.find((s) => s.isoCode === formData.workLocation.state);
+            const stateName = stateObj ? stateObj.name : formData.workLocation.state;
+
             const submitData = {
                 ...formData,
+                domainName: domain ? domain.label : formData.domainName,
+                roleUnderDomain: role ? role.label : formData.roleUnderDomain,
+                skills: formData.skills.map((skill) => skill.name),
                 workBasis: Object.keys(formData.workBasis).filter(
                     (key) => formData.workBasis[key]
                 ),
-                workMode: Object.keys(formData.workMode).filter(
-                    (key) => formData.workMode[key]
-                ), // Changed to array
-                workCountry: formData.workLocation.country,
-                workState: formData.workLocation.state,
+                workMode: Object.keys(formData.workMode).filter((key) => formData.workMode[key]),
+                call: formData.contact_methods.call.selected
+                    ? formData.contact_methods.call.value
+                    : "",
+                whatsapp: formData.contact_methods.whatsapp.selected
+                    ? formData.contact_methods.whatsapp.value
+                    : "",
+                instagram: formData.contact_methods.instagram.selected
+                    ? formData.contact_methods.instagram.value
+                    : "",
+                linkedin: formData.contact_methods.linkedin.selected
+                    ? formData.contact_methods.linkedin.value
+                    : "",
+                facebook: formData.contact_methods.facebook.selected
+                    ? formData.contact_methods.facebook.value
+                    : "",
+                otherContact: formData.contact_methods.other.selected
+                    ? formData.contact_methods.other.value
+                    : "",
+                workCountry: countryName, // Use full country name
+                workState: stateName, // Use full state name
                 workCity: formData.workLocation.district,
                 internshipTimeType: formData.internshipTimeType || "",
+                jobTimeType: formData.jobTimeType || "",
                 internshipDuration:
                     formData.workBasis.Internship &&
                     formData.internshipDuration.value &&
@@ -577,7 +1327,8 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                         ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
                         : "",
                 experienceRange:
-                    formData.experienceRange.min && formData.experienceRange.max
+                    formData.experienceRange.min &&
+                    formData.experienceRange.max
                         ? `${formData.experienceRange.min}-${formData.experienceRange.max} years`
                         : "",
                 jobAmountRange:
@@ -586,32 +1337,60 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                     formData.jobAmountRange.max
                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
                         : "",
+                       timeCommitment:
+    formData.timeCommitment.value && formData.timeCommitment.unit
+        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+        : "",
             };
-            delete submitData.workLocation;
+            console.log(submitData)
+            delete submitData.contact_methods;
             const response = await fetch(
-                `http://localhost:3333/api/founder/update-post/${listingId}`,
+                "http://localhost:3333/api/founder/add-listing/",
                 {
-                    method: "PATCH",
+                    method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(submitData),
                     credentials: "include",
                 }
             );
             if (response.ok) {
-                console.log("Form updated:", submitData);
+                console.log("Form submitted:", submitData);
                 onClose();
             } else {
                 setErrors({
-                    submit: "Failed to update the form. Please try again.",
+                    submit: "Failed to submit the form. Please try again.",
                 });
             }
         } catch (err) {
             setErrors({ submit: "An error occurred. Please try again." });
         }
-    };
+    }
+};
 
     const handleCancel = () => {
         setFormData({
+           
+            userType: "",
+            otherUserType: "",
+            requirementType: "",
+            otherRequirementType: "",
+            startUpName: "",
+            aboutEntity: "",
+            
+            timeCommitment: { value: "", unit: "" },
+            websiteOfStartupLink: "",
+            contact_methods: {
+                call: { selected: false, value: "" },
+                whatsapp: { selected: false, value: "" },
+                instagram: { selected: false, value: "" },
+                linkedin: { selected: false, value: "" },
+                facebook: { selected: false, value: "" },
+                other: { selected: false, value: "" },
+            },
+            headline: "",
+            domainName: "",
+            roleUnderDomain: "",
+            skills: [],
             workBasis: {
                 Partnership: false,
                 Collaboration: false,
@@ -634,37 +1413,700 @@ function UpdateFounderPostForm({ listingId, onClose }) {
             freelancePaymentRange: { min: "", max: "" },
             projectDescription: "",
             percentageBasisValue: "",
-            timeCommitment: "",
             equityBasisValue: "",
             otherWorkBasis: "",
             workMode: { Remote: false, Hybrid: false, Onsite: false },
             workLocation: { country: "", state: "", district: "" },
             experienceRange: { min: "", max: "" },
-
+            aboutOpportunity: "",
             responsibilities: "",
             whyShouldJoin: "",
             anyOtherInfo: "",
         });
+        setDomainSearchText("");
+        setRoleSearchText("");
+        setSkillSearchText("");
+        setShowDomainSuggestions(false);
+        setShowRoleSuggestions(false);
+        setShowSkillSuggestions(false);
+        setStep(1);
         setErrors({});
         onClose();
     };
 
-    if (loadingData) {
-        return <div>Loading post data...</div>;
+    if (profileError) {
+        return <div className="text-red-500">{profileError}</div>;
     }
 
-    if (dataError) {
-        return <div className="text-red-500">{dataError}</div>;
-    }
-
-    return (
+     return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
-            <h3 className="text-xl font-semibold text-[#7900BF] mb-6">
-                Update Opportunity Details
-            </h3>
+            <div className="h-20 flex items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-[50%] mx-auto text-xl">
+                <div className="flex flex-col">
+                    <p className="flex items-center gap-2">
+                        01{" "}
+                        <span className={`text-sm text-violet-600`}>
+                            About Founder
+                        </span>
+                    </p>
+                    <div className="flex items-center gap-1">
+                        <div
+                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600`}
+                        >
+                            ✓
+                        </div>
+                        <div
+                            className={`w-[150px] h-1 ${
+                                step > 1 ? "bg-violet-600" : "bg-gray-200"
+                            }`}
+                        ></div>
+                    </div>
+                </div>
+                <div className="flex flex-col">
+                    <p className="flex items-center gap-2">
+                        02{" "}
+                        <span
+                            className={`text-sm ${
+                                step > 1 ? "text-violet-600" : "text-black"
+                            }`}
+                        >
+                            Skills and Strength
+                        </span>
+                    </p>
+                    <div className="flex items-center gap-1">
+                        <div
+                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
+                                step > 1 ? "bg-violet-600" : "bg-white"
+                            }`}
+                        >
+                            ✓
+                        </div>
+                        <div
+                            className={`w-[150px] h-1 ${
+                                step > 2 ? "bg-violet-600" : "bg-gray-200"
+                            }`}
+                        ></div>
+                    </div>
+                </div>
+                <div className="flex flex-col">
+                    <p className="flex items-center gap-2 w-[150px]">
+                        03{" "}
+                        <span
+                            className={`text-sm ${
+                                step > 2 ? "text-violet-600" : "text-black"
+                            }`}
+                        >
+                            Looking for
+                        </span>
+                    </p>
+                    <div className="flex items-center gap-1">
+                        <div
+                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
+                                step > 2 ? "bg-violet-600" : "bg-white"
+                            }`}
+                        >
+                            ✓
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {step === 1 && (
+                <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
+                    <div className="flex flex-col">
+                        <p className="text-violet-700 text-xl">
+                            Stay It Your Way
+                        </p>
+                        <p className="text-violet-400">
+                            This isn't your typical hiring form. In a few short
+                            questions, you'll paint a picture of your world and
+                            who you're looking for — no corporate lingo
+                            required.
+                        </p>
+                    </div>
+                    <img src="./FormImage1.svg" alt="" className="scale-150" />
+                </div>
+            )}
+
+            {step === 2 && (
+                <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
+                    <div className="flex flex-col">
+                        <p className="text-violet-700 text-xl">
+                            You're almost there!
+                        </p>
+                        <p className="text-violet-400">
+                            This fun little form helps you describe your vibe
+                            and your need — quick, casual, and human. No
+                            resumes, no HR jargon. Just say it like it is.
+                        </p>
+                    </div>
+                    <img src="./FormImage2.svg" alt="" className="" />
+                </div>
+            )}
+
+            {step === 3 && (
+                <div className="flex items-center w-full bg-violet-100 px-5 rounded-2xl mb-5">
+                    <div className="flex flex-col">
+                        <p className="text-violet-700 text-xl">
+                            You've made it to the final step!
+                        </p>
+                        <p className="text-violet-400">
+                            This short form captures who you are, what you need,
+                            and how your team works — no fluff, no lengthy job
+                            descriptions. Just clear, honest details. Done in
+                            minutes.
+                        </p>
+                    </div>
+                    <img src="./FormImage3.svg" alt="" className="" />
+                </div>
+            )}
+
+            {step === 1 && (
+                <form className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <h3 className="col-span-3 text-xl font-semibold text-[#7900BF] mb-4">
+                        Let's introduce you to the world.
+                    </h3>
+                    {/* First Name */}
+                    
+                    {/* Personal Website */}
+                    <div className="relative">
+                        <label
+                            htmlFor="websiteOfStartupLink"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Personal website
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="websiteOfStartupLink"
+                                name="websiteOfStartupLink"
+                                value={formData.websiteOfStartupLink}
+                                onChange={handleChange}
+                                type="url"
+                                placeholder="Enter website URL (https://)"
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.websiteOfStartupLink
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                        </div>
+                        {errors.websiteOfStartupLink && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.websiteOfStartupLink}
+                            </p>
+                        )}
+                    </div>
+                    <div className="relative col-span-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            You are a <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-4">
+                            {[
+                                "Business Owner",
+                                "Startup Founder",
+                                "Working Professional",
+                                "Freelancer",
+                                "Student",
+                                "Other",
+                            ].map((type) => (
+                                <label key={type} className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="userType"
+                                        value={type}
+                                        checked={formData.userType === type}
+                                        onChange={handleChange}
+                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                    />
+                                    <span className="ml-2 text-gray-700">
+                                        {type}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                        {errors.userType && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.userType}
+                            </p>
+                        )}
+                        {formData.userType === "Other" && (
+                            <div className="mt-4">
+                                <label
+                                    htmlFor="otherUserType"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Specify User Type{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="otherUserType"
+                                        name="otherUserType"
+                                        value={formData.otherUserType}
+                                        onChange={handleChange}
+                                        type="text"
+                                        placeholder="Specify your user type"
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                            errors.otherUserType
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                    />
+                                    {/* <button
+                    type="button"
+                    onClick={() => enhanceField('otherUserType', formData.otherUserType)}
+                    disabled={enhanceLoading.otherUserType}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                  >
+                    {enhanceLoading.otherUserType ? 'Enhancing...' : 'Enhance'}
+                  </button> */}
+                                </div>
+                                {errors.otherUserType && (
+                                    <p className="text-red-500 text-sm mt-1">
+                                        {errors.otherUserType}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="relative col-span-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            This requirement is for a{" "}
+                            <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-4">
+                            {[
+                                "Business",
+                                "Startup",
+                                "Side Project",
+                                "Personal Need",
+                                "Other",
+                            ].map((type) => (
+                                <label key={type} className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="requirementType"
+                                        value={type}
+                                        checked={
+                                            formData.requirementType === type
+                                        }
+                                        onChange={handleChange}
+                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                    />
+                                    <span className="ml-2 text-gray-700">
+                                        {type}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                        {errors.requirementType && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.requirementType}
+                            </p>
+                        )}
+                        {formData.requirementType === "Other" && (
+                            <div className="mt-4">
+                                <label
+                                    htmlFor="otherRequirementType"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Specify Requirement Type{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="otherRequirementType"
+                                        name="otherRequirementType"
+                                        value={formData.otherRequirementType}
+                                        onChange={handleChange}
+                                        type="text"
+                                        placeholder="Specify requirement type"
+                                        className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                            errors.otherRequirementType
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                    />
+                                    {/* <button
+                    type="button"
+                    onClick={() => enhanceField('otherRequirementType', formData.otherRequirementType)}
+                    disabled={enhanceLoading.otherRequirementType}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                  >
+                    {enhanceLoading.otherRequirementType ? 'Enhancing...' : 'Enhance'}
+                  </button> */}
+                                </div>
+                                {errors.otherRequirementType && (
+                                    <p className="text-red-500 text-sm mt-1">
+                                        {errors.otherRequirementType}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                        {["Startup", "Business"].includes(
+                            formData.requirementType
+                        ) && (
+                            <div className="mt-4">
+                                <label
+                                    htmlFor="startUpName"
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
+                                    Business/Startup Name{" "}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="startUpName"
+                                        name="startUpName"
+                                        value={formData.startUpName}
+                                        onChange={handleChange}
+                                        type="text"
+                                        placeholder="Enter business/startup name"
+                                        className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                            errors.startUpName
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        }`}
+                                    />
+                                    {/* <button
+                    type="button"
+                    onClick={() => enhanceField('startUpName', formData.startUpName)}
+                    disabled={enhanceLoading.startUpName}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                  >
+                    {enhanceLoading.startUpName ? 'Enhancing...' : 'Enhance'}
+                  </button> */}
+                                </div>
+                                {errors.startUpName && (
+                                    <p className="text-red-500 text-sm mt-1">
+                                        {errors.startUpName}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {/* About Me */}
+                    {formData.requirementType&& <div className="relative col-span-2">
+                        <label
+                            htmlFor="aboutEntity"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            About your requirement
+                        </label>
+                        <div className="relative">
+                            <textarea
+                                id="aboutEntity"
+                                name="aboutEntity"
+                                value={formData.aboutEntity}
+                                onChange={handleChange}
+                                maxLength={300}
+                                placeholder="Briefly describe your business/project/startup"
+                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
+                            />
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    enhanceField(
+                                        "aboutEntity",
+                                        formData.aboutEntity
+                                    )
+                                }
+                                disabled={enhanceLoading.aboutEntity}
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                    enhanceLoading.aboutEntity
+                                        ? "animate-pulse"
+                                        : ""
+                                }`}
+                                title={
+                                    enhanceLoading.aboutEntity
+                                        ? "Enhancing..."
+                                        : "Enhance"
+                                }
+                            >
+                                <FaMagic className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+}
+                    <div className="relative col-span-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            How people can reach out to you (select at least
+                            two) <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-4">
+                            {[
+                                "call",
+                                "whatsapp",
+                                "instagram",
+                                "linkedin",
+                                "facebook",
+                                "other",
+                            ].map((method) => (
+                                <div key={method} className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id={method}
+                                        checked={
+                                            formData.contact_methods[method]
+                                                .selected
+                                        }
+                                        onChange={() =>
+                                            handleContactMethodChange(method)
+                                        }
+                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                    />
+                                    <label
+                                        htmlFor={method}
+                                        className="ml-2 text-gray-700"
+                                    >
+                                        {method.charAt(0).toUpperCase() +
+                                            method.slice(1)}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                        {errors.contact_methods && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.contact_methods}
+                            </p>
+                        )}
+                        <div className="mt-4 space-y-4 grid grid-cols-3 gap-10">
+                            {Object.entries(formData.contact_methods).map(
+                                ([method, { selected, value }]) =>
+                                    selected && (
+                                        <div key={method} className="relative">
+                                            <label
+                                                htmlFor={`${method}Value`}
+                                                className="block font-medium mb-1 text-black opacity-[73%]"
+                                            >
+                                                {method
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    method.slice(1)}{" "}
+                                                {method === "whatsapp" ||
+                                                method === "call"
+                                                    ? "Number"
+                                                    : "URL"}{" "}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
+                                            </label>
+                                            <div className="gap-2">
+                                                {method === "call" ||
+                                                method === "whatsapp" ? (
+                                                    <div className="text-left ">
+                                                        <PhoneInput
+                                                            country="in"
+                                                            value={value}
+                                                            onChange={(phone) =>
+                                                                handleContactValueChange(
+                                                                    method,
+                                                                    phone
+                                                                )
+                                                            }
+                                                            // disabled={method === 'call'}
+                                                            containerClass="w-full"
+                                                            inputClass={`w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 ${
+                                                                errors[
+                                                                    `${method}Value`
+                                                                ]
+                                                                    ? "border-red-500"
+                                                                    : ""
+                                                            } `}
+                                                            buttonClass="border-gray-300 h-14 w-16"
+                                                            dropdownClass="h-28"
+                                                            containerStyle={{
+                                                                height: "56px",
+                                                                width: "100%",
+                                                            }}
+                                                            inputStyle={{
+                                                                height: "43px",
+                                                                width: "100%",
+                                                            }}
+                                                            buttonStyle={{
+                                                                position:
+                                                                    "absolute",
+                                                                left: "5px",
+                                                                top: "1px",
+                                                                height: "40px",
+                                                                width: "40px",
+                                                                backgroundColor:
+                                                                    "transparent",
+                                                                border: "none",
+                                                                outline: "none",
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <input
+                                                        id={`${method}Value`}
+                                                        type="url"
+                                                        value={value}
+                                                        onChange={(e) =>
+                                                            handleContactValueChange(
+                                                                method,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder={`Enter your ${method} URL (https://)`}
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                            errors[
+                                                                `${method}Value`
+                                                            ]
+                                                                ? "border-red-500"
+                                                                : "border-gray-300"
+                                                        }`}
+                                                    />
+                                                )}
+                                            </div>
+                                            {errors[`${method}Value`] && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors[`${method}Value`]}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="col-span-3 flex justify-between space-x-4 mt-6">
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleNext}
+                            className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                        >
+                            Next Step
+                        </button>
+                    </div>
+                </form>
+            )}
+
+            {step === 2 && (
+                <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
+                        Your dream teammate, freelancer, or hire — describe them
+                        here.
+                    </h3>
+
+                    <div className="relative col-span-2">
+                        <label
+                            htmlFor="headline"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Headline (e.g., I am looking for...){" "}
+                            <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <input
+                                id="headline"
+                                name="headline"
+                                value={formData.headline}
+                                onChange={handleChange}
+                                maxLength={80}
+                                placeholder="Enter a catchy headline"
+                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.headline
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    enhanceField("headline", formData.headline)
+                                }
+                                disabled={enhanceLoading.headline}
+                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                    enhanceLoading.headline
+                                        ? "animate-pulse"
+                                        : ""
+                                }`}
+                                title={
+                                    enhanceLoading.headline
+                                        ? "Enhancing..."
+                                        : "Enhance"
+                                }
+                            >
+                                <FaMagic className="w-5 h-5" />
+                            </button>
+                        </div>
+                        {errors.headline && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.headline}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="relative">
+                        <label
+                            htmlFor="roleUnderDomain"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Role of person needed{" "}
+                            <span className="text-red-500">*</span>
+                        </label>
+                        <Select
+                            key={formData.domainName} // Force re-mount when domain changes
+                            closeMenuOnSelect={true}
+                            components={animatedComponents}
+                            options={filteredRoles}
+                            value={filteredRoles.find(
+                                (role) =>
+                                    role.value === formData.roleUnderDomain
+                            )}
+                            onChange={handleRoleSelect}
+                            placeholder="Select a role"
+                            isClearable
+                            classNamePrefix="react-select"
+                        />
+                        {errors.roleUnderDomain && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.roleUnderDomain}
+                            </p>
+                        )}
+                    </div>
+                    <div className="relative">
+                        <label
+                            htmlFor="domainName"
+                            className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Domain of person needed{" "}
+                            <span className="text-red-500">*</span>
+                        </label>
+                        {loadingDomains ? (
+                            <p className="text-gray-500">Loading domains...</p>
+                        ) : (
+                            <Select
+                                closeMenuOnSelect={true}
+                                components={animatedComponents}
+                                options={domains}
+                                value={domains.find(
+                                    (domain) =>
+                                        domain.value === formData.domainName
+                                )}
+                                onChange={handleDomainSelect}
+                                placeholder="Select a domain"
+                                isClearable
+                                classNamePrefix="react-select"
+                            />
+                        )}
+                        {errors.domainName && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.domainName}
+                            </p>
+                        )}
+                    </div>
+                
+
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Work Basis <span className="text-red-500">*</span>
@@ -673,12 +2115,12 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                             {[
                                 "Partnership",
                                 "Collaboration",
-                                "Internship",
-                                "Job",
-                                "Freelance",
+                                "EquityBasis",
                                 "ProjectBasis",
                                 "PercentageBasis",
-                                "EquityBasis",
+                                "Job",
+                                "Internship",
+                                "Freelance",
                                 "Other",
                             ].map((basis) => (
                                 <div key={basis} className="flex items-center">
@@ -718,14 +2160,14 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                         Partnership Criteria{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="flex items-start gap-2">
+                                    <div className="relative">
                                         <textarea
                                             id="partnershipCriteria"
                                             name="partnershipCriteria"
                                             value={formData.partnershipCriteria}
                                             onChange={handleChange}
                                             placeholder="Describe the partnership criteria"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                 errors.partnershipCriteria
                                                     ? "border-red-500"
                                                     : "border-gray-300"
@@ -742,11 +2184,18 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                             disabled={
                                                 enhanceLoading.partnershipCriteria
                                             }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                            className={`absolute right-3 top-3  text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                                enhanceLoading.partnershipCriteria
+                                                    ? "animate-pulse"
+                                                    : ""
+                                            }`}
+                                            title={
+                                                enhanceLoading.partnershipCriteria
+                                                    ? "Enhancing..."
+                                                    : "Enhance"
+                                            }
                                         >
-                                            {enhanceLoading.partnershipCriteria
-                                                ? "Enhancing..."
-                                                : "Enhance"}
+                                            <FaMagic className="w-5 h-5" />
                                         </button>
                                     </div>
                                     {errors.partnershipCriteria && (
@@ -864,30 +2313,34 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                     *
                                                 </span>
                                             </label>
-                                            <input
-                                                id="internshipDuration"
-                                                name="internshipDuration.value"
-                                                value={
-                                                    formData.internshipDuration
-                                                        .value
-                                                }
-                                                onChange={(e) =>
-                                                    handleNestedChange(
-                                                        "internshipDuration",
-                                                        "value",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                min="1"
-                                                placeholder="Duration"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.internshipDuration
-                                                        ?.value
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    id="internshipDuration"
+                                                    name="internshipDuration.value"
+                                                    value={
+                                                        formData
+                                                            .internshipDuration
+                                                            .value
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNestedChange(
+                                                            "internshipDuration",
+                                                            "value",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    type="number"
+                                                    min="1"
+                                                    placeholder="Duration"
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                        errors
+                                                            .internshipDuration
+                                                            ?.value
+                                                            ? "border-red-500"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                />
+                                            </div>
                                             {errors.internshipDuration
                                                 ?.value && (
                                                 <p className="text-red-500 text-sm mt-1">
@@ -939,6 +2392,9 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                 <option value="Months">
                                                     Months
                                                 </option>
+                                                <option value="Years">
+                                                    Years
+                                                </option>
                                             </select>
                                             {errors.internshipDuration
                                                 ?.unit && (
@@ -965,32 +2421,34 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                         *
                                                     </span>
                                                 </label>
-                                                <input
-                                                    id="internshipStipendRangeMin"
-                                                    name="internshipStipendRange.min"
-                                                    value={
-                                                        formData
-                                                            .internshipStipendRange
-                                                            .min
-                                                    }
-                                                    onChange={(e) =>
-                                                        handleNestedChange(
-                                                            "internshipStipendRange",
-                                                            "min",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    type="number"
-                                                    min="0"
-                                                    placeholder="Min stipend"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors
-                                                            .internshipStipendRange
-                                                            ?.min
-                                                            ? "border-red-500"
-                                                            : "border-gray-300"
-                                                    }`}
-                                                />
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        id="internshipStipendRangeMin"
+                                                        name="internshipStipendRange.min"
+                                                        value={
+                                                            formData
+                                                                .internshipStipendRange
+                                                                .min
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleNestedChange(
+                                                                "internshipStipendRange",
+                                                                "min",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        type="number"
+                                                        min="0"
+                                                        placeholder="Min stipend"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                            errors
+                                                                .internshipStipendRange
+                                                                ?.min
+                                                                ? "border-red-500"
+                                                                : "border-gray-300"
+                                                        }`}
+                                                    />
+                                                </div>
                                                 {errors.internshipStipendRange
                                                     ?.min && (
                                                     <p className="text-red-500 text-sm mt-1">
@@ -1012,32 +2470,34 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                         *
                                                     </span>
                                                 </label>
-                                                <input
-                                                    id="internshipStipendRangeMax"
-                                                    name="internshipStipendRange.max"
-                                                    value={
-                                                        formData
-                                                            .internshipStipendRange
-                                                            .max
-                                                    }
-                                                    onChange={(e) =>
-                                                        handleNestedChange(
-                                                            "internshipStipendRange",
-                                                            "max",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    type="number"
-                                                    min="0"
-                                                    placeholder="Max stipend"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors
-                                                            .internshipStipendRange
-                                                            ?.max
-                                                            ? "border-red-500"
-                                                            : "border-gray-300"
-                                                    }`}
-                                                />
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        id="internshipStipendRangeMax"
+                                                        name="internshipStipendRange.max"
+                                                        value={
+                                                            formData
+                                                                .internshipStipendRange
+                                                                .max
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleNestedChange(
+                                                                "internshipStipendRange",
+                                                                "max",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        type="number"
+                                                        min="0"
+                                                        placeholder="Max stipend"
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                            errors
+                                                                .internshipStipendRange
+                                                                ?.max
+                                                                ? "border-red-500"
+                                                                : "border-gray-300"
+                                                        }`}
+                                                    />
+                                                </div>
                                                 {errors.internshipStipendRange
                                                     ?.max && (
                                                     <p className="text-red-500 text-sm mt-1">
@@ -1064,7 +2524,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                     *
                                                 </span>
                                             </label>
-                                            <div className="flex items-start gap-2">
+                                            <div className="relative">
                                                 <textarea
                                                     id="internshipPerformanceCriteria"
                                                     name="internshipPerformanceCriteria"
@@ -1073,7 +2533,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                     }
                                                     onChange={handleChange}
                                                     placeholder="Describe performance criteria"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                                    className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                         errors.internshipPerformanceCriteria
                                                             ? "border-red-500"
                                                             : "border-gray-300"
@@ -1090,11 +2550,18 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                     disabled={
                                                         enhanceLoading.internshipPerformanceCriteria
                                                     }
-                                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                                    className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                                        enhanceLoading.internshipPerformanceCriteria
+                                                            ? "animate-pulse"
+                                                            : ""
+                                                    }`}
+                                                    title={
+                                                        enhanceLoading.internshipPerformanceCriteria
+                                                            ? "Enhancing..."
+                                                            : "Enhance"
+                                                    }
                                                 >
-                                                    {enhanceLoading.internshipPerformanceCriteria
-                                                        ? "Enhancing..."
-                                                        : "Enhance"}
+                                                    <FaMagic className="w-5 h-5" />
                                                 </button>
                                             </div>
                                             {errors.internshipPerformanceCriteria && (
@@ -1118,7 +2585,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                         Collaboration Description{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="flex items-start gap-2">
+                                    <div className="relative">
                                         <textarea
                                             id="collaborationDescription"
                                             name="collaborationDescription"
@@ -1127,7 +2594,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                             }
                                             onChange={handleChange}
                                             placeholder="Describe the collaboration"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y ${
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                 errors.collaborationDescription
                                                     ? "border-red-500"
                                                     : "border-gray-300"
@@ -1144,11 +2611,18 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                             disabled={
                                                 enhanceLoading.collaborationDescription
                                             }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                                enhanceLoading.collaborationDescription
+                                                    ? "animate-pulse"
+                                                    : ""
+                                            }`}
+                                            title={
+                                                enhanceLoading.collaborationDescription
+                                                    ? "Enhancing..."
+                                                    : "Enhance"
+                                            }
                                         >
-                                            {enhanceLoading.collaborationDescription
-                                                ? "Enhancing..."
-                                                : "Enhance"}
+                                            <FaMagic className="w-5 h-5" />
                                         </button>
                                     </div>
                                     {errors.collaborationDescription && (
@@ -1160,78 +2634,139 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                             )}
 
                             {formData.workBasis.Job && (
-                                <div className="relative flex gap-4">
-                                    <div className="w-1/2">
-                                        <label
-                                            htmlFor="jobAmountRangeMin"
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Min Amount (₹){" "}
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Job Time Type{" "}
                                             <span className="text-red-500">
                                                 *
                                             </span>
                                         </label>
-                                        <input
-                                            id="jobAmountRangeMin"
-                                            name="jobAmountRange.min"
-                                            value={formData.jobAmountRange.min}
-                                            onChange={(e) =>
-                                                handleNestedChange(
-                                                    "jobAmountRange",
-                                                    "min",
-                                                    e.target.value
+                                        <div className="flex gap-4">
+                                            {["FullTime", "PartTime"].map(
+                                                (type) => (
+                                                    <label
+                                                        key={type}
+                                                        className="flex items-center"
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name="jobTimeType"
+                                                            value={type}
+                                                            checked={
+                                                                formData.jobTimeType ===
+                                                                type
+                                                            }
+                                                            onChange={(e) =>
+                                                                handleNestedChange(
+                                                                    "jobTimeType",
+                                                                    null,
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+                                                        />
+                                                        <span className="ml-2 text-gray-700">
+                                                            {type === "FullTime"
+                                                                ? "Full-time"
+                                                                : "Part-time"}
+                                                        </span>
+                                                    </label>
                                                 )
-                                            }
-                                            type="number"
-                                            min="0"
-                                            placeholder="Min amount"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.jobAmountRange?.min
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors.jobAmountRange?.min && (
+                                            )}
+                                        </div>
+                                        {errors.jobTimeType && (
                                             <p className="text-red-500 text-sm mt-1">
-                                                {errors.jobAmountRange.min}
+                                                {errors.jobTimeType}
                                             </p>
                                         )}
                                     </div>
-                                    <div className="w-1/2">
-                                        <label
-                                            htmlFor="jobAmountRangeMax"
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Max Amount (₹){" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <input
-                                            id="jobAmountRangeMax"
-                                            name="jobAmountRange.max"
-                                            value={formData.jobAmountRange.max}
-                                            onChange={(e) =>
-                                                handleNestedChange(
-                                                    "jobAmountRange",
-                                                    "max",
-                                                    e.target.value
-                                                )
-                                            }
-                                            type="number"
-                                            min="0"
-                                            placeholder="Max amount"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.jobAmountRange?.max
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors.jobAmountRange?.max && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors.jobAmountRange.max}
-                                            </p>
-                                        )}
+                                    <div className="relative flex gap-4">
+                                        <div className="w-1/2">
+                                            <label
+                                                htmlFor="jobAmountRangeMin"
+                                                className="block text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                Min Amount (₹){" "}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
+                                            </label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    id="jobAmountRangeMin"
+                                                    name="jobAmountRange.min"
+                                                    value={
+                                                        formData.jobAmountRange
+                                                            .min
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNestedChange(
+                                                            "jobAmountRange",
+                                                            "min",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    type="number"
+                                                    min="0"
+                                                    placeholder="Min amount"
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                        errors.jobAmountRange
+                                                            ?.min
+                                                            ? "border-red-500"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                />
+                                            </div>
+                                            {errors.jobAmountRange?.min && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors.jobAmountRange.min}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="w-1/2">
+                                            <label
+                                                htmlFor="jobAmountRangeMax"
+                                                className="block text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                Max Amount (₹){" "}
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
+                                            </label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    id="jobAmountRangeMax"
+                                                    name="jobAmountRange.max"
+                                                    value={
+                                                        formData.jobAmountRange
+                                                            .max
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleNestedChange(
+                                                            "jobAmountRange",
+                                                            "max",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    type="number"
+                                                    min="0"
+                                                    placeholder="Max amount"
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                        errors.jobAmountRange
+                                                            ?.max
+                                                            ? "border-red-500"
+                                                            : "border-gray-300"
+                                                    }`}
+                                                />
+                                            </div>
+                                            {errors.jobAmountRange?.max && (
+                                                <p className="text-red-500 text-sm mt-1">
+                                                    {errors.jobAmountRange.max}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -1248,30 +2783,33 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                 *
                                             </span>
                                         </label>
-                                        <input
-                                            id="freelancePaymentRangeMin"
-                                            name="freelancePaymentRange.min"
-                                            value={
-                                                formData.freelancePaymentRange
-                                                    .min
-                                            }
-                                            onChange={(e) =>
-                                                handleNestedChange(
-                                                    "freelancePaymentRange",
-                                                    "min",
-                                                    e.target.value
-                                                )
-                                            }
-                                            type="number"
-                                            min="0"
-                                            placeholder="Min payment"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.freelancePaymentRange
-                                                    ?.min
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="freelancePaymentRangeMin"
+                                                name="freelancePaymentRange.min"
+                                                value={
+                                                    formData
+                                                        .freelancePaymentRange
+                                                        .min
+                                                }
+                                                onChange={(e) =>
+                                                    handleNestedChange(
+                                                        "freelancePaymentRange",
+                                                        "min",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                type="number"
+                                                min="0"
+                                                placeholder="Min payment"
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                    errors.freelancePaymentRange
+                                                        ?.min
+                                                        ? "border-red-500"
+                                                        : "border-gray-300"
+                                                }`}
+                                            />
+                                        </div>
                                         {errors.freelancePaymentRange?.min && (
                                             <p className="text-red-500 text-sm mt-1">
                                                 {
@@ -1291,30 +2829,33 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                 *
                                             </span>
                                         </label>
-                                        <input
-                                            id="freelancePaymentRangeMax"
-                                            name="freelancePaymentRange.max"
-                                            value={
-                                                formData.freelancePaymentRange
-                                                    .max
-                                            }
-                                            onChange={(e) =>
-                                                handleNestedChange(
-                                                    "freelancePaymentRange",
-                                                    "max",
-                                                    e.target.value
-                                                )
-                                            }
-                                            type="number"
-                                            min="0"
-                                            placeholder="Max payment"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.freelancePaymentRange
-                                                    ?.max
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="freelancePaymentRangeMax"
+                                                name="freelancePaymentRange.max"
+                                                value={
+                                                    formData
+                                                        .freelancePaymentRange
+                                                        .max
+                                                }
+                                                onChange={(e) =>
+                                                    handleNestedChange(
+                                                        "freelancePaymentRange",
+                                                        "max",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                type="number"
+                                                min="0"
+                                                placeholder="Max payment"
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                    errors.freelancePaymentRange
+                                                        ?.max
+                                                        ? "border-red-500"
+                                                        : "border-gray-300"
+                                                }`}
+                                            />
+                                        </div>
                                         {errors.freelancePaymentRange?.max && (
                                             <p className="text-red-500 text-sm mt-1">
                                                 {
@@ -1333,17 +2874,17 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                         htmlFor="projectDescription"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Project Description{" "}
+                                        Project Criteria{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="flex items-start gap-2">
+                                    <div className="relative">
                                         <textarea
                                             id="projectDescription"
                                             name="projectDescription"
                                             value={formData.projectDescription}
                                             onChange={handleChange}
                                             placeholder="Describe the project"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                 errors.projectDescription
                                                     ? "border-red-500"
                                                     : "border-gray-300"
@@ -1360,11 +2901,18 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                             disabled={
                                                 enhanceLoading.projectDescription
                                             }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                                enhanceLoading.projectDescription
+                                                    ? "animate-pulse"
+                                                    : ""
+                                            }`}
+                                            title={
+                                                enhanceLoading.projectDescription
+                                                    ? "Enhancing..."
+                                                    : "Enhance"
+                                            }
                                         >
-                                            {enhanceLoading.projectDescription
-                                                ? "Enhancing..."
-                                                : "Enhance"}
+                                            <FaMagic className="w-5 h-5" />
                                         </button>
                                     </div>
                                     {errors.projectDescription && (
@@ -1384,19 +2932,23 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                         Percentage Value (%){" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <input
-                                        id="percentageBasisValue"
-                                        name="percentageBasisValue"
-                                        value={formData.percentageBasisValue}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Enter percentage value"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.percentageBasisValue
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            id="percentageBasisValue"
+                                            name="percentageBasisValue"
+                                            value={
+                                                formData.percentageBasisValue
+                                            }
+                                            onChange={handleChange}
+                                            type="text"
+                                            placeholder="Enter percentage value"
+                                            className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                errors.percentageBasisValue
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            }`}
+                                        />
+                                    </div>
                                     {errors.percentageBasisValue && (
                                         <p className="text-red-500 text-sm mt-1">
                                             {errors.percentageBasisValue}
@@ -1414,19 +2966,21 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                         Equity Value (%){" "}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <input
-                                        id="equityBasisValue"
-                                        name="equityBasisValue"
-                                        value={formData.equityBasisValue}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Enter equity value"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.equityBasisValue
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            id="equityBasisValue"
+                                            name="equityBasisValue"
+                                            value={formData.equityBasisValue}
+                                            onChange={handleChange}
+                                            type="text"
+                                            placeholder="Enter equity value"
+                                            className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                                errors.equityBasisValue
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            }`}
+                                        />
+                                    </div>
                                     {errors.equityBasisValue && (
                                         <p className="text-red-500 text-sm mt-1">
                                             {errors.equityBasisValue}
@@ -1457,23 +3011,6 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                                     : "border-gray-300"
                                             }`}
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                enhanceField(
-                                                    "otherWorkBasis",
-                                                    formData.otherWorkBasis
-                                                )
-                                            }
-                                            disabled={
-                                                enhanceLoading.otherWorkBasis
-                                            }
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
-                                        >
-                                            {enhanceLoading.otherWorkBasis
-                                                ? "Enhancing..."
-                                                : "Enhance"}
-                                        </button>
                                     </div>
                                     {errors.otherWorkBasis && (
                                         <p className="text-red-500 text-sm mt-1">
@@ -1485,23 +3022,62 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                         </div>
                     </div>
 
-                    <div className="relative col-span-2">
-                        <label
-                            htmlFor="timeCommitment"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Time Commitment
-                        </label>
-                        <input
-                            id="timeCommitment"
-                            name="timeCommitment"
-                            value={formData.timeCommitment}
-                            onChange={handleChange}
-                            type="text"
-                            placeholder="e.g., 20 hours/week"
-                            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-blue-400 border-gray-300"
-                        />
-                    </div>
+                    <div className="relative col-span-2 flex gap-4">
+    <div className="w-1/3">
+        <label
+            htmlFor="timeCommitmentValue"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Time Commitment
+        </label>
+        <div className="flex items-center gap-2">
+            <input
+                id="timeCommitmentValue"
+                name="timeCommitment.value"
+                value={formData.timeCommitment.value}
+                onChange={(e) =>
+                    handleNestedChange("timeCommitment", "value", e.target.value)
+                }
+                type="number"
+                min="1"
+                placeholder="Enter value"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                    errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+        </div>
+        {errors.timeCommitment?.value && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
+        )}
+    </div>
+    <div className="w-1/3">
+        <label
+            htmlFor="timeCommitmentUnit"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Unit
+        </label>
+       <select
+    id="timeCommitmentUnit"
+    name="timeCommitment.unit"
+    value={formData.timeCommitment.unit}
+    onChange={(e) =>
+        handleNestedChange("timeCommitment", "unit", e.target.value)
+    }
+    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+        errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+    }`}
+>
+    <option value="">Select Unit</option>
+    <option value="hours/day">Hours/Day</option>
+    <option value="hours/week">Hours/Week</option>
+    <option value="hours/month">Hours/Month</option>
+</select>
+        {errors.timeCommitment?.unit && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
+        )}
+    </div>
+</div>
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1672,26 +3248,28 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                 Min Experience (Years){" "}
                                 <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                id="experienceRangeMin"
-                                name="experienceRange.min"
-                                value={formData.experienceRange.min}
-                                onChange={(e) =>
-                                    handleNestedChange(
-                                        "experienceRange",
-                                        "min",
-                                        e.target.value
-                                    )
-                                }
-                                type="number"
-                                min="0"
-                                placeholder="Min experience"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.experienceRange?.min
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                            />
+                            <div className="flex items-center gap-2">
+                                <input
+                                    id="experienceRangeMin"
+                                    name="experienceRange.min"
+                                    value={formData.experienceRange.min}
+                                    onChange={(e) =>
+                                        handleNestedChange(
+                                            "experienceRange",
+                                            "min",
+                                            e.target.value
+                                        )
+                                    }
+                                    type="number"
+                                    min="0"
+                                    placeholder="Min experience"
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                        errors.experienceRange?.min
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    }`}
+                                />
+                            </div>
                             {errors.experienceRange?.min && (
                                 <p className="text-red-500 text-sm mt-1">
                                     {errors.experienceRange.min}
@@ -1706,26 +3284,28 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                 Max Experience (Years){" "}
                                 <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                id="experienceRangeMax"
-                                name="experienceRange.max"
-                                value={formData.experienceRange.max}
-                                onChange={(e) =>
-                                    handleNestedChange(
-                                        "experienceRange",
-                                        "max",
-                                        e.target.value
-                                    )
-                                }
-                                type="number"
-                                min="0"
-                                placeholder="Max experience"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.experienceRange?.max
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                            />
+                            <div className="flex items-center gap-2">
+                                <input
+                                    id="experienceRangeMax"
+                                    name="experienceRange.max"
+                                    value={formData.experienceRange.max}
+                                    onChange={(e) =>
+                                        handleNestedChange(
+                                            "experienceRange",
+                                            "max",
+                                            e.target.value
+                                        )
+                                    }
+                                    type="number"
+                                    min="0"
+                                    placeholder="Max experience"
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                        errors.experienceRange?.max
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    }`}
+                                />
+                            </div>
                             {errors.experienceRange?.max && (
                                 <p className="text-red-500 text-sm mt-1">
                                     {errors.experienceRange.max}
@@ -1734,7 +3314,37 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                         </div>
                     </div>
 
-                    <div className="relative col-span-2">
+                    <div className="col-span-2 flex justify-between items-center mt-6">
+                        <button
+                            type="button"
+                            onClick={handleBack}
+                            className="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                        >
+                            Back
+                        </button>
+                        <div className="flex space-x-4">
+                            <button
+                                type="button"
+                                onClick={handleCancel}
+                                className="bg-gray-300 text-gray-700 px-6 py-1 rounded-lg font-medium hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-400"
+                            >
+                                Next Step
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            )}
+
+            {step === 3 && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="relative">
                         <label
                             htmlFor="responsibilities"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -1742,7 +3352,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                             Responsibilities{" "}
                             <span className="text-red-500">*</span>
                         </label>
-                        <div className="flex items-start gap-2">
+                        <div className="relative">
                             <textarea
                                 id="responsibilities"
                                 name="responsibilities"
@@ -1750,11 +3360,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                 onChange={handleChange}
                                 maxLength={400}
                                 placeholder="List key responsibilities"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                    errors.responsibilities
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
+                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
                             />
                             <button
                                 type="button"
@@ -1765,11 +3371,18 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                     )
                                 }
                                 disabled={enhanceLoading.responsibilities}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                    enhanceLoading.responsibilities
+                                        ? "animate-pulse"
+                                        : ""
+                                }`}
+                                title={
+                                    enhanceLoading.responsibilities
+                                        ? "Enhancing..."
+                                        : "Enhance"
+                                }
                             >
-                                {enhanceLoading.responsibilities
-                                    ? "Enhancing..."
-                                    : "Enhance"}
+                                <FaMagic className="w-5 h-5" />
                             </button>
                         </div>
                         {errors.responsibilities && (
@@ -1779,7 +3392,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                         )}
                     </div>
 
-                    <div className="relative col-span-2">
+                    <div className="relative">
                         <label
                             htmlFor="whyShouldJoin"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -1787,7 +3400,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                             Why Should They Join?{" "}
                             <span className="text-red-500">*</span>
                         </label>
-                        <div className="flex items-start gap-2">
+                        <div className="relative">
                             <textarea
                                 id="whyShouldJoin"
                                 name="whyShouldJoin"
@@ -1795,11 +3408,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                 onChange={handleChange}
                                 maxLength={300}
                                 placeholder="What makes this opportunity exciting?"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                    errors.whyShouldJoin
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
+                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
                             />
                             <button
                                 type="button"
@@ -1810,11 +3419,18 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                     )
                                 }
                                 disabled={enhanceLoading.whyShouldJoin}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                    enhanceLoading.whyShouldJoin
+                                        ? "animate-pulse"
+                                        : ""
+                                }`}
+                                title={
+                                    enhanceLoading.whyShouldJoin
+                                        ? "Enhancing..."
+                                        : "Enhance"
+                                }
                             >
-                                {enhanceLoading.whyShouldJoin
-                                    ? "Enhancing..."
-                                    : "Enhance"}
+                                <FaMagic className="w-5 h-5" />
                             </button>
                         </div>
                         {errors.whyShouldJoin && (
@@ -1824,14 +3440,14 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                         )}
                     </div>
 
-                    <div className="relative col-span-2">
+                    <div className="relative">
                         <label
                             htmlFor="anyOtherInfo"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
                             Any Other Information
                         </label>
-                        <div className="flex items-start gap-2">
+                        <div className="relative">
                             <textarea
                                 id="anyOtherInfo"
                                 name="anyOtherInfo"
@@ -1839,7 +3455,7 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                 onChange={handleChange}
                                 maxLength={200}
                                 placeholder="Additional details (optional)"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
+                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
                             />
                             <button
                                 type="button"
@@ -1850,36 +3466,54 @@ function UpdateFounderPostForm({ listingId, onClose }) {
                                     )
                                 }
                                 disabled={enhanceLoading.anyOtherInfo}
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+                                    enhanceLoading.anyOtherInfo
+                                        ? "animate-pulse"
+                                        : ""
+                                }`}
+                                title={
+                                    enhanceLoading.anyOtherInfo
+                                        ? "Enhancing..."
+                                        : "Enhance"
+                                }
                             >
-                                {enhanceLoading.anyOtherInfo
-                                    ? "Enhancing..."
-                                    : "Enhance"}
+                                <FaMagic className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
-                </div>
 
-                {errors.submit && (
-                    <p className="text-red-500 text-sm mt-4">{errors.submit}</p>
-                )}
+                    {errors.submit && (
+                        <p className="text-red-500 text-sm mt-4">
+                            {errors.submit}
+                        </p>
+                    )}
 
-                <div className="flex justify-between items-center mt-6">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                    >
-                        Update
-                    </button>
-                </div>
-            </form>
+                    <div className="flex justify-between items-center mt-6">
+                        <button
+                            type="button"
+                            onClick={handleBack}
+                            className="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                        >
+                            Back
+                        </button>
+                        <div className="flex space-x-4">
+                            <button
+                                type="button"
+                                onClick={handleCancel}
+                                className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-blue-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            )}
         </div>
     );
 }

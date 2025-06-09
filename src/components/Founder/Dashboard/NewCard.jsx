@@ -272,39 +272,53 @@ const NewCard = ({ post }) => {
       </div>
 
       {/* View Modal */}
-      {isModalOpen && (
-        <ViewFounderPostModal
-          post={post}
-          onClose={() => setIsModalOpen(false)}
-          onUpdate={() => {
-            setIsModalOpen(false);
-            setIsUpdateModalOpen(true);
-          }}
-        />
-      )}
+     {isModalOpen && (
+  <div
+    className="fixed inset-0 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) setIsModalOpen(false);
+    }}
+  >
+    <div className="bg-white rounded-3xl p-8 w-full max-w-[800px] max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
+      <ViewFounderPostModal
+        post={post}
+        onClose={() => setIsModalOpen(false)}
+        onUpdate={() => {
+          setIsModalOpen(false);
+          setIsUpdateModalOpen(true);
+        }}
+      />
+    </div>
+  </div>
+)}
 
       {/* Update Modal */}
       {isUpdateModalOpen && (
-        <div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-[800px] max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-violet-900 tracking-tight">
-                Update Post
-              </h2>
-              <button
-                className="text-gray-600 text-sm font-medium px-4 py-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"
-                onClick={() => setIsUpdateModalOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-            <UpdateFounderPostForm
-              listingId={post._id}
-              onClose={() => setIsUpdateModalOpen(false)}
-            />
-          </div>
-        </div>
-      )}
+  <div
+    className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) setIsUpdateModalOpen(false);
+    }}
+  >
+    <div className="bg-white rounded-3xl p-8 w-full max-w-[800px] max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-violet-900 tracking-tight">
+          Update Post
+        </h2>
+        <button
+          className="text-gray-600 text-sm font-medium px-4 py-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"
+          onClick={() => setIsUpdateModalOpen(false)}
+        >
+          Close
+        </button>
+      </div>
+      <UpdateFounderPostForm
+        listingId={post._id}
+        onClose={() => setIsUpdateModalOpen(false)}
+      />
+    </div>
+  </div>
+)}
     </>
   );
 };

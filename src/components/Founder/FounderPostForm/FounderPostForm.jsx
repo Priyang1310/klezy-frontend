@@ -5,6 +5,7 @@ import { FaMagic } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
+import chroma from "chroma-js";
 import makeAnimated from "react-select/animated";
 
 function FounderPostForm({ onClose }) {
@@ -61,7 +62,7 @@ function FounderPostForm({ onClose }) {
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
         percentageBasisValue: "",
-        timeCommitment: "",
+        timeCommitment: { value: "", unit: "" },
         equityBasisValue: "",
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -153,6 +154,73 @@ function FounderPostForm({ onClose }) {
             );
         }
     }, [formData.workLocation.state]);
+
+     let skillOptions = filteredSkills.map((skill) => ({
+        value: skill._id,
+        label: skill.name,
+        color: "#a855f7", // Optional: Assign custom color, here purple for example
+    }));
+
+    // Selected values in the same format
+    let selectedSkills = formData.skills.map((skill) => ({
+        value: skill._id,
+        label: skill.name,
+        color: "#a855f7",
+    }));
+
+    const colourStyles = {
+        control: (styles) => ({ ...styles, backgroundColor: "white" }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+            const color = chroma(data.color || "#a855f7");
+            return {
+                ...styles,
+                backgroundColor: isDisabled
+                    ? undefined
+                    : isSelected
+                    ? data.color
+                    : isFocused
+                    ? color.alpha(0.1).css()
+                    : undefined,
+                color: isDisabled
+                    ? "#ccc"
+                    : isSelected
+                    ? chroma.contrast(color, "white") > 2
+                        ? "white"
+                        : "black"
+                    : data.color,
+                cursor: isDisabled ? "not-allowed" : "default",
+
+                ":active": {
+                    ...styles[":active"],
+                    backgroundColor: !isDisabled
+                        ? isSelected
+                            ? data.color
+                            : color.alpha(0.3).css()
+                        : undefined,
+                },
+            };
+        },
+        multiValue: (styles, { data }) => {
+            const color = chroma(data.color || "#a855f7");
+            return {
+                ...styles,
+                backgroundColor: color.alpha(0.1).css(),
+            };
+        },
+        multiValueLabel: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+        }),
+        multiValueRemove: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+            ":hover": {
+                backgroundColor: data.color,
+                color: "white",
+            },
+        }),
+    };
+
 
     // Fetch domains and roles
     useEffect(() => {
@@ -257,6 +325,18 @@ function FounderPostForm({ onClose }) {
                             ? skillsData.skills
                             : []
                     );
+
+                    skillOptions = filteredSkills.map((skill) => ({
+                        value: skill._id,
+                        label: skill.name,
+                        color: "#a855f7", // Optional: Assign custom color, here purple for example
+                    }));
+
+                    selectedSkills = formData.skills.map((skill) => ({
+                        value: skill._id,
+                        label: skill.name,
+                        color: "#a855f7",
+                    }));
                 } catch (error) {
                     console.error("Error fetching skills:", error);
                     setSkills([]);
@@ -883,7 +963,7 @@ function FounderPostForm({ onClose }) {
             formData.workBasis.ProjectBasis &&
             !formData.projectDescription.trim()
         )
-            newErrors.projectDescription = "Project description is required";
+            newErrors.projectDescription = "Project Criteria is required";
         if (
             formData.workBasis.PercentageBasis &&
             !formData.percentageBasisValue.trim()
@@ -931,7 +1011,25 @@ function FounderPostForm({ onClose }) {
                 ...newErrors.experienceRange,
                 max: "Valid maximum experience is required",
             };
-
+            // Validate timeCommitment only if at least one field is filled
+if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+    if (
+        !formData.timeCommitment.value.trim() ||
+        isNaN(formData.timeCommitment.value) ||
+        Number(formData.timeCommitment.value) <= 0
+    ) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            value: "Valid time commitment value is required",
+        };
+    }
+    if (!formData.timeCommitment.unit) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            unit: "Time commitment unit is required",
+        };
+    }
+}
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -1031,7 +1129,8 @@ function FounderPostForm({ onClose }) {
                     field: "percentageBasisValue",
                     value: formData.percentageBasisValue,
                 },
-                { field: "timeCommitment", value: formData.timeCommitment },
+               { field: "timeCommitment.value", value: formData.timeCommitment.value },
+{ field: "timeCommitment.unit", value: formData.timeCommitment.unit },
                 { field: "equityBasisValue", value: formData.equityBasisValue },
                 { field: "otherWorkBasis", value: formData.otherWorkBasis },
                 {
@@ -1074,9 +1173,7 @@ const handleSubmit = async (e) => {
                 workBasis: Object.keys(formData.workBasis).filter(
                     (key) => formData.workBasis[key]
                 ),
-                workMode: Object.keys(formData.workMode)
-                    .filter((key) => formData.workMode[key])
-                    .at(),
+                workMode: Object.keys(formData.workMode).filter((key) => formData.workMode[key]),
                 call: formData.contact_methods.call.selected
                     ? formData.contact_methods.call.value
                     : "",
@@ -1129,9 +1226,13 @@ const handleSubmit = async (e) => {
                     formData.jobAmountRange.max
                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
                         : "",
+                        timeCommitment:
+    formData.timeCommitment.value && formData.timeCommitment.unit
+        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+        : "",
             };
+            console.log(submitData)
             delete submitData.contact_methods;
-
             const response = await fetch(
                 "http://localhost:3333/api/founder/add-listing/",
                 {
@@ -1171,7 +1272,7 @@ const handleSubmit = async (e) => {
             country: formData.country,
             state: formData.state,
             district: formData.district,
-            timeCommitment: "",
+            timeCommitment: { value: "", unit: "" },
             websiteOfStartupLink: "",
             contact_methods: {
                 call: { selected: false, value: "" },
@@ -1761,12 +1862,12 @@ const handleSubmit = async (e) => {
                         )}
                     </div>
                     {/* About Me */}
-                    <div className="relative col-span-2">
+                    {formData.requirementType&& <div className="relative col-span-2">
                         <label
                             htmlFor="aboutEntity"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                            About the {formData.requirementType}
+                            About your requirement
                         </label>
                         <div className="relative">
                             <textarea
@@ -1802,7 +1903,7 @@ const handleSubmit = async (e) => {
                             </button>
                         </div>
                     </div>
-
+}
                     <div className="relative col-span-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             How people can reach out to you (select at least
@@ -2080,71 +2181,42 @@ const handleSubmit = async (e) => {
                         )}
                     </div>
                     {formData.domainName && (
-                        <div className="relative col-span-2">
-                            <label
-                                htmlFor="skills"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Skills <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                id="skills"
-                                name="skillsInput"
-                                value={skillSearchText}
-                                onChange={handleSkillInput}
-                                placeholder="Type to search skills"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                            />
-                            {showSkillSuggestions &&
-                                filteredSkills.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                        {filteredSkills
-                                            .filter(
-                                                (skill) =>
-                                                    !formData.skills.some(
-                                                        (s) =>
-                                                            s._id === skill._id
-                                                    )
-                                            )
-                                            .map((skill) => (
-                                                <li
-                                                    key={skill._id}
-                                                    onClick={() =>
-                                                        handleSkillSelect(skill)
-                                                    }
-                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                                >
-                                                    {skill.name}
-                                                </li>
-                                            ))}
-                                    </ul>
-                                )}
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {formData.skills.map((skill) => (
-                                    <span
-                                        key={skill._id}
-                                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
-                                    >
-                                        {skill.name}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleSkillRemove(skill._id)
-                                            }
-                                            className="ml-2 text-purple-600 hover:text-purple-800"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                            {errors.skills && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.skills}
-                                </p>
-                            )}
-                        </div>
-                    )}
+    <div className="relative col-span-2">
+      <label
+        htmlFor="skills"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Skills <span className="text-red-500">*</span>
+      </label>
+
+      <Select
+        id="skills"
+        isMulti
+        name="skills"
+        value={selectedSkills}
+        options={skillOptions.filter(
+          (skill) => !formData.skills.some((s) => s._id === skill.value)
+        )}
+        onChange={(selectedOptions) => {
+          // Convert selectedOptions back to your schema format
+          const updatedSkills = selectedOptions.map((opt) => ({
+            _id: opt.value,
+            name: opt.label,
+          }));
+          setFormData({ ...formData, skills: updatedSkills });
+        }}
+        styles={colourStyles}
+        placeholder="Type to search skills"
+        closeMenuOnSelect={false}
+      />
+
+      {errors.skills && (
+        <p className="text-red-500 text-sm mt-1">
+          {errors.skills}
+        </p>
+      )}
+    </div>
+  )}
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2913,7 +2985,7 @@ const handleSubmit = async (e) => {
                                         htmlFor="projectDescription"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Project Description{" "}
+                                        Project Criteria{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
@@ -3061,22 +3133,62 @@ const handleSubmit = async (e) => {
                         </div>
                     </div>
 
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Time Commitment
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="timeCommitment"
-                                name="timeCommitment"
-                                value={formData.timeCommitment}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="e.g., 20 hours/week"
-                                className="w-1/3 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
-                            />
-                        </div>
-                    </div>
+                    <div className="relative col-span-2 flex gap-4">
+    <div className="w-1/3">
+        <label
+            htmlFor="timeCommitmentValue"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Time Commitment
+        </label>
+        <div className="flex items-center gap-2">
+            <input
+                id="timeCommitmentValue"
+                name="timeCommitment.value"
+                value={formData.timeCommitment.value}
+                onChange={(e) =>
+                    handleNestedChange("timeCommitment", "value", e.target.value)
+                }
+                type="number"
+                min="1"
+                placeholder="Enter value"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                    errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+        </div>
+        {errors.timeCommitment?.value && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
+        )}
+    </div>
+    <div className="w-1/3">
+        <label
+            htmlFor="timeCommitmentUnit"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Unit
+        </label>
+        <select
+            id="timeCommitmentUnit"
+            name="timeCommitment.unit"
+            value={formData.timeCommitment.unit}
+            onChange={(e) =>
+                handleNestedChange("timeCommitment", "unit", e.target.value)
+            }
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+            }`}
+        >
+            <option value="">Select Unit</option>
+            <option value="hours/day">Hours/Day</option>
+            <option value="hours/week">Hours/Week</option>
+            <option value="hours/month">Hours/Month</option>
+        </select>
+        {errors.timeCommitment?.unit && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
+        )}
+    </div>
+</div>
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">

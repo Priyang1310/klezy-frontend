@@ -3,6 +3,7 @@ import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
 import Select from "react-select";
+import chroma from "chroma-js";
 import makeAnimated from "react-select/animated";
 
 import PhoneInput from "react-phone-input-2";
@@ -58,7 +59,7 @@ function GetDiscoveredForm({ onClose }) {
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
         percentageBasisValue: "",
-        timeCommitment: "",
+        timeCommitment: { value: "", unit: "" },
         equityBasisValue: "",
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -153,8 +154,8 @@ function GetDiscoveredForm({ onClose }) {
         }
     }, [formData.workLocation.state]);
 
-     // Fetch domains and roles
-     useEffect(() => {
+    // Fetch domains and roles
+    useEffect(() => {
         const fetchDomains = async () => {
             console.log("Hi!");
             try {
@@ -224,6 +225,72 @@ function GetDiscoveredForm({ onClose }) {
         fetchDomains();
     }, []);
 
+    let skillOptions = filteredSkills.map((skill) => ({
+        value: skill._id,
+        label: skill.name,
+        color: "#a855f7", // Optional: Assign custom color, here purple for example
+    }));
+
+    // Selected values in the same format
+    let selectedSkills = formData.skills.map((skill) => ({
+        value: skill._id,
+        label: skill.name,
+        color: "#a855f7",
+    }));
+
+    const colourStyles = {
+        control: (styles) => ({ ...styles, backgroundColor: "white" }),
+        option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+            const color = chroma(data.color || "#a855f7");
+            return {
+                ...styles,
+                backgroundColor: isDisabled
+                    ? undefined
+                    : isSelected
+                    ? data.color
+                    : isFocused
+                    ? color.alpha(0.1).css()
+                    : undefined,
+                color: isDisabled
+                    ? "#ccc"
+                    : isSelected
+                    ? chroma.contrast(color, "white") > 2
+                        ? "white"
+                        : "black"
+                    : data.color,
+                cursor: isDisabled ? "not-allowed" : "default",
+
+                ":active": {
+                    ...styles[":active"],
+                    backgroundColor: !isDisabled
+                        ? isSelected
+                            ? data.color
+                            : color.alpha(0.3).css()
+                        : undefined,
+                },
+            };
+        },
+        multiValue: (styles, { data }) => {
+            const color = chroma(data.color || "#a855f7");
+            return {
+                ...styles,
+                backgroundColor: color.alpha(0.1).css(),
+            };
+        },
+        multiValueLabel: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+        }),
+        multiValueRemove: (styles, { data }) => ({
+            ...styles,
+            color: data.color,
+            ":hover": {
+                backgroundColor: data.color,
+                color: "white",
+            },
+        }),
+    };
+
     // Fetch skills when domainName changes
     useEffect(() => {
         setFormData((prev) => ({
@@ -256,6 +323,18 @@ function GetDiscoveredForm({ onClose }) {
                             ? skillsData.skills
                             : []
                     );
+
+                    skillOptions = filteredSkills.map((skill) => ({
+                        value: skill._id,
+                        label: skill.name,
+                        color: "#a855f7", // Optional: Assign custom color, here purple for example
+                    }));
+
+                    selectedSkills = formData.skills.map((skill) => ({
+                        value: skill._id,
+                        label: skill.name,
+                        color: "#a855f7",
+                    }));
                 } catch (error) {
                     console.error("Error fetching skills:", error);
                     setSkills([]);
@@ -514,9 +593,9 @@ function GetDiscoveredForm({ onClose }) {
                 skills: [], // Reset skills
             }));
             allRoles.sort((a, b) => a.label.localeCompare(b.label));
-            
+
             const labelArr = allRoles.map((role) => role.label);
-            console.log("Helllpppppppp",labelArr);
+            console.log("Helllpppppppp", labelArr);
             setFilteredRoles(allRoles); // Reset to all roles
             setDomainSearchText(""); // Clear domain search text
             setRoleSearchText(""); // Clear role search text
@@ -583,15 +662,15 @@ function GetDiscoveredForm({ onClose }) {
                     : prev.domainName, // Preserve domainName
                 skills: [], // Reset skills
             }));
-            setDomainSearchText(
-                associatedDomain
-                    ? associatedDomain.label
-                    : ""
-            );
+            setDomainSearchText(associatedDomain ? associatedDomain.label : "");
             setRoleSearchText(""); // Reset search text
             setFilteredRoles(
                 allRoles.filter(
-                    (role) => role.domainId === (associatedDomain ? associatedDomain.value : formData.domainName)
+                    (role) =>
+                        role.domainId ===
+                        (associatedDomain
+                            ? associatedDomain.value
+                            : formData.domainName)
                 )
             ); // Show all roles for the domain
             setShowRoleSuggestions(false);
@@ -1020,6 +1099,25 @@ function GetDiscoveredForm({ onClose }) {
                 };
             }
         }
+        // Validate timeCommitment only if at least one field is filled
+        if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+            if (
+                !formData.timeCommitment.value.trim() ||
+                isNaN(formData.timeCommitment.value) ||
+                Number(formData.timeCommitment.value) <= 0
+            ) {
+                newErrors.timeCommitment = {
+                    ...newErrors.timeCommitment,
+                    value: "Valid time commitment value is required",
+                };
+            }
+            if (!formData.timeCommitment.unit) {
+                newErrors.timeCommitment = {
+                    ...newErrors.timeCommitment,
+                    unit: "Time commitment unit is required",
+                };
+            }
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -1165,118 +1263,129 @@ function GetDiscoveredForm({ onClose }) {
     };
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validateStep3()) {
-        try {
-            const domain = domains.find((d) => d.value === formData.domainName);
-            const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
-            const submitData = {
-                ...formData,
-                domainName: domain ? domain.label : formData.domainName, // Use label instead of name
-                roleUnderDomain: role ? role.label : formData.roleUnderDomain, // Use label instead of name
-                skills: formData.skills.map((skill) => skill.name),
-                workBasis: formData.workBasis,
-                workMode: formData.workMode,
-                contact_methods: {
-                    call: formData.contact_methods.call,
-                    whatsapp: formData.contact_methods.whatsapp,
-                    instagram: formData.contact_methods.instagram,
-                    linkedin: formData.contact_methods.linkedin,
-                    facebook: formData.contact_methods.facebook,
-                    other: formData.contact_methods.other,
-                },
-                workCountry: formData.workLocation.country,
-                workState: formData.workLocation.state,
-                workCity: formData.workLocation.district,
-                internshipDuration:
-                    formData.internshipDuration.value &&
-                    formData.internshipDuration.unit
-                        ? {
-                              value: formData.internshipDuration.value,
-                              unit: formData.internshipDuration.unit,
-                          }
-                        : { value: "", unit: "" },
-                freelancePaymentRange:
-                    formData.freelancePaymentRange.min &&
-                    formData.freelancePaymentRange.max
-                        ? {
-                              min: formData.freelancePaymentRange.min,
-                              max: formData.freelancePaymentRange.max,
-                          }
-                        : { min: "", max: "" },
-                internshipStipendRange:
-                    formData.internshipType === "Paid" &&
-                    formData.internshipStipendRange.min &&
-                    formData.internshipStipendRange.max
-                        ? {
-                              min: formData.internshipStipendRange.min,
-                              max: formData.internshipStipendRange.max,
-                          }
-                        : { min: "", max: "" },
-                jobAmountRange:
-                    formData.jobAmountRange.min &&
-                    formData.jobAmountRange.max
-                        ? {
-                              min: formData.jobAmountRange.min,
-                              max: formData.jobAmountRange.max,
-                          }
-                        : { min: "", max: "" },
-                experience: {
-                    years:
-                        formData.experience.unit === "Years"
-                            ? `${formData.experience.min}-${formData.experience.max} Years`
+        e.preventDefault();
+        if (validateStep3()) {
+            try {
+                const domain = domains.find(
+                    (d) => d.value === formData.domainName
+                );
+                const role = allRoles.find(
+                    (r) => r.value === formData.roleUnderDomain
+                );
+                const submitData = {
+                    ...formData,
+                    domainName: domain ? domain.label : formData.domainName, // Use label instead of name
+                    roleUnderDomain: role
+                        ? role.label
+                        : formData.roleUnderDomain, // Use label instead of name
+                    skills: formData.skills.map((skill) => skill.name),
+                    workBasis: formData.workBasis,
+                    workMode: formData.workMode,
+                    contact_methods: {
+                        call: formData.contact_methods.call,
+                        whatsapp: formData.contact_methods.whatsapp,
+                        instagram: formData.contact_methods.instagram,
+                        linkedin: formData.contact_methods.linkedin,
+                        facebook: formData.contact_methods.facebook,
+                        other: formData.contact_methods.other,
+                    },
+                    timeCommitment:
+                        formData.timeCommitment.value &&
+                        formData.timeCommitment.unit
+                            ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
                             : "",
-                    months:
-                        formData.experience.unit === "Months"
-                            ? `${formData.experience.min}-${formData.experience.max} Months`
-                            : "",
-                    days:
-                        formData.experience.unit === "Days"
-                            ? `${formData.experience.min}-${formData.experience.max} Days`
-                            : "",
-                },
-                otherLinks: formData.otherLinks.map((linkObj, index) => ({
-                    url: linkObj.url,
-                    title: linkObj.title || `Link ${index + 1}`,
-                })),
-                jobTimeType: formData.jobTimeType || "",
-            };
+                    workCountry: formData.workLocation.country,
+                    workState: formData.workLocation.state,
+                    workCity: formData.workLocation.district,
+                    internshipDuration:
+                        formData.internshipDuration.value &&
+                        formData.internshipDuration.unit
+                            ? {
+                                  value: formData.internshipDuration.value,
+                                  unit: formData.internshipDuration.unit,
+                              }
+                            : { value: "", unit: "" },
+                    freelancePaymentRange:
+                        formData.freelancePaymentRange.min &&
+                        formData.freelancePaymentRange.max
+                            ? {
+                                  min: formData.freelancePaymentRange.min,
+                                  max: formData.freelancePaymentRange.max,
+                              }
+                            : { min: "", max: "" },
+                    internshipStipendRange:
+                        formData.internshipType === "Paid" &&
+                        formData.internshipStipendRange.min &&
+                        formData.internshipStipendRange.max
+                            ? {
+                                  min: formData.internshipStipendRange.min,
+                                  max: formData.internshipStipendRange.max,
+                              }
+                            : { min: "", max: "" },
+                    jobAmountRange:
+                        formData.jobAmountRange.min &&
+                        formData.jobAmountRange.max
+                            ? {
+                                  min: formData.jobAmountRange.min,
+                                  max: formData.jobAmountRange.max,
+                              }
+                            : { min: "", max: "" },
+                    experience: {
+                        years:
+                            formData.experience.unit === "Years"
+                                ? `${formData.experience.min}-${formData.experience.max} Years`
+                                : "",
+                        months:
+                            formData.experience.unit === "Months"
+                                ? `${formData.experience.min}-${formData.experience.max} Months`
+                                : "",
+                        days:
+                            formData.experience.unit === "Days"
+                                ? `${formData.experience.min}-${formData.experience.max} Days`
+                                : "",
+                    },
+                    otherLinks: formData.otherLinks.map((linkObj, index) => ({
+                        url: linkObj.url,
+                        title: linkObj.title || `Link ${index + 1}`,
+                    })),
+                    jobTimeType: formData.jobTimeType || "",
+                };
 
-            // Remove individual contact method fields
-            delete submitData.call;
-            delete submitData.whatsapp;
-            delete submitData.instagram;
-            delete submitData.linkedin;
-            delete submitData.facebook;
-            delete submitData.otherContact;
+                // Remove individual contact method fields
+                delete submitData.call;
+                delete submitData.whatsapp;
+                delete submitData.instagram;
+                delete submitData.linkedin;
+                delete submitData.facebook;
+                delete submitData.otherContact;
 
-            const response = await fetch(
-                "http://localhost:3333/api/get-discovered/add-listing",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(submitData),
-                    credentials: "include",
+                const response = await fetch(
+                    "http://localhost:3333/api/get-discovered/add-listing",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(submitData),
+                        credentials: "include",
+                    }
+                );
+
+                if (response.ok) {
+                    console.log("Form submitted:", submitData);
+                    onClose();
+                } else {
+                    const errorData = await response.json();
+                    setErrors({
+                        submit:
+                            errorData.message ||
+                            "Failed to submit the form. Please try again.",
+                    });
                 }
-            );
-
-            if (response.ok) {
-                console.log("Form submitted:", submitData);
-                onClose();
-            } else {
-                const errorData = await response.json();
-                setErrors({
-                    submit:
-                        errorData.message ||
-                        "Failed to submit the form. Please try again.",
-                });
+            } catch (err) {
+                console.error("Submission error:", err);
+                setErrors({ submit: "An error occurred. Please try again." });
             }
-        } catch (err) {
-            console.error("Submission error:", err);
-            setErrors({ submit: "An error occurred. Please try again." });
         }
-    }
-};
+    };
     const handleCancel = () => {
         setFormData({
             first_name: formData.first_name,
@@ -1324,7 +1433,7 @@ function GetDiscoveredForm({ onClose }) {
             freelancePaymentRange: { min: "", max: "" },
             projectDescription: "",
             percentageBasisValue: "",
-            timeCommitment: "",
+            timeCommitment: { value: "", unit: "" },
             equityBasisValue: "",
             otherWorkBasis: "",
             workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -2014,7 +2123,7 @@ function GetDiscoveredForm({ onClose }) {
                             <p className="text-gray-500">Loading domains...</p>
                         ) : (
                             <Select
-                            key={formData.domainName}
+                                key={formData.domainName}
                                 closeMenuOnSelect={true}
                                 components={animatedComponents}
                                 options={domains} // Use all domains to allow selecting other domains
@@ -2042,57 +2151,36 @@ function GetDiscoveredForm({ onClose }) {
                             >
                                 Skills <span className="text-red-500">*</span>
                             </label>
-                            <input
+
+                            <Select
                                 id="skills"
-                                name="skillsInput"
-                                value={skillSearchText}
-                                onChange={handleSkillInput}
-                                placeholder="Type to search skills"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                            />
-                            {showSkillSuggestions &&
-                                filteredSkills.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                        {filteredSkills
-                                            .filter(
-                                                (skill) =>
-                                                    !formData.skills.some(
-                                                        (s) =>
-                                                            s._id === skill._id
-                                                    )
-                                            )
-                                            .map((skill) => (
-                                                <li
-                                                    key={skill._id}
-                                                    onClick={() =>
-                                                        handleSkillSelect(skill)
-                                                    }
-                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                                >
-                                                    {skill.name}
-                                                </li>
-                                            ))}
-                                    </ul>
+                                isMulti
+                                name="skills"
+                                value={selectedSkills}
+                                options={skillOptions.filter(
+                                    (skill) =>
+                                        !formData.skills.some(
+                                            (s) => s._id === skill.value
+                                        )
                                 )}
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {formData.skills.map((skill) => (
-                                    <span
-                                        key={skill._id}
-                                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
-                                    >
-                                        {skill.name}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleSkillRemove(skill._id)
-                                            }
-                                            className="ml-2 text-purple-600 hover:text-purple-800"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
+                                onChange={(selectedOptions) => {
+                                    // Convert selectedOptions back to your schema format
+                                    const updatedSkills = selectedOptions.map(
+                                        (opt) => ({
+                                            _id: opt.value,
+                                            name: opt.label,
+                                        })
+                                    );
+                                    setFormData({
+                                        ...formData,
+                                        skills: updatedSkills,
+                                    });
+                                }}
+                                styles={colourStyles}
+                                placeholder="Type to search skills"
+                                closeMenuOnSelect={false}
+                            />
+
                             {errors.skills && (
                                 <p className="text-red-500 text-sm mt-1">
                                     {errors.skills}
@@ -3143,21 +3231,75 @@ function GetDiscoveredForm({ onClose }) {
                             </div>
                         )}
                     </div>
-                    <div className="relative col-span-1 ">
-                        <label
-                            htmlFor="timeCommitment"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Time Commitment
-                        </label>
-                        <input
-                            id="timeCommitment"
-                            name="timeCommitment"
-                            value={formData.timeCommitment}
-                            onChange={handleChange}
-                            placeholder="e.g., 20 hours/week"
-                            className="w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
-                        />
+                    <div className="relative col-span-1 flex gap-4">
+                        <div className="w-1/2">
+                            <label
+                                htmlFor="timeCommitmentValue"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Time Commitment
+                            </label>
+                            <input
+                                id="timeCommitmentValue"
+                                name="timeCommitment.value"
+                                value={formData.timeCommitment.value}
+                                onChange={(e) =>
+                                    handleNestedChange(
+                                        "timeCommitment",
+                                        "value",
+                                        e.target.value
+                                    )
+                                }
+                                type="number"
+                                min="1"
+                                placeholder="Enter value"
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.timeCommitment?.value
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            />
+                            {errors.timeCommitment?.value && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.timeCommitment.value}
+                                </p>
+                            )}
+                        </div>
+                        <div className="w-1/2">
+                            <label
+                                htmlFor="timeCommitmentUnit"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Unit
+                            </label>
+                            <select
+                                id="timeCommitmentUnit"
+                                name="timeCommitment.unit"
+                                value={formData.timeCommitment.unit}
+                                onChange={(e) =>
+                                    handleNestedChange(
+                                        "timeCommitment",
+                                        "unit",
+                                        e.target.value
+                                    )
+                                }
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                    errors.timeCommitment?.unit
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                }`}
+                            >
+                                <option value="">Select Unit</option>
+                                <option value="hours/day">Hours/Day</option>
+                                <option value="hours/week">Hours/Week</option>
+                                <option value="hours/month">Hours/Month</option>
+                            </select>
+                            {errors.timeCommitment?.unit && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.timeCommitment.unit}
+                                </p>
+                            )}
+                        </div>
                     </div>
                     <div className="relative col-span-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
