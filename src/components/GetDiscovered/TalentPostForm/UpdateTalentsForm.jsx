@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import Select from "react-select";
+import chroma from "chroma-js";
 import makeAnimated from "react-select/animated";
 import "react-phone-input-2/lib/style.css";
 // import { useParams } from "react-router-dom";
@@ -89,6 +90,72 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     const [listingError, setListingError] = useState("");
     const [enhanceLoading, setEnhanceLoading] = useState({});
 
+     let skillOptions = filteredSkills.map((skill) => ({
+        value: skill._id,
+        label: skill.name,
+        color: "#a855f7", // Optional: Assign custom color, here purple for example
+    }));
+
+    // Selected values in the same format
+    let selectedSkills = formData.skills.map((skill) => ({
+        value: skill._id,
+        label: skill.name,
+        color: "#a855f7",
+    }));
+
+    const colourStyles = {
+            control: (styles) => ({ ...styles, backgroundColor: "white" }),
+            option: (styles, { data, isDisabled, isFocused, isSelected }) => {
+                const color = chroma(data.color || "#a855f7");
+                return {
+                    ...styles,
+                    backgroundColor: isDisabled
+                        ? undefined
+                        : isSelected
+                        ? data.color
+                        : isFocused
+                        ? color.alpha(0.1).css()
+                        : undefined,
+                    color: isDisabled
+                        ? "#ccc"
+                        : isSelected
+                        ? chroma.contrast(color, "white") > 2
+                            ? "white"
+                            : "black"
+                        : data.color,
+                    cursor: isDisabled ? "not-allowed" : "default",
+    
+                    ":active": {
+                        ...styles[":active"],
+                        backgroundColor: !isDisabled
+                            ? isSelected
+                                ? data.color
+                                : color.alpha(0.3).css()
+                            : undefined,
+                    },
+                };
+            },
+            multiValue: (styles, { data }) => {
+                const color = chroma(data.color || "#a855f7");
+                return {
+                    ...styles,
+                    backgroundColor: color.alpha(0.1).css(),
+                };
+            },
+            multiValueLabel: (styles, { data }) => ({
+                ...styles,
+                color: data.color,
+            }),
+            multiValueRemove: (styles, { data }) => ({
+                ...styles,
+                color: data.color,
+                ":hover": {
+                    backgroundColor: data.color,
+                    color: "white",
+                },
+            }),
+        };
+    
     // Fetch listing data
     useEffect(() => {
         const fetchListing = async () => {
@@ -425,6 +492,17 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             ? skillsData.skills
                             : []
                     );
+                    skillOptions = filteredSkills.map((skill) => ({
+                        value: skill._id,
+                        label: skill.name,
+                        color: "#a855f7", // Optional: Assign custom color, here purple for example
+                    }));
+
+                    selectedSkills = formData.skills.map((skill) => ({
+                        value: skill._id,
+                        label: skill.name,
+                        color: "#a855f7",
+                    }));
                 } catch (error) {
                     console.error("Error fetching skills:", error);
                     setSkills([]);
@@ -2031,71 +2109,42 @@ if (formData.timeCommitment.value || formData.timeCommitment.unit) {
                         )}
                     </div>
                     {formData.domainName && (
-                        <div className="relative col-span-2">
-                            <label
-                                htmlFor="skills"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Skills <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                id="skills"
-                                name="skillsInput"
-                                value={skillSearchText}
-                                onChange={handleSkillInput}
-                                placeholder="Type to search skills"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                            />
-                            {showSkillSuggestions &&
-                                filteredSkills.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                        {filteredSkills
-                                            .filter(
-                                                (skill) =>
-                                                    !formData.skills.some(
-                                                        (s) =>
-                                                            s._id === skill._id
-                                                    )
-                                            )
-                                            .map((skill) => (
-                                                <li
-                                                    key={skill._id}
-                                                    onClick={() =>
-                                                        handleSkillSelect(skill)
-                                                    }
-                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                                >
-                                                    {skill.name}
-                                                </li>
-                                            ))}
-                                    </ul>
-                                )}
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {formData.skills.map((skill) => (
-                                    <span
-                                        key={skill._id}
-                                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
-                                    >
-                                        {skill.name}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleSkillRemove(skill._id)
-                                            }
-                                            className="ml-2 text-purple-600 hover:text-purple-800"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                            {errors.skills && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.skills}
-                                </p>
-                            )}
-                        </div>
-                    )}
+    <div className="relative col-span-2">
+      <label
+        htmlFor="skills"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Skills <span className="text-red-500">*</span>
+      </label>
+
+      <Select
+        id="skills"
+        isMulti
+        name="skills"
+        value={selectedSkills}
+        options={skillOptions.filter(
+          (skill) => !formData.skills.some((s) => s._id === skill.value)
+        )}
+        onChange={(selectedOptions) => {
+          // Convert selectedOptions back to your schema format
+          const updatedSkills = selectedOptions.map((opt) => ({
+            _id: opt.value,
+            name: opt.label,
+          }));
+          setFormData({ ...formData, skills: updatedSkills });
+        }}
+        styles={colourStyles}
+        placeholder="Type to search skills"
+        closeMenuOnSelect={false}
+      />
+
+      {errors.skills && (
+        <p className="text-red-500 text-sm mt-1">
+          {errors.skills}
+        </p>
+      )}
+    </div>
+  )}
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Work Basis <span className="text-red-500">*</span>
