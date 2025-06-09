@@ -19,29 +19,29 @@ const App = () => {
         }
     };
 
-    const navigate = useNavigate();
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await fetch(
-                    "http://localhost:3333/api/auth/protected",
-                    {
-                        credentials: "include", // sends cookies!
-                    }
-                );
-                if (res.ok) {
-                    // Token is valid, redirect to dashboard
-                    navigate("/dashboard-founder");
-                } else {
-                    // stay on login page
-                }
-            } catch (error) {
-                console.error("Auth check failed:", error);
-            }
-        };
+    // const navigate = useNavigate();
+    // useEffect(() => {
+    //     const checkAuth = async () => {
+    //         try {
+    //             const res = await fetch(
+    //                 "http://localhost:3333/api/auth/protected",
+    //                 {
+    //                     credentials: "include", // sends cookies!
+    //                 }
+    //             );
+    //             if (res.ok) {
+    //                 // Token is valid, redirect to dashboard
+    //                 navigate("/dashboard-founder");
+    //             } else {
+    //                 // stay on login page
+    //             }
+    //         } catch (error) {
+    //             console.error("Auth check failed:", error);
+    //         }
+    //     };
 
-        checkAuth();
-    }, []);
+    //     checkAuth();
+    // }, []);
 
     return (
         <Routes>
