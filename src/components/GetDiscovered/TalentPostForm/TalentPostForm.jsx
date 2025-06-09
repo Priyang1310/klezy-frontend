@@ -58,7 +58,7 @@ function GetDiscoveredForm({ onClose }) {
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
         percentageBasisValue: "",
-        timeCommitment: "",
+        timeCommitment: { value: "", unit: "" },
         equityBasisValue: "",
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -1020,6 +1020,25 @@ function GetDiscoveredForm({ onClose }) {
                 };
             }
         }
+        // Validate timeCommitment only if at least one field is filled
+if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+    if (
+        !formData.timeCommitment.value.trim() ||
+        isNaN(formData.timeCommitment.value) ||
+        Number(formData.timeCommitment.value) <= 0
+    ) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            value: "Valid time commitment value is required",
+        };
+    }
+    if (!formData.timeCommitment.unit) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            unit: "Time commitment unit is required",
+        };
+    }
+}
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -1185,6 +1204,10 @@ function GetDiscoveredForm({ onClose }) {
                     facebook: formData.contact_methods.facebook,
                     other: formData.contact_methods.other,
                 },
+                timeCommitment:
+    formData.timeCommitment.value && formData.timeCommitment.unit
+        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+        : "",
                 workCountry: formData.workLocation.country,
                 workState: formData.workLocation.state,
                 workCity: formData.workLocation.district,
@@ -1324,7 +1347,7 @@ function GetDiscoveredForm({ onClose }) {
             freelancePaymentRange: { min: "", max: "" },
             projectDescription: "",
             percentageBasisValue: "",
-            timeCommitment: "",
+            timeCommitment: { value: "", unit: "" },
             equityBasisValue: "",
             otherWorkBasis: "",
             workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -3143,22 +3166,60 @@ function GetDiscoveredForm({ onClose }) {
                             </div>
                         )}
                     </div>
-                    <div className="relative col-span-1 ">
-                        <label
-                            htmlFor="timeCommitment"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Time Commitment
-                        </label>
-                        <input
-                            id="timeCommitment"
-                            name="timeCommitment"
-                            value={formData.timeCommitment}
-                            onChange={handleChange}
-                            placeholder="e.g., 20 hours/week"
-                            className="w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
-                        />
-                    </div>
+                    <div className="relative col-span-1 flex gap-4">
+    <div className="w-1/2">
+        <label
+            htmlFor="timeCommitmentValue"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Time Commitment
+        </label>
+        <input
+            id="timeCommitmentValue"
+            name="timeCommitment.value"
+            value={formData.timeCommitment.value}
+            onChange={(e) =>
+                handleNestedChange("timeCommitment", "value", e.target.value)
+            }
+            type="number"
+            min="1"
+            placeholder="Enter value"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
+            }`}
+        />
+        {errors.timeCommitment?.value && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
+        )}
+    </div>
+    <div className="w-1/2">
+        <label
+            htmlFor="timeCommitmentUnit"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Unit
+        </label>
+        <select
+            id="timeCommitmentUnit"
+            name="timeCommitment.unit"
+            value={formData.timeCommitment.unit}
+            onChange={(e) =>
+                handleNestedChange("timeCommitment", "unit", e.target.value)
+            }
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+            }`}
+        >
+            <option value="">Select Unit</option>
+            <option value="hours/day">Hours/Day</option>
+            <option value="hours/week">Hours/Week</option>
+            <option value="hours/month">Hours/Month</option>
+        </select>
+        {errors.timeCommitment?.unit && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
+        )}
+    </div>
+</div>
                     <div className="relative col-span-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Experience <span className="text-red-500">*</span>

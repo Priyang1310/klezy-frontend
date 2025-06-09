@@ -52,7 +52,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
         percentageBasisValue: "",
-        timeCommitment: "",
+        timeCommitment: { value: "", unit: "" },
         equityBasisValue: "",
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -183,7 +183,12 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                     },
                     projectDescription: data.projectDescription || "",
                     percentageBasisValue: data.percentageBasisValue || "",
-                    timeCommitment: data.timeCommitment || "",
+                    timeCommitment: (() => {
+    const tc = data.timeCommitment || "";
+    if (!tc) return { value: "", unit: "" };
+    const match = tc.match(/^(\d+)\s*(hours\/day|hours\/week|hours\/month|hours\/year)$/);
+    return match ? { value: match[1], unit: match[2] } : { value: "", unit: "" };
+})(),
                     equityBasisValue: data.equityBasisValue || "",
                     otherWorkBasis: data.otherWorkBasis || "",
                     workMode: {
@@ -1148,7 +1153,25 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                 };
             }
         }
-
+        // Validate timeCommitment only if at least one field is filled
+if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+    if (
+        !formData.timeCommitment.value.trim() ||
+        isNaN(formData.timeCommitment.value) ||
+        Number(formData.timeCommitment.value) <= 0
+    ) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            value: "Valid time commitment value is required",
+        };
+    }
+    if (!formData.timeCommitment.unit) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            unit: "Time commitment unit is required",
+        };
+    }
+}
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -1315,6 +1338,10 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                 );
                 const submitData = {
                     ...formData,
+                    timeCommitment:
+    formData.timeCommitment.value && formData.timeCommitment.unit
+        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+        : "",
                     domainName: domain ? domain.name : "",
                     roleUnderDomain: role ? role.name : "",
                     skills: formData.skills.map((skill) => skill.name),
@@ -1469,7 +1496,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             freelancePaymentRange: { min: "", max: "" },
             projectDescription: "",
             percentageBasisValue: "",
-            timeCommitment: "",
+            timeCommitment: { value: "", unit: "" },
             equityBasisValue: "",
             otherWorkBasis: "",
             workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -3086,6 +3113,61 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             </div>
                         )}
                     </div>
+                    <div className="relative col-span-1 flex gap-4">
+    <div className="w-1/2">
+        <label
+            htmlFor="timeCommitmentValue"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Time Commitment
+        </label>
+        <input
+            id="timeCommitmentValue"
+            name="timeCommitment.value"
+            value={formData.timeCommitment.value}
+            onChange={(e) =>
+                handleNestedChange("timeCommitment", "value", e.target.value)
+            }
+            type="number"
+            min="1"
+            placeholder="Enter value"
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
+            }`}
+        />
+        {errors.timeCommitment?.value && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
+        )}
+    </div>
+    <div className="w-1/2">
+        <label
+            htmlFor="timeCommitmentUnit"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Unit
+        </label>
+        <select
+            id="timeCommitmentUnit"
+            name="timeCommitment.unit"
+            value={formData.timeCommitment.unit}
+            onChange={(e) =>
+                handleNestedChange("timeCommitment", "unit", e.target.value)
+            }
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+            }`}
+        >
+            <option value="">Select Unit</option>
+            <option value="hours/day">Hours/Day</option>
+            <option value="hours/week">Hours/Week</option>
+            <option value="hours/month">Hours/Month</option>
+            <option value="hours/year">Hours/Year</option>
+        </select>
+        {errors.timeCommitment?.unit && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
+        )}
+    </div>
+</div>
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Experience <span className="text-red-500">*</span>

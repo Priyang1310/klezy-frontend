@@ -61,7 +61,7 @@ function FounderPostForm({ onClose }) {
         freelancePaymentRange: { min: "", max: "" },
         projectDescription: "",
         percentageBasisValue: "",
-        timeCommitment: "",
+        timeCommitment: { value: "", unit: "" },
         equityBasisValue: "",
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
@@ -883,7 +883,7 @@ function FounderPostForm({ onClose }) {
             formData.workBasis.ProjectBasis &&
             !formData.projectDescription.trim()
         )
-            newErrors.projectDescription = "Project description is required";
+            newErrors.projectDescription = "Project Criteria is required";
         if (
             formData.workBasis.PercentageBasis &&
             !formData.percentageBasisValue.trim()
@@ -931,7 +931,25 @@ function FounderPostForm({ onClose }) {
                 ...newErrors.experienceRange,
                 max: "Valid maximum experience is required",
             };
-
+            // Validate timeCommitment only if at least one field is filled
+if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+    if (
+        !formData.timeCommitment.value.trim() ||
+        isNaN(formData.timeCommitment.value) ||
+        Number(formData.timeCommitment.value) <= 0
+    ) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            value: "Valid time commitment value is required",
+        };
+    }
+    if (!formData.timeCommitment.unit) {
+        newErrors.timeCommitment = {
+            ...newErrors.timeCommitment,
+            unit: "Time commitment unit is required",
+        };
+    }
+}
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -1031,7 +1049,8 @@ function FounderPostForm({ onClose }) {
                     field: "percentageBasisValue",
                     value: formData.percentageBasisValue,
                 },
-                { field: "timeCommitment", value: formData.timeCommitment },
+               { field: "timeCommitment.value", value: formData.timeCommitment.value },
+{ field: "timeCommitment.unit", value: formData.timeCommitment.unit },
                 { field: "equityBasisValue", value: formData.equityBasisValue },
                 { field: "otherWorkBasis", value: formData.otherWorkBasis },
                 {
@@ -1074,9 +1093,7 @@ const handleSubmit = async (e) => {
                 workBasis: Object.keys(formData.workBasis).filter(
                     (key) => formData.workBasis[key]
                 ),
-                workMode: Object.keys(formData.workMode)
-                    .filter((key) => formData.workMode[key])
-                    .at(),
+                workMode: Object.keys(formData.workMode).filter((key) => formData.workMode[key]),
                 call: formData.contact_methods.call.selected
                     ? formData.contact_methods.call.value
                     : "",
@@ -1129,9 +1146,13 @@ const handleSubmit = async (e) => {
                     formData.jobAmountRange.max
                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
                         : "",
+                        timeCommitment:
+    formData.timeCommitment.value && formData.timeCommitment.unit
+        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+        : "",
             };
+            console.log(submitData)
             delete submitData.contact_methods;
-
             const response = await fetch(
                 "http://localhost:3333/api/founder/add-listing/",
                 {
@@ -1171,7 +1192,7 @@ const handleSubmit = async (e) => {
             country: formData.country,
             state: formData.state,
             district: formData.district,
-            timeCommitment: "",
+            timeCommitment: { value: "", unit: "" },
             websiteOfStartupLink: "",
             contact_methods: {
                 call: { selected: false, value: "" },
@@ -1761,12 +1782,12 @@ const handleSubmit = async (e) => {
                         )}
                     </div>
                     {/* About Me */}
-                    <div className="relative col-span-2">
+                    {formData.requirementType&& <div className="relative col-span-2">
                         <label
                             htmlFor="aboutEntity"
                             className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                            About the {formData.requirementType}
+                            About your requirement
                         </label>
                         <div className="relative">
                             <textarea
@@ -1802,7 +1823,7 @@ const handleSubmit = async (e) => {
                             </button>
                         </div>
                     </div>
-
+}
                     <div className="relative col-span-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             How people can reach out to you (select at least
@@ -2913,7 +2934,7 @@ const handleSubmit = async (e) => {
                                         htmlFor="projectDescription"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Project Description{" "}
+                                        Project Criteria{" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
@@ -3061,22 +3082,62 @@ const handleSubmit = async (e) => {
                         </div>
                     </div>
 
-                    <div className="relative col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Time Commitment
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="timeCommitment"
-                                name="timeCommitment"
-                                value={formData.timeCommitment}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="e.g., 20 hours/week"
-                                className="w-1/3 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
-                            />
-                        </div>
-                    </div>
+                    <div className="relative col-span-2 flex gap-4">
+    <div className="w-1/3">
+        <label
+            htmlFor="timeCommitmentValue"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Time Commitment
+        </label>
+        <div className="flex items-center gap-2">
+            <input
+                id="timeCommitmentValue"
+                name="timeCommitment.value"
+                value={formData.timeCommitment.value}
+                onChange={(e) =>
+                    handleNestedChange("timeCommitment", "value", e.target.value)
+                }
+                type="number"
+                min="1"
+                placeholder="Enter value"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                    errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+        </div>
+        {errors.timeCommitment?.value && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
+        )}
+    </div>
+    <div className="w-1/3">
+        <label
+            htmlFor="timeCommitmentUnit"
+            className="block text-sm font-medium text-gray-700 mb-1"
+        >
+            Unit
+        </label>
+        <select
+            id="timeCommitmentUnit"
+            name="timeCommitment.unit"
+            value={formData.timeCommitment.unit}
+            onChange={(e) =>
+                handleNestedChange("timeCommitment", "unit", e.target.value)
+            }
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+            }`}
+        >
+            <option value="">Select Unit</option>
+            <option value="hours/day">Hours/Day</option>
+            <option value="hours/week">Hours/Week</option>
+            <option value="hours/month">Hours/Month</option>
+        </select>
+        {errors.timeCommitment?.unit && (
+            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
+        )}
+    </div>
+</div>
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
