@@ -1257,12 +1257,12 @@ import PasswordValidator from "password-validator";
 // Initialize password validator schema
 const schema = new PasswordValidator();
 schema
-  .is().min(8) // Minimum length 8
-  .has().uppercase() // Must have uppercase letters
-  .has().lowercase() // Must have lowercase letters
-  .has().digits() // Must have digits
-  .has().symbols() // Must have symbols
-  .has().not().spaces();
+    .is().min(8) // Minimum length 8
+    .has().uppercase() // Must have uppercase letters
+    .has().lowercase() // Must have lowercase letters
+    .has().digits() // Must have digits
+    .has().symbols() // Must have symbols
+    .has().not().spaces();
 
 const SignUpNew = () => {
     const navigate = useNavigate();
@@ -1573,17 +1573,17 @@ const SignUpNew = () => {
             const errorMessages = validationErrors.map((err) => {
                 switch (err.validation) {
                     case "min":
-                        return "Password must be at least 8 characters long";
+                        return "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, %.";
                     case "uppercase":
-                        return "Password must contain at least one uppercase letter";
+                        return "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, %.";
                     case "lowercase":
-                        return "Password must contain at least one lowercase letter";
+                        return "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, %.";
                     case "digits":
-                        return "Password must contain at least one number";
+                        return "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, %.";
                     case "symbols":
-                        return "Password must contain at least one special character";
+                        return "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, %.";
                     default:
-                        return "Invalid password";
+                        return "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, %.";
                 }
             });
             setErrors((prev) => ({
@@ -1788,12 +1788,12 @@ const SignUpNew = () => {
                                 </div>
                                 <div className="flex flex-col w-full gap-2 mb-4">
                                     <div className="text-left mb-2">
-                                        <label className="block font-medium mb-1 text-black opacity-[73%]"> Who you are </label>
+                                        <label className="block font-medium mb-1 text-black opacity-[73%]"> What do you want to do ?</label>
                                         <div className="flex gap-4">
                                             <label
                                                 className={`flex items-center gap-2 ${errors.role
-                                                        ? "text-red-500"
-                                                        : ""
+                                                    ? "text-red-500"
+                                                    : ""
                                                     }`}
                                             >
                                                 <input
@@ -1808,8 +1808,8 @@ const SignUpNew = () => {
                                             </label>
                                             <label
                                                 className={`flex items-center gap-2 ${errors.role
-                                                        ? "text-red-500"
-                                                        : ""
+                                                    ? "text-red-500"
+                                                    : ""
                                                     }`}
                                             >
                                                 <input
@@ -1822,7 +1822,7 @@ const SignUpNew = () => {
                                                     onChange={handleRoleChange}
                                                     className="h-4 w-4 text-violet-500 focus:ring-violet-500 border-gray-300"
                                                 />
-                                                <span className="text-sm text-gray-600"> Getting Discovered </span>
+                                                <span className="text-sm text-gray-600"> Get Discovered </span>
                                             </label>
                                         </div>
                                         {errors.role && (
@@ -1837,8 +1837,8 @@ const SignUpNew = () => {
                                             <input
                                                 type="text"
                                                 className={`w-full h-10 px-2 border ${errors.firstName
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                                     } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                 placeholder="Enter First Name"
                                                 value={firstName}
@@ -1855,8 +1855,8 @@ const SignUpNew = () => {
                                             <input
                                                 type="text"
                                                 className={`w-full h-10 px-2 border ${errors.middleName
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                                     } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                 placeholder="Enter Middle Name"
                                                 value={middleName}
@@ -1875,8 +1875,8 @@ const SignUpNew = () => {
                                             <input
                                                 type="text"
                                                 className={`w-full h-10 px-2 border ${errors.lastName
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                                     } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                 placeholder="Enter Last Name"
                                                 value={lastName}
@@ -1899,8 +1899,8 @@ const SignUpNew = () => {
                                                 onChange={handleDobChange}
                                                 required
                                                 className={`w-full h-10 px-2 border ${errors.dob
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                                     } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             />
                                             {errors.dob && (
@@ -2087,8 +2087,8 @@ const SignUpNew = () => {
                             <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
                             <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
                         </div>
-                        <div className="flex gap-10 h-[75%] w-[60%] z-10 bg-white px-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm items-center justify-center">
-                            <div className="flex flex-col h-full gap-4 w-[60%] py-10 rounded-lg">
+                        <div className="flex items-center justify-center gap-10 h-[75%] w-[60%] z-10 bg-white px-8 rounded-4xl shadow-lg shadow-[#5C058E] text-center text-sm">
+                            <div className=" flex flex-col h-full gap-4 w-full py-10 rounded-lg">
                                 <div className="flex flex-col items-start gap-0.5">
                                     <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">
                                         Verification
@@ -2101,135 +2101,139 @@ const SignUpNew = () => {
                                         proceed.
                                     </p>
                                 </div>
-                                <div className="flex flex-col">
-                                    <div className="flex gap-4 w-full mb-2 items-end">
-                                        <div className="flex items-end gap-2 w-full">
-                                            <div className="text-left w-[60%]">
-                                                <label className="block font-medium mb-1 text-black opacity-[73%]">
-                                                    Phone
-                                                </label>
-                                                <PhoneInput
-                                                    country={"in"}
-                                                    value={phoneNumber}
-                                                    onChange={handlePhoneChange}
-                                                    containerClass="w-full"
-                                                    inputClass={`w-full h-10 px-4 text-gray-900 border ${errors.phoneNumber
+                                <div className="flex ">
+                                    <div className=" w-full">
+                                        <div className="flex gap-4 w-full mb-2 items-end">
+                                            <div className="flex items-end gap-2 w-full">
+                                                <div className="text-left w-[60%]">
+                                                    <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                                        Phone
+                                                    </label>
+                                                    <PhoneInput
+                                                        country={"in"}
+                                                        value={phoneNumber}
+                                                        onChange={handlePhoneChange}
+                                                        containerClass="w-full"
+                                                        inputClass={`w-full h-10 px-4 text-gray-900 border ${errors.phoneNumber
                                                             ? "border-red-500"
                                                             : "border-gray-300"
-                                                        } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                                    buttonClass="border-gray-300 h-14 w-16"
-                                                    dropdownClass="h-28"
-                                                    inputStyle={{
-                                                        height: "40px",
-                                                        width: "100%",
-                                                        borderRadius: "0.5rem",
-                                                    }}
-                                                    buttonStyle={{
-                                                        position: "absolute",
-                                                        left: "5px",
-                                                        top: "1px",
-                                                        height: "40px",
-                                                        width: "40px",
-                                                        backgroundColor:
-                                                            "transparent",
-                                                        border: "none",
-                                                        outline: "none",
-                                                    }}
-                                                />
-                                                {errors.phoneNumber && (
-                                                    <p className="text-red-500 text-xs mt-1">
-                                                        {errors.phoneNumber}
-                                                    </p>
-                                                )}
+                                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                        buttonClass="border-gray-300 h-14 w-16"
+                                                        dropdownClass="h-28"
+                                                        inputStyle={{
+                                                            height: "40px",
+                                                            width: "100%",
+                                                            borderRadius: "0.5rem",
+                                                        }}
+                                                        buttonStyle={{
+                                                            position: "absolute",
+                                                            left: "5px",
+                                                            top: "1px",
+                                                            height: "40px",
+                                                            width: "40px",
+                                                            backgroundColor:
+                                                                "transparent",
+                                                            border: "none",
+                                                            outline: "none",
+                                                        }}
+                                                    />
+                                                    {errors.phoneNumber && (
+                                                        <p className="text-red-500 text-xs mt-1">
+                                                            {errors.phoneNumber}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    className="bg-[#5E0194] text-white w-24 h-10 px-2 py-1 text-xs rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300 disabled:opacity-85"
+                                                    onClick={handleSendPhoneOTP}
+                                                    disabled={phoneTimer > 0}
+                                                >
+                                                    {phoneTimer > 0
+                                                        ? `Resend OTP (${phoneTimer}s)`
+                                                        : "Send OTP"}
+                                                </button>
                                             </div>
-                                            <button
-                                                className="bg-[#5E0194] text-white w-24 h-10 px-2 py-1 text-xs rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300 disabled:opacity-85"
-                                                onClick={handleSendPhoneOTP}
-                                                disabled={phoneTimer > 0}
-                                            >
-                                                {phoneTimer > 0
-                                                    ? `Resend OTP (${phoneTimer}s)`
-                                                    : "Send OTP"}
-                                            </button>
                                         </div>
-                                    </div>
-                                    {showOTPInput && (
-                                        <div className="text-left w-[60%] mb-2">
-                                            <label className="block font-medium mb-1 text-black opacity-[73%]">
-                                                Phone Verification Code
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className={`w-full h-10 px-2 border ${errors.PhoneOTP
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                    } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                                placeholder="Enter Code"
-                                                value={PhoneOTP}
-                                                onChange={handlePhoneOTPChange}
-                                            />
-                                            {errors.PhoneOTP && (
-                                                <p className="text-red-500 text-xs mt-1">
-                                                    {errors.PhoneOTP}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
-                                    <div className="flex gap-4 w-full mb-2 items-end">
-                                        <div className="flex items-end gap-2 w-full">
-                                            <div className="text-left w-[60%]">
+                                        {showOTPInput && (
+                                            <div className="text-left w-[60%] mb-2">
                                                 <label className="block font-medium mb-1 text-black opacity-[73%]">
-                                                    Email
+                                                    Phone Verification Code
                                                 </label>
                                                 <input
-                                                    type="email"
-                                                    className={`w-full h-10 px-2 border ${errors.email
-                                                            ? "border-red-500"
-                                                            : "border-gray-300"
+                                                    type="text"
+                                                    className={`w-full h-10 px-2 border ${errors.PhoneOTP
+                                                        ? "border-red-500"
+                                                        : "border-gray-300"
                                                         } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                                    placeholder="Enter Email Address"
-                                                    value={email}
-                                                    onChange={handleEmailChange}
+                                                    placeholder="Enter Code"
+                                                    value={PhoneOTP}
+                                                    onChange={handlePhoneOTPChange}
                                                 />
-                                                {errors.email && (
+                                                {errors.PhoneOTP && (
                                                     <p className="text-red-500 text-xs mt-1">
-                                                        {errors.email}
+                                                        {errors.PhoneOTP}
                                                     </p>
                                                 )}
                                             </div>
-                                            <button
-                                                className="bg-[#5E0194] text-white w-24 h-10 px-2 py-1 text-xs rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300 disabled:opacity-85"
-                                                onClick={handleSendEmailOTP}
-                                                disabled={emailTimer > 0}
-                                            >
-                                                {emailTimer > 0
-                                                    ? `Resend OTP (${emailTimer}s)`
-                                                    : "Send OTP"}
-                                            </button>
-                                        </div>
+                                        )}
                                     </div>
-                                    {showEmailCodeInput && (
-                                        <div className="text-left w-[60%] mb-2">
-                                            <label className="block font-medium mb-1 text-black opacity-[73%]">
-                                                Email Verification Code
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className={`w-full h-10 px-2 border ${errors.EmailOTP
+                                    <div className=" w-full">
+                                        <div className="flex gap-4 w-full mb-2 items-end">
+                                            <div className="flex items-end gap-2 w-full">
+                                                <div className="text-left w-[60%]">
+                                                    <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                                        Email
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        className={`w-full h-10 px-2 border ${errors.email
+                                                            ? "border-red-500"
+                                                            : "border-gray-300"
+                                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                        placeholder="Enter Email Address"
+                                                        value={email}
+                                                        onChange={handleEmailChange}
+                                                    />
+                                                    {errors.email && (
+                                                        <p className="text-red-500 text-xs mt-1">
+                                                            {errors.email}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <button
+                                                    className="bg-[#5E0194] text-white w-24 h-10 px-2 py-1 text-xs rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300 disabled:opacity-85"
+                                                    onClick={handleSendEmailOTP}
+                                                    disabled={emailTimer > 0}
+                                                >
+                                                    {emailTimer > 0
+                                                        ? `Resend OTP (${emailTimer}s)`
+                                                        : "Send OTP"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {showEmailCodeInput && (
+                                            <div className="text-left w-[60%] mb-2">
+                                                <label className="block font-medium mb-1 text-black opacity-[73%]">
+                                                    Email Verification Code
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className={`w-full h-10 px-2 border ${errors.EmailOTP
                                                         ? "border-red-500"
                                                         : "border-gray-300"
-                                                    } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                                placeholder="Enter Code"
-                                                value={EmailOTP}
-                                                onChange={handleEmailOTPChange}
-                                            />
-                                            {errors.EmailOTP && (
-                                                <p className="text-red-500 text-xs mt-1">
-                                                    {errors.EmailOTP}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
+                                                        } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                    placeholder="Enter Code"
+                                                    value={EmailOTP}
+                                                    onChange={handleEmailOTPChange}
+                                                />
+                                                {errors.EmailOTP && (
+                                                    <p className="text-red-500 text-xs mt-1">
+                                                        {errors.EmailOTP}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex gap-3 w-[85%]">
                                     <button
@@ -2294,8 +2298,8 @@ const SignUpNew = () => {
                                                     : "password"
                                             }
                                             className={`w-full h-10 px-2 pr-10 border ${errors.password
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
+                                                ? "border-red-500"
+                                                : "border-gray-300"
                                                 } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             placeholder="Enter Password"
                                             value={password}
@@ -2331,8 +2335,8 @@ const SignUpNew = () => {
                                                     : "password"
                                             }
                                             className={`w-full h-10 px-2 pr-10 border ${errors.confirmPassword
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
+                                                ? "border-red-500"
+                                                : "border-gray-300"
                                                 } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             placeholder="Re-Enter Password"
                                             value={confirmPassword}

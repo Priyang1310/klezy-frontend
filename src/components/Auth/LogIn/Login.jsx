@@ -327,7 +327,7 @@
 // export default Login;
 
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput from "react-phone-input-2";
@@ -337,7 +337,7 @@ import { FaEyeSlash, FaEye } from "react-icons/fa";
 const Login = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("Founder");
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState(""); // For top-level errors
   const navigate = useNavigate();
@@ -354,6 +354,12 @@ const Login = () => {
     const phoneRegex = /^\+?\d{10,15}$/;
     return phoneRegex.test(cleanedPhone);
   };
+
+  useEffect(() => {
+    if (role) {
+      setErrors((prev) => ({ ...prev, role: "" }));
+    }
+  }, [role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -440,6 +446,7 @@ const Login = () => {
     exit: { opacity: 0, x: -50, transition: { duration: 0.4 } },
   };
 
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -452,22 +459,38 @@ const Login = () => {
           variants={pageVariants}
         >
           <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
-            {/* ...background blobs... */}
+            <div className="absolute -right-[50%] top-[100%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-40 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+            <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
           </div>
-          <div className="flex gap-10 w-fit h-[75%] z-10 bg-white p-8 rounded-4xl shadow-md shadow-[#5C058E] text-center text-sm items-center justify-evenly">
-            <div className="h-full w-fit flex justify-center items-center">
-              <img src="./image1.svg" alt="" className="h-full" />
+          <div className="flex w-[50%] h-[70%] z-10 bg-white rounded-4xl shadow-md shadow-[#5C058E] text-center text-sm items-center justify-evenly">
+            <div className="rounded-l-4xl h-full w-[50%] flex flex-col justify-center items-start bg-[#F1DAFF] pl-[3rem]">
+              <h2 className="text-4xl font-semibold text-[#5E0194] mb-2">
+                Sign In.
+              </h2>
+              <p className="text-[#786D7F] opacity-[86%] text-sm">
+                Don’t have an account?{" "}
+                <a
+                  href="#"
+                  className="text-[#5E0194] font-medium underline"
+                  onClick={handleSignUp}
+                >
+                  Sign up
+                </a>
+              </p>
+              <img src="./image1.svg" alt="" className="h-[54%] mt-10" />
             </div>
             <form
-              className="flex flex-col h-full gap-1 w-[50%] p-4 rounded-lg justify-center"
+              className="flex flex-col h-full w-[50%] px-[1rem] rounded-r-4xl justify-center gap-2 "
               onSubmit={handleSubmit}
               noValidate
             >
-              <div className="flex flex-col mb-2 items-start gap-0.5">
-                <p className="uppercase text-[#2B0242] opacity-[66%] font-medium">
+              {/* <div className="flex flex-col items-start gap-0.5">
+                <p className="text-xs uppercase text-[#2B0242] opacity-[66%] font-medium mb-2">
                   Start your journey
                 </p>
-                <h2 className="text-[48px] font-bold text-[#5E0194]">
+                <h2 className="text-[48px]  font-bold text-[#5E0194]">
                   Sign In to Klezy.
                 </h2>
                 <p className="text-[#786D7F] opacity-[86%] text-sm">
@@ -480,17 +503,18 @@ const Login = () => {
                     Sign up
                   </a>
                 </p>
-              </div>
-              {formError && (
-                <div className="mb-2 text-center text-red-500 font-semibold">
-                  {formError}
+                <div className="text-sm text-center text-red-500 font-semibold h-4 mb-2">
+                  <p className="">{formError !== ("Invalid Password!") ? `${formError}` : ""}</p>
                 </div>
-              )}
+              </div> */}
+              <div className="text-sm text-left text-red-500 font-medium h-4">
+                <p className="">{formError !== ("Invalid Password!") ? `${formError}` : ""}</p>
+              </div>
               <div className="mb-4 text-left">
-                <label className="block font-medium mb-1 text-black opacity-[73%]">
-                  Who you are
-                </label>
-                <div className="flex gap-4">
+                {/* <label className="block font-medium mb-1 text-black opacity-[73%]">
+                  What do you want to do
+                </label> */}
+                {/* <div className="flex gap-4">
                   <label
                     className={`flex items-center gap-2 ${errors.role ? "text-red-500" : ""}`}
                   >
@@ -523,13 +547,32 @@ const Login = () => {
                     />
                     <span className="text-sm text-gray-600">Getting Discovered</span>
                   </label>
+                </div> */}
+                <div className="flex gap-4 w-fit">
+                  {["Founder", "GetDiscovered"].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setRole(option);
+                        setErrors((prev) => ({ ...prev, role: "" }));
+                        setFormError("");
+                      }}
+                      className={`px-4 py-2 text-sm ${role === option
+                        ? "  border-b-2 border-gray-500 text-gray-800 font-bold"
+                        : " text-gray-600"
+                        } ${errors.role ? "border-red-500" : ""}`}
+                    >
+                      {option === "Founder" ? "Discover Talent" : "Get Discovered"}
+                    </button>
+                  ))}
                 </div>
-                {errors.role && (
-                  <p className="text-red-500 text-xs mt-1">{errors.role}</p>
-                )}
+                {/* <div className="h-1">
+                  {errors.role && (<p className="text-red-500 text-xs mt-1">({errors.role ? `${errors.role}` : ""})</p>)}
+                </div> */}
               </div>
               <div className="mb-4 text-left">
-                <label className="block font-medium mb-1 text-black opacity-[73%]">
+                <label className="block font-medium mb-2 text-black opacity-[73%]">
                   Login using
                 </label>
                 <div className="flex gap-4">
@@ -542,6 +585,7 @@ const Login = () => {
                         setLoginMethod("phone");
                         setEmailOrPhone("");
                         setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
+                        setFormError("");
                       }}
                       className="h-4 w-4 border-gray-300"
                     />
@@ -556,6 +600,7 @@ const Login = () => {
                         setLoginMethod("email");
                         setEmailOrPhone("");
                         setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
+                        setFormError("");
                       }}
                       className="h-4 w-4 text-violet-500 focus:ring-violet-500 border-gray-300"
                     />
@@ -565,13 +610,17 @@ const Login = () => {
               </div>
               {loginMethod === "phone" ? (
                 <div className="text-left mb-1">
-                  <label className="block font-medium mb-1 text-black opacity-[73%]">
-                    Phone number
+                  <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                    Phone number {errors.emailOrPhone && (
+                      <p className="text-red-500 text-sm">{errors.emailOrPhone ? `*` : ""}</p>
+                    )}
                   </label>
                   <PhoneInput
                     country={"in"}
+                    className= {`${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                      }`}
                     value={emailOrPhone}
-                    onChange={(value) => setEmailOrPhone(value)}
+                    onChange={(value) => {setEmailOrPhone(value); setFormError("");}}
                     containerClass="w-full"
                     inputClass={`w-full h-12 px-4 text-gray-900 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
                       } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
@@ -582,7 +631,7 @@ const Login = () => {
                       width: "100%",
                     }}
                     inputStyle={{
-                      height: "43px",
+                      height: "44px",
                       width: "100%",
                     }}
                     buttonStyle={{
@@ -596,36 +645,43 @@ const Login = () => {
                       outline: "none",
                     }}
                   />
-                  {errors.emailOrPhone && (
+                  {/* {errors.emailOrPhone && (
                     <p className="text-red-500 text-xs mt-1">{errors.emailOrPhone}</p>
-                  )}
+                  )} */}
                 </div>
               ) : (
-                <div className="text-left mb-2">
-                  <label className="block font-medium mb-1 text-black opacity-[73%]">
-                    Email address
+                <div className="text-left mb-4">
+                  <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                    Email address {errors.emailOrPhone && (
+                      <p className="text-red-500 text-sm">{errors.emailOrPhone ? `*` : ""}</p>
+                    )}
                   </label>
                   <input
                     type="email"
                     value={emailOrPhone}
-                    onChange={(e) => setEmailOrPhone(e.target.value)}
-                    className={`w-full h-10 px-3 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                    onChange={(e) => {setEmailOrPhone(e.target.value); setFormError("");}}
+                    className={`w-full h-11 px-3 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
                       } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                     placeholder="Enter your email"
                   />
-                  {errors.emailOrPhone && (
+                  {/* {errors.emailOrPhone && (
                     <p className="text-red-500 text-xs mt-1">{errors.emailOrPhone}</p>
-                  )}
+                  )} */}
                 </div>
               )}
-              <div className="text-left relative mb-4">
-                <label className="block font-medium mb-1 text-black opacity-[73%]">
-                  Password
+              <div className="text-left relative">
+                <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                  Password {errors.password && (
+                    <p className="text-red-500 text-sm mr-1">{errors.password ? `*` : ""}</p>
+                  )}
+                  <div className="text-sm text-start text-red-500 font-medium">
+                    <p className="">{formError === ("Invalid Password!") ? `Wrong Password` : ""}</p>
+                  </div>
                 </label>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {setPassword(e.target.value); setFormError("");}}
                   className={`w-full h-10 px-2 border ${errors.password ? "border-red-500" : "border-gray-300"
                     } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                   placeholder="Enter Password"
@@ -637,9 +693,12 @@ const Login = () => {
                 >
                   {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
                 </button>
-                {errors.password && (
+                {/* {errors.password && (
                   <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-                )}
+                )} */}
+                {/* <div className="text-sm text-start text-red-500 font-semibold h-4">
+                  <p className="">{formError === ("Invalid Password!") ? `Wrong Password` : ""}</p>
+                </div> */}
               </div>
               <div className="w-full flex items-center justify-start mb-4">
                 <a
