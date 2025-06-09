@@ -7,24 +7,18 @@ import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-function UpdateFounderPostForm({ onClose }) {
+function UpdateFounderPostForm({ listingId,onClose }) {
     const animatedComponents = makeAnimated();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
-        first_name: "",
-        middle_name: "",
-        last_name: "",
-        gender: "",
+        
         userType: "",
         otherUserType: "",
         requirementType: "",
         otherRequirementType: "",
         startUpName: "",
         aboutEntity: "",
-        email: "",
-        country: "",
-        state: "",
-        district: "",
+       
         websiteOfStartupLink: "",
         contact_methods: {
             call: { selected: false, value: "" },
@@ -90,45 +84,255 @@ function UpdateFounderPostForm({ onClose }) {
     const [countries, setCountries] = useState([]);
     const [states, setStates] = useState([]);
     const [districts, setDistricts] = useState([]);
-    const [loadingProfile, setLoadingProfile] = useState(true);
+    // const [loadingProfile, setLoadingProfile] = useState(true);
     const [profileError, setProfileError] = useState("");
     const [enhanceLoading, setEnhanceLoading] = useState({}); // Track loading state for each field
 
     // Fetch profile data
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await fetch(
-                    "http://localhost:3333/api/founder/get-pre-filled-details",
-                    {
-                        method: "GET",
-                        credentials: "include",
-                    }
-                );
-                if (!response.ok) throw new Error("Failed to fetch profile");
-                const data = await response.json();
+    // useEffect(() => {
+    //     const fetchProfile = async () => {
+    //         try {
+    //             const response = await fetch(
+    //                 "http://localhost:3333/api/founder/get-pre-filled-details",
+    //                 {
+    //                     method: "GET",
+    //                     credentials: "include",
+    //                 }
+    //             );
+    //             if (!response.ok) throw new Error("Failed to fetch profile");
+    //             const data = await response.json();
 
-                console.log(data);
+    //             console.log(data);
+    //             setFormData((prev) => ({
+    //                 ...prev,
+    //                 first_name: data.user.firstName || "",
+    //                 middle_name: data.user.middleName || "",
+    //                 last_name: data.user.lastName || "",
+    //                 gender: data.user.gender || "",
+    //                 email: data.user.email || "",
+    //                 country: data.user.country || "",
+    //                 state: data.user.state || "",
+    //                 district: data.user.city || "",
+    //             }));
+    //         } catch (error) {
+    //             setProfileError("Failed to load profile data");
+    //             console.error("Error fetching profile:", error);
+    //         } finally {
+    //             setLoadingProfile(false);
+    //         }
+    //     };
+    //     fetchProfile();
+    // }, []);
+   useEffect(() => {
+    const fetchListing = async () => {
+        try {
+            // setLoadingListing(true);
+            const response = await fetch(
+                `http://localhost:3333/api/founder/get-pre-filled-details-for-update-form/${listingId}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) throw new Error("Failed to fetch listing data");
+            const  {postData}  = await response.json();
+            const data = postData
+            console.log(data)
+            // Map work location codes
+            let countryCode = "";
+            let stateCode = "";
+            let cityName = "";
+
+            if (data.workMode.includes("Hybrid") || data.workMode.includes("Onsite")) {
+                const countryObj = Country.getAllCountries().find(
+                    (c) => c.name === data.workCountry
+                );
+                countryCode = countryObj?.isoCode || "";
+                if (countryCode) {
+                    const stateObj = State.getStatesOfCountry(countryCode).find(
+                        (s) => s.name === data.workState
+                    );
+                    stateCode = stateObj?.isoCode || "";
+                    if (stateCode) {
+                        const cityObj = City.getCitiesOfState(countryCode, stateCode).find(
+                            (c) => c.name === data.workCity
+                        );
+                        cityName = cityObj?.name || data.workCity;
+                    }
+                }
+                setStates(State.getStatesOfCountry(countryCode));
+                setDistricts(City.getCitiesOfState(countryCode, stateCode));
+            }
+
+            // Helper to parse range strings (e.g., "1000-2000 rupees" or "1-5 years")
+            const parseRange = (str) => {
+    if (!str) return { min: "", max: "" };
+    const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|years)?$/);
+    return match ? { min: match[1], max: match[2] } : { min: "", max: "" };
+};
+
+            // Helper to parse duration (e.g., "2 Months")
+            const parseDuration = (str) => {
+    if (!str) return { value: "", unit: "" };
+    // Handle formats like "2 hours/month" or "2 Months"
+    const hoursMatch = str.match(/^(\d+)\s*hours\/(\w+)$/);
+    const standardMatch = str.match(/^(\d+)\s*(Weeks|Months|Years)$/);
+    if (hoursMatch) {
+        return { value: hoursMatch[1], unit: `hours/${hoursMatch[2]}` };
+    } else if (standardMatch) {
+        return { value: standardMatch[1], unit: standardMatch[2] };
+    }
+    return { value: "", unit: "" };
+};
+
+            // Map pre-filled data to formData
+            const newFormData = {
+                userType: data.userType || "",
+                otherUserType: data.otherUserType || "",
+                requirementType: data.requirementType || "",
+                otherRequirementType: data.otherRequirementType || "",
+                startUpName: data.startUpName || "",
+                aboutEntity: data.aboutEntity || "",
+                websiteOfStartupLink: data.websiteOfStartupLink || "",
+                contact_methods: {
+                    call: {
+                        selected: !!data.call,
+                        value: data.call || "",
+                    },
+                    whatsapp: {
+                        selected: !!data.whatsapp,
+                        value: data.whatsapp || "",
+                    },
+                    instagram: {
+                        selected: !!data.instagram,
+                        value: data.instagram || "",
+                    },
+                    linkedin: {
+                        selected: !!data.linkedin || "",
+                        value: data.linkedin || "",
+                    },
+                    facebook: {
+                        selected: !!data.facebook,
+                        value: data.facebook || "",
+                    },
+                    other: {
+                        selected: !!data.other,
+                        value: data.email || "",
+                    },
+                },
+                headline: data.headline || "",
+                domainName: "", // To be set after fetching domains
+                roleUnderDomain: "", // To be set after fetching roles
+                skills: data.skills?.map((skill, idx) => ({
+                    _id: `temp-${idx}`,
+                    name: skill,
+                })) || [],
+                workBasis: {
+                    Partnership: data.workBasis?.includes("Partnership") || false,
+                    Collaboration: data.workBasis?.includes("Collaboration") || false,
+                    Internship: data.workBasis?.includes("Internship") || false,
+                    Job: data.workBasis?.includes("Job") || false,
+                    Freelance: data.workBasis?.includes("Freelance") || false,
+                    ProjectBasis: data.workBasis?.includes("ProjectBasis") || false,
+                    PercentageBasis: data.workBasis?.includes("PercentageBasis") || false,
+                    EquityBasis: data.workBasis?.includes("EquityBasis") || false,
+                    Other: data.workBasis?.includes("Other") || false,
+                },
+                partnershipCriteria: data.partnershipCriteria || "",
+                internshipType: data.internshipType || null,
+                internshipTimeType: data.internshipTimeType || null,
+                internshipDuration: parseDuration(data.internshipDuration),
+                internshipStipendRange: parseRange(data.internshipStipendRange),
+                internshipPerformanceCriteria: data.internshipPerformanceCriteria || "",
+                collaborationDescription: data.collaborationDescription || "",
+                jobTimeType: data.jobTimeType || null,
+                jobAmountRange: parseRange(data.jobAmountRange),
+                freelancePaymentRange: parseRange(data.freelancePaymentRange),
+                projectDescription: data.projectDescription || "",
+                percentageBasisValue: data.percentageBasisValue || "",
+                timeCommitment: parseDuration(data.timeCommitment),
+                equityBasisValue: data.equityBasisValue || "",
+                otherWorkBasis: data.otherWorkBasis || "",
+                workMode: {
+                    Remote: data.workMode?.includes("Remote") || false,
+                    Hybrid: data.workMode?.includes("Hybrid") || false,
+                    Onsite: data.workMode?.includes("Onsite") || false,
+                },
+                workLocation: {
+                    country: countryCode,
+                    state: stateCode,
+                    district: cityName,
+                },
+                experienceRange: parseRange(data.experienceRange),
+                aboutOpportunity: data.aboutOpportunity || "",
+                responsibilities: data.responsibilities || "",
+                whyShouldJoin: data.whyShouldJoin || "",
+                anyOtherInfo: data.anyOtherInfo || "",
+            };
+            console.log(formData.experienceRange)
+            setFormData(newFormData);
+
+            // Fetch domains to set domainName and roleUnderDomain
+            const domainResponse = await fetch(
+                "http://localhost:3333/api/domain/get-all-domains",
+                { method: "GET", credentials: "include" }
+            );
+            if (!domainResponse.ok) throw new Error("Failed to fetch domains");
+            const domainData = await domainResponse.json();
+            if (!domainData.success) throw new Error("Failed to fetch domains");
+            const sortedDomains = domainData.domains
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((domain) => ({
+                    value: domain._id,
+                    label: domain.name,
+                    roles: domain.roles,
+                }));
+            setDomains(sortedDomains);
+            setFilteredDomains(sortedDomains);
+
+            const domain = sortedDomains.find((d) => d.label === data.domainName);
+            if (domain) {
+                setDomainSearchText(domain.label);
                 setFormData((prev) => ({
                     ...prev,
-                    first_name: data.user.firstName || "",
-                    middle_name: data.user.middleName || "",
-                    last_name: data.user.lastName || "",
-                    gender: data.user.gender || "",
-                    email: data.user.email || "",
-                    country: data.user.country || "",
-                    state: data.user.state || "",
-                    district: data.user.city || "",
+                    domainName: domain.value,
                 }));
-            } catch (error) {
-                setProfileError("Failed to load profile data");
-                console.error("Error fetching profile:", error);
-            } finally {
-                setLoadingProfile(false);
+                const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
+                if (role) {
+                    setRoleSearchText(role.name);
+                    setFormData((prev) => ({
+                        ...prev,
+                        roleUnderDomain: role._id,
+                    }));
+                }
             }
-        };
-        fetchProfile();
-    }, []);
+
+            // Set roles
+            const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
+                if (Array.isArray(domain.roles)) {
+                    return [
+                        ...acc,
+                        ...domain.roles.map((role) => ({
+                            value: role._id,
+                            label: role.name,
+                            domainId: domain.value,
+                        })),
+                    ];
+                }
+                return acc;
+            }, []);
+            setAllRoles(rolesFromAllDomains);
+            setFilteredRoles(rolesFromAllDomains);
+        } catch (error) {
+            // setListingError("Failed to load listing data");
+            console.error("Error fetching listing:", error);
+        } finally {
+            // setLoadingListing(false);
+            setLoadingDomains(false);
+        }
+    };
+    fetchListing();
+}, [listingId]);
 
     // Fetch countries
     useEffect(() => {
@@ -516,11 +720,11 @@ function UpdateFounderPostForm({ onClose }) {
         setDomainSearchText(e.target.value);
         setShowDomainSuggestions(true);
     };
-
+    
     const handleDomainFocus = () => setShowDomainSuggestions(true);
     const handleDomainBlur = () =>
         setTimeout(() => setShowDomainSuggestions(false), 200);
-
+    
     const handleDomainSelect = (selectedDomain) => {
         if (selectedDomain === null) {
             setFormData((prev) => ({
@@ -680,20 +884,7 @@ function UpdateFounderPostForm({ onClose }) {
 
     const validateStep1 = () => {
         const newErrors = {};
-        if (!formData.first_name.trim())
-            newErrors.first_name = "First Name is required";
-        if (!formData.last_name.trim())
-            newErrors.last_name = "Last Name is required";
-        if (!formData.gender) newErrors.gender = "Gender is required";
-        if (!formData.email.trim()) newErrors.email = "Email is required";
-        if (
-            formData.email &&
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-        )
-            newErrors.email = "Invalid email format";
-        if (!formData.country) newErrors.country = "Country is required";
-        if (!formData.state) newErrors.state = "State is required";
-        if (!formData.district) newErrors.district = "District is required";
+         
         if (!formData.userType) newErrors.userType = "User type is required";
         if (formData.userType === "Other" && !formData.otherUserType.trim())
             newErrors.otherUserType = "Please specify user type";
@@ -768,8 +959,8 @@ function UpdateFounderPostForm({ onClose }) {
         if (!formData.domainName) newErrors.domainName = "Domain is required";
         if (!formData.roleUnderDomain)
             newErrors.roleUnderDomain = "Role is required";
-        if (formData.skills.length === 0)
-            newErrors.skills = "At least one skill is required";
+        // if (formData.skills.length === 0)
+        //     newErrors.skills = "At least one skill is required";
         if (!Object.values(formData.workBasis).some((selected) => selected))
             newErrors.workBasis = "At least one work basis is required";
 
@@ -1146,7 +1337,7 @@ const handleSubmit = async (e) => {
                     formData.jobAmountRange.max
                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
                         : "",
-                        timeCommitment:
+                       timeCommitment:
     formData.timeCommitment.value && formData.timeCommitment.unit
         ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
         : "",
@@ -1178,20 +1369,14 @@ const handleSubmit = async (e) => {
 
     const handleCancel = () => {
         setFormData({
-            first_name: formData.first_name,
-            middle_name: formData.middle_name,
-            last_name: formData.last_name,
-            gender: formData.gender,
+           
             userType: "",
             otherUserType: "",
             requirementType: "",
             otherRequirementType: "",
             startUpName: "",
             aboutEntity: "",
-            email: formData.email,
-            country: formData.country,
-            state: formData.state,
-            district: formData.district,
+            
             timeCommitment: { value: "", unit: "" },
             websiteOfStartupLink: "",
             contact_methods: {
@@ -1249,15 +1434,11 @@ const handleSubmit = async (e) => {
         onClose();
     };
 
-    if (loadingProfile) {
-        return <div>Loading profile data...</div>;
-    }
-
     if (profileError) {
         return <div className="text-red-500">{profileError}</div>;
     }
 
-    return (
+     return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
             <div className="h-20 flex items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-[50%] mx-auto text-xl">
                 <div className="flex flex-col">
@@ -1385,183 +1566,7 @@ const handleSubmit = async (e) => {
                         Let's introduce you to the world.
                     </h3>
                     {/* First Name */}
-                    <div className="relative">
-                        <label
-                            htmlFor="first_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="first_name"
-                            name="first_name"
-                            value={formData.first_name}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.first_name && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.first_name}
-                            </p>
-                        )}
-                    </div>
-                    {/* Mid Name */}
-                    <div className="relative">
-                        <label
-                            htmlFor="middle_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Middle Name
-                        </label>
-                        <input
-                            id="middle_name"
-                            name="middle_name"
-                            value={formData.middle_name}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                    </div>
-                    {/* Last name */}
-                    <div className="relative">
-                        <label
-                            htmlFor="last_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="last_name"
-                            name="last_name"
-                            value={formData.last_name}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.last_name && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.last_name}
-                            </p>
-                        )}
-                    </div>
-                    {/* Country */}
-                    <div className="relative">
-                        <label
-                            htmlFor="country"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Country <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="country"
-                            name="country"
-                            value={formData.country}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.country && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.country}
-                            </p>
-                        )}
-                    </div>
-                    {/* State */}
-                    <div className="relative">
-                        <label
-                            htmlFor="state"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            State <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="state"
-                            name="state"
-                            value={formData.state}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.state && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.state}
-                            </p>
-                        )}
-                    </div>
-                    {/* City */}
-                    <div className="relative">
-                        <label
-                            htmlFor="district"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            City <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="district"
-                            name="district"
-                            value={formData.district}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.district && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.district}
-                            </p>
-                        )}
-                    </div>
-                    {/* Gender */}
-                    <div className="relative">
-                        <label
-                            htmlFor="gender"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Gender <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="gender"
-                            name="gender"
-                            value={formData.gender}
-                            disabled
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Prefer not to specify">
-                                Prefer not to specify
-                            </option>
-                        </select>
-                        {errors.gender && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.gender}
-                            </p>
-                        )}
-                    </div>
-                    {/* Email */}
-                    <div className="relative">
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            disabled
-                            type="text"
-                            className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                        {errors.email && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.email}
-                            </p>
-                        )}
-                    </div>
-
+                    
                     {/* Personal Website */}
                     <div className="relative">
                         <label
@@ -2100,72 +2105,7 @@ const handleSubmit = async (e) => {
                             </p>
                         )}
                     </div>
-                    {formData.domainName && (
-                        <div className="relative col-span-2">
-                            <label
-                                htmlFor="skills"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Skills <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                id="skills"
-                                name="skillsInput"
-                                value={skillSearchText}
-                                onChange={handleSkillInput}
-                                placeholder="Type to search skills"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400"
-                            />
-                            {showSkillSuggestions &&
-                                filteredSkills.length > 0 && (
-                                    <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
-                                        {filteredSkills
-                                            .filter(
-                                                (skill) =>
-                                                    !formData.skills.some(
-                                                        (s) =>
-                                                            s._id === skill._id
-                                                    )
-                                            )
-                                            .map((skill) => (
-                                                <li
-                                                    key={skill._id}
-                                                    onClick={() =>
-                                                        handleSkillSelect(skill)
-                                                    }
-                                                    className="px-4 py-2 hover:bg-purple-100 cursor-pointer transition-all duration-200"
-                                                >
-                                                    {skill.name}
-                                                </li>
-                                            ))}
-                                    </ul>
-                                )}
-                            <div className="mt-2 flex flex-wrap gap-2">
-                                {formData.skills.map((skill) => (
-                                    <span
-                                        key={skill._id}
-                                        className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
-                                    >
-                                        {skill.name}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleSkillRemove(skill._id)
-                                            }
-                                            className="ml-2 text-purple-600 hover:text-purple-800"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                            {errors.skills && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.skills}
-                                </p>
-                            )}
-                        </div>
-                    )}
+                
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -3117,22 +3057,22 @@ const handleSubmit = async (e) => {
         >
             Unit
         </label>
-        <select
-            id="timeCommitmentUnit"
-            name="timeCommitment.unit"
-            value={formData.timeCommitment.unit}
-            onChange={(e) =>
-                handleNestedChange("timeCommitment", "unit", e.target.value)
-            }
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
-            }`}
-        >
-            <option value="">Select Unit</option>
-            <option value="hours/day">Hours/Day</option>
-            <option value="hours/week">Hours/Week</option>
-            <option value="hours/month">Hours/Month</option>
-        </select>
+       <select
+    id="timeCommitmentUnit"
+    name="timeCommitment.unit"
+    value={formData.timeCommitment.unit}
+    onChange={(e) =>
+        handleNestedChange("timeCommitment", "unit", e.target.value)
+    }
+    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+        errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+    }`}
+>
+    <option value="">Select Unit</option>
+    <option value="hours/day">Hours/Day</option>
+    <option value="hours/week">Hours/Week</option>
+    <option value="hours/month">Hours/Month</option>
+</select>
         {errors.timeCommitment?.unit && (
             <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
         )}
