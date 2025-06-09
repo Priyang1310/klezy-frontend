@@ -346,7 +346,7 @@ useEffect(() => {
             if (!response.ok) throw new Error("Failed to fetch listing data");
             const { postData } = await response.json();
             const data = postData;
-            console.log(data);
+            console.log("Backend data:", data);
 
             // Map work location codes
             let countryCode = "";
@@ -376,7 +376,7 @@ useEffect(() => {
             // Helper to parse range strings
             const parseRange = (str) => {
                 if (!str) return { min: "", max: "" };
-                const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|years)?$/);
+                const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|ruppes|years)?$/);
                 return match ? { min: match[1], max: match[2] } : { min: "", max: "" };
             };
 
@@ -437,13 +437,16 @@ useEffect(() => {
                     roleId = role._id;
                     roleLabel = role.name;
                 }
-                // Set filtered roles for the selected domain
                 setFilteredRoles(
                     rolesFromAllDomains.filter((r) => r.domainId === domain.value)
                 );
             } else {
                 setFilteredRoles(rolesFromAllDomains);
             }
+
+            // Parse experienceRange and log to verify
+            const parsedExperienceRange = parseRange(data.experienceRange);
+            console.log("Parsed experienceRange:", parsedExperienceRange);
 
             // Map pre-filled data to formData
             const newFormData = {
@@ -487,7 +490,7 @@ useEffect(() => {
                 internshipStipendRange: parseRange(data.internshipStipendRange),
                 internshipPerformanceCriteria: data.internshipPerformanceCriteria || "",
                 collaborationDescription: data.collaborationDescription || "",
-                jobTimeType: data.jobTimeType || null,
+                jobTimeType: data.jobTimeType || "",
                 jobAmountRange: parseRange(data.jobAmountRange),
                 freelancePaymentRange: parseRange(data.freelancePaymentRange),
                 projectDescription: data.projectDescription || "",
@@ -505,12 +508,13 @@ useEffect(() => {
                     state: stateCode,
                     district: cityName,
                 },
-                experienceRange: parseRange(data.experienceRange),
+                experienceRange: parsedExperienceRange, // Ensure parsed values are set
                 aboutOpportunity: data.aboutOpportunity || "",
                 responsibilities: data.responsibilities || "",
                 whyShouldJoin: data.whyShouldJoin || "",
                 anyOtherInfo: data.anyOtherInfo || "",
             };
+            console.log("newFormData.experienceRange:", newFormData.experienceRange);
             setFormData(newFormData);
 
             // Set search texts
@@ -1677,9 +1681,9 @@ const handleSubmit = async (e) => {
             delete submitData.contact_methods;
 
             const response = await fetch(
-                `http://localhost:3333/api/founder/update-listing/${listingId}`,
+                `http://localhost:3333/api/founder/update-post/${listingId}`,
                 {
-                    method: "PUT",
+                    method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(submitData),
                     credentials: "include",
