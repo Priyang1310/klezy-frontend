@@ -123,10 +123,219 @@ function UpdateFounderPostForm({ listingId,onClose }) {
     //     };
     //     fetchProfile();
     // }, []);
-   useEffect(() => {
+//    useEffect(() => {
+//     const fetchListing = async () => {
+//         try {
+//             // setLoadingListing(true);
+//             const response = await fetch(
+//                 `http://localhost:3333/api/founder/get-pre-filled-details-for-update-form/${listingId}`,
+//                 {
+//                     method: "GET",
+//                     credentials: "include",
+//                 }
+//             );
+//             if (!response.ok) throw new Error("Failed to fetch listing data");
+//             const  {postData}  = await response.json();
+//             const data = postData
+//             console.log(data)
+//             // Map work location codes
+//             let countryCode = "";
+//             let stateCode = "";
+//             let cityName = "";
+
+//             if (data.workMode.includes("Hybrid") || data.workMode.includes("Onsite")) {
+//                 const countryObj = Country.getAllCountries().find(
+//                     (c) => c.name === data.workCountry
+//                 );
+//                 countryCode = countryObj?.isoCode || "";
+//                 if (countryCode) {
+//                     const stateObj = State.getStatesOfCountry(countryCode).find(
+//                         (s) => s.name === data.workState
+//                     );
+//                     stateCode = stateObj?.isoCode || "";
+//                     if (stateCode) {
+//                         const cityObj = City.getCitiesOfState(countryCode, stateCode).find(
+//                             (c) => c.name === data.workCity
+//                         );
+//                         cityName = cityObj?.name || data.workCity;
+//                     }
+//                 }
+//                 setStates(State.getStatesOfCountry(countryCode));
+//                 setDistricts(City.getCitiesOfState(countryCode, stateCode));
+//             }
+
+//             // Helper to parse range strings (e.g., "1000-2000 rupees" or "1-5 years")
+//             const parseRange = (str) => {
+//     if (!str) return { min: "", max: "" };
+//     const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|years)?$/);
+//     return match ? { min: match[1], max: match[2] } : { min: "", max: "" };
+// };
+
+//             // Helper to parse duration (e.g., "2 Months")
+//             const parseDuration = (str) => {
+//     if (!str) return { value: "", unit: "" };
+//     // Handle formats like "2 hours/month" or "2 Months"
+//     const hoursMatch = str.match(/^(\d+)\s*hours\/(\w+)$/);
+//     const standardMatch = str.match(/^(\d+)\s*(Weeks|Months|Years)$/);
+//     if (hoursMatch) {
+//         return { value: hoursMatch[1], unit: `hours/${hoursMatch[2]}` };
+//     } else if (standardMatch) {
+//         return { value: standardMatch[1], unit: standardMatch[2] };
+//     }
+//     return { value: "", unit: "" };
+// };
+
+//             // Map pre-filled data to formData
+//             const newFormData = {
+//                 userType: data.userType || "",
+//                 otherUserType: data.otherUserType || "",
+//                 requirementType: data.requirementType || "",
+//                 otherRequirementType: data.otherRequirementType || "",
+//                 startUpName: data.startUpName || "",
+//                 aboutEntity: data.aboutEntity || "",
+//                 websiteOfStartupLink: data.websiteOfStartupLink || "",
+//                 contact_methods: {
+//                     call: {
+//                         selected: !!data.call,
+//                         value: data.call || "",
+//                     },
+//                     whatsapp: {
+//                         selected: !!data.whatsapp,
+//                         value: data.whatsapp || "",
+//                     },
+//                     instagram: {
+//                         selected: !!data.instagram,
+//                         value: data.instagram || "",
+//                     },
+//                     linkedin: {
+//                         selected: !!data.linkedin || "",
+//                         value: data.linkedin || "",
+//                     },
+//                     facebook: {
+//                         selected: !!data.facebook,
+//                         value: data.facebook || "",
+//                     },
+//                     other: {
+//                         selected: !!data.other,
+//                         value: data.email || "",
+//                     },
+//                 },
+//                 headline: data.headline || "",
+//                 domainName: "", // To be set after fetching domains
+//                 roleUnderDomain: "", // To be set after fetching roles
+//                 skills: data.skills?.map((skill, idx) => ({
+//                     _id: `temp-${idx}`,
+//                     name: skill,
+//                 })) || [],
+//                 workBasis: {
+//                     Partnership: data.workBasis?.includes("Partnership") || false,
+//                     Collaboration: data.workBasis?.includes("Collaboration") || false,
+//                     Internship: data.workBasis?.includes("Internship") || false,
+//                     Job: data.workBasis?.includes("Job") || false,
+//                     Freelance: data.workBasis?.includes("Freelance") || false,
+//                     ProjectBasis: data.workBasis?.includes("ProjectBasis") || false,
+//                     PercentageBasis: data.workBasis?.includes("PercentageBasis") || false,
+//                     EquityBasis: data.workBasis?.includes("EquityBasis") || false,
+//                     Other: data.workBasis?.includes("Other") || false,
+//                 },
+//                 partnershipCriteria: data.partnershipCriteria || "",
+//                 internshipType: data.internshipType || null,
+//                 internshipTimeType: data.internshipTimeType || null,
+//                 internshipDuration: parseDuration(data.internshipDuration),
+//                 internshipStipendRange: parseRange(data.internshipStipendRange),
+//                 internshipPerformanceCriteria: data.internshipPerformanceCriteria || "",
+//                 collaborationDescription: data.collaborationDescription || "",
+//                 jobTimeType: data.jobTimeType || null,
+//                 jobAmountRange: parseRange(data.jobAmountRange),
+//                 freelancePaymentRange: parseRange(data.freelancePaymentRange),
+//                 projectDescription: data.projectDescription || "",
+//                 percentageBasisValue: data.percentageBasisValue || "",
+//                 timeCommitment: parseDuration(data.timeCommitment),
+//                 equityBasisValue: data.equityBasisValue || "",
+//                 otherWorkBasis: data.otherWorkBasis || "",
+//                 workMode: {
+//                     Remote: data.workMode?.includes("Remote") || false,
+//                     Hybrid: data.workMode?.includes("Hybrid") || false,
+//                     Onsite: data.workMode?.includes("Onsite") || false,
+//                 },
+//                 workLocation: {
+//                     country: countryCode,
+//                     state: stateCode,
+//                     district: cityName,
+//                 },
+//                 experienceRange: parseRange(data.experienceRange),
+//                 aboutOpportunity: data.aboutOpportunity || "",
+//                 responsibilities: data.responsibilities || "",
+//                 whyShouldJoin: data.whyShouldJoin || "",
+//                 anyOtherInfo: data.anyOtherInfo || "",
+//             };
+//             console.log(formData.experienceRange)
+//             setFormData(newFormData);
+
+//             // Fetch domains to set domainName and roleUnderDomain
+//             const domainResponse = await fetch(
+//                 "http://localhost:3333/api/domain/get-all-domains",
+//                 { method: "GET", credentials: "include" }
+//             );
+//             if (!domainResponse.ok) throw new Error("Failed to fetch domains");
+//             const domainData = await domainResponse.json();
+//             if (!domainData.success) throw new Error("Failed to fetch domains");
+//             const sortedDomains = domainData.domains
+//                 .sort((a, b) => a.name.localeCompare(b.name))
+//                 .map((domain) => ({
+//                     value: domain._id,
+//                     label: domain.name,
+//                     roles: domain.roles,
+//                 }));
+//             setDomains(sortedDomains);
+//             setFilteredDomains(sortedDomains);
+
+//             const domain = sortedDomains.find((d) => d.label === data.domainName);
+//             if (domain) {
+//                 setDomainSearchText(domain.label);
+//                 setFormData((prev) => ({
+//                     ...prev,
+//                     domainName: domain.value,
+//                 }));
+//                 const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
+//                 if (role) {
+//                     setRoleSearchText(role.name);
+//                     setFormData((prev) => ({
+//                         ...prev,
+//                         roleUnderDomain: role._id,
+//                     }));
+//                 }
+//             }
+
+//             // Set roles
+//             const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
+//                 if (Array.isArray(domain.roles)) {
+//                     return [
+//                         ...acc,
+//                         ...domain.roles.map((role) => ({
+//                             value: role._id,
+//                             label: role.name,
+//                             domainId: domain.value,
+//                         })),
+//                     ];
+//                 }
+//                 return acc;
+//             }, []);
+//             setAllRoles(rolesFromAllDomains);
+//             setFilteredRoles(rolesFromAllDomains);
+//         } catch (error) {
+//             // setListingError("Failed to load listing data");
+//             console.error("Error fetching listing:", error);
+//         } finally {
+//             // setLoadingListing(false);
+//             setLoadingDomains(false);
+//         }
+//     };
+//     fetchListing();
+// }, [listingId]);
+useEffect(() => {
     const fetchListing = async () => {
         try {
-            // setLoadingListing(true);
             const response = await fetch(
                 `http://localhost:3333/api/founder/get-pre-filled-details-for-update-form/${listingId}`,
                 {
@@ -135,14 +344,14 @@ function UpdateFounderPostForm({ listingId,onClose }) {
                 }
             );
             if (!response.ok) throw new Error("Failed to fetch listing data");
-            const  {postData}  = await response.json();
-            const data = postData
-            console.log(data)
+            const { postData } = await response.json();
+            const data = postData;
+            console.log("Backend data:", data);
+
             // Map work location codes
             let countryCode = "";
             let stateCode = "";
             let cityName = "";
-
             if (data.workMode.includes("Hybrid") || data.workMode.includes("Onsite")) {
                 const countryObj = Country.getAllCountries().find(
                     (c) => c.name === data.workCountry
@@ -164,26 +373,80 @@ function UpdateFounderPostForm({ listingId,onClose }) {
                 setDistricts(City.getCitiesOfState(countryCode, stateCode));
             }
 
-            // Helper to parse range strings (e.g., "1000-2000 rupees" or "1-5 years")
+            // Helper to parse range strings
             const parseRange = (str) => {
-    if (!str) return { min: "", max: "" };
-    const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|years)?$/);
-    return match ? { min: match[1], max: match[2] } : { min: "", max: "" };
-};
+                if (!str) return { min: "", max: "" };
+                const match = str.match(/^(\d+)-(\d+)\s*(?:rupees|ruppes|years)?$/);
+                return match ? { min: match[1], max: match[2] } : { min: "", max: "" };
+            };
 
-            // Helper to parse duration (e.g., "2 Months")
+            // Helper to parse duration
             const parseDuration = (str) => {
-    if (!str) return { value: "", unit: "" };
-    // Handle formats like "2 hours/month" or "2 Months"
-    const hoursMatch = str.match(/^(\d+)\s*hours\/(\w+)$/);
-    const standardMatch = str.match(/^(\d+)\s*(Weeks|Months|Years)$/);
-    if (hoursMatch) {
-        return { value: hoursMatch[1], unit: `hours/${hoursMatch[2]}` };
-    } else if (standardMatch) {
-        return { value: standardMatch[1], unit: standardMatch[2] };
-    }
-    return { value: "", unit: "" };
-};
+                if (!str) return { value: "", unit: "" };
+                const hoursMatch = str.match(/^(\d+)\s*hours\/(\w+)$/);
+                const standardMatch = str.match(/^(\d+)\s*(Weeks|Months|Years)$/);
+                if (hoursMatch) {
+                    return { value: hoursMatch[1], unit: `hours/${hoursMatch[2]}` };
+                } else if (standardMatch) {
+                    return { value: standardMatch[1], unit: standardMatch[2] };
+                }
+                return { value: "", unit: "" };
+            };
+
+            // Fetch domains to set domainName and roleUnderDomain
+            const domainResponse = await fetch(
+                "http://localhost:3333/api/domain/get-all-domains",
+                { method: "GET", credentials: "include" }
+            );
+            if (!domainResponse.ok) throw new Error("Failed to fetch domains");
+            const domainData = await domainResponse.json();
+            if (!domainData.success) throw new Error("Failed to fetch domains");
+            const sortedDomains = domainData.domains
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((domain) => ({
+                    value: domain._id,
+                    label: domain.name,
+                    roles: domain.roles,
+                }));
+            setDomains(sortedDomains);
+            setFilteredDomains(sortedDomains);
+
+            // Set roles
+            const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
+                if (Array.isArray(domain.roles)) {
+                    return [
+                        ...acc,
+                        ...domain.roles.map((role) => ({
+                            value: role._id,
+                            label: role.name,
+                            domainId: domain.value,
+                        })),
+                    ];
+                }
+                return acc;
+            }, []);
+            setAllRoles(rolesFromAllDomains);
+
+            // Find the domain and role
+            const domain = sortedDomains.find((d) => d.label === data.domainName);
+            let roleId = "";
+            let roleLabel = "";
+            if (domain) {
+                const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
+                if (role) {
+                    roleId = role._id;
+                    roleLabel = role.name;
+                }
+                setFilteredRoles(
+                    rolesFromAllDomains.filter((r) => r.domainId === domain.value)
+                );
+            } else {
+                setFilteredRoles(rolesFromAllDomains);
+            }
+
+            // Parse experienceRange and log to verify
+            const parsedExperienceRange = parseRange(data.experienceRange);
+            console.log("Parsed experienceRange:", parsedExperienceRange);
 
             // Map pre-filled data to formData
             const newFormData = {
@@ -195,34 +458,16 @@ function UpdateFounderPostForm({ listingId,onClose }) {
                 aboutEntity: data.aboutEntity || "",
                 websiteOfStartupLink: data.websiteOfStartupLink || "",
                 contact_methods: {
-                    call: {
-                        selected: !!data.call,
-                        value: data.call || "",
-                    },
-                    whatsapp: {
-                        selected: !!data.whatsapp,
-                        value: data.whatsapp || "",
-                    },
-                    instagram: {
-                        selected: !!data.instagram,
-                        value: data.instagram || "",
-                    },
-                    linkedin: {
-                        selected: !!data.linkedin || "",
-                        value: data.linkedin || "",
-                    },
-                    facebook: {
-                        selected: !!data.facebook,
-                        value: data.facebook || "",
-                    },
-                    other: {
-                        selected: !!data.other,
-                        value: data.email || "",
-                    },
+                    call: { selected: !!data.call, value: data.call || "" },
+                    whatsapp: { selected: !!data.whatsapp, value: data.whatsapp || "" },
+                    instagram: { selected: !!data.instagram, value: data.instagram || "" },
+                    linkedin: { selected: !!data.linkedin, value: data.linkedin || "" },
+                    facebook: { selected: !!data.facebook, value: data.facebook || "" },
+                    other: { selected: !!data.other, value: data.email || "" },
                 },
                 headline: data.headline || "",
-                domainName: "", // To be set after fetching domains
-                roleUnderDomain: "", // To be set after fetching roles
+                domainName: domain ? domain.value : "",
+                roleUnderDomain: roleId,
                 skills: data.skills?.map((skill, idx) => ({
                     _id: `temp-${idx}`,
                     name: skill,
@@ -245,7 +490,7 @@ function UpdateFounderPostForm({ listingId,onClose }) {
                 internshipStipendRange: parseRange(data.internshipStipendRange),
                 internshipPerformanceCriteria: data.internshipPerformanceCriteria || "",
                 collaborationDescription: data.collaborationDescription || "",
-                jobTimeType: data.jobTimeType || null,
+                jobTimeType: data.jobTimeType || "",
                 jobAmountRange: parseRange(data.jobAmountRange),
                 freelancePaymentRange: parseRange(data.freelancePaymentRange),
                 projectDescription: data.projectDescription || "",
@@ -263,77 +508,26 @@ function UpdateFounderPostForm({ listingId,onClose }) {
                     state: stateCode,
                     district: cityName,
                 },
-                experienceRange: parseRange(data.experienceRange),
+                experienceRange: parsedExperienceRange, // Ensure parsed values are set
                 aboutOpportunity: data.aboutOpportunity || "",
                 responsibilities: data.responsibilities || "",
                 whyShouldJoin: data.whyShouldJoin || "",
                 anyOtherInfo: data.anyOtherInfo || "",
             };
-            console.log(formData.experienceRange)
+            console.log("newFormData.experienceRange:", newFormData.experienceRange);
             setFormData(newFormData);
 
-            // Fetch domains to set domainName and roleUnderDomain
-            const domainResponse = await fetch(
-                "http://localhost:3333/api/domain/get-all-domains",
-                { method: "GET", credentials: "include" }
-            );
-            if (!domainResponse.ok) throw new Error("Failed to fetch domains");
-            const domainData = await domainResponse.json();
-            if (!domainData.success) throw new Error("Failed to fetch domains");
-            const sortedDomains = domainData.domains
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((domain) => ({
-                    value: domain._id,
-                    label: domain.name,
-                    roles: domain.roles,
-                }));
-            setDomains(sortedDomains);
-            setFilteredDomains(sortedDomains);
-
-            const domain = sortedDomains.find((d) => d.label === data.domainName);
-            if (domain) {
-                setDomainSearchText(domain.label);
-                setFormData((prev) => ({
-                    ...prev,
-                    domainName: domain.value,
-                }));
-                const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
-                if (role) {
-                    setRoleSearchText(role.name);
-                    setFormData((prev) => ({
-                        ...prev,
-                        roleUnderDomain: role._id,
-                    }));
-                }
-            }
-
-            // Set roles
-            const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
-                if (Array.isArray(domain.roles)) {
-                    return [
-                        ...acc,
-                        ...domain.roles.map((role) => ({
-                            value: role._id,
-                            label: role.name,
-                            domainId: domain.value,
-                        })),
-                    ];
-                }
-                return acc;
-            }, []);
-            setAllRoles(rolesFromAllDomains);
-            setFilteredRoles(rolesFromAllDomains);
+            // Set search texts
+            setDomainSearchText(domain ? domain.label : "");
+            setRoleSearchText(roleLabel);
         } catch (error) {
-            // setListingError("Failed to load listing data");
             console.error("Error fetching listing:", error);
         } finally {
-            // setLoadingListing(false);
             setLoadingDomains(false);
         }
     };
     fetchListing();
 }, [listingId]);
-
     // Fetch countries
     useEffect(() => {
         setCountries(Country.getAllCountries());
@@ -429,47 +623,83 @@ function UpdateFounderPostForm({ listingId,onClose }) {
         fetchDomains();
     }, []);
 
-    // Fetch skills when domainName changes
-    useEffect(() => {
-        setFormData((prev) => ({
-            ...prev,
-            // roleUnderDomain: "",
-            skills: [],
-        }));
-        setRoleSearchText("");
-        setSkills([]);
-        setFilteredSkills([]);
-        setSkillSearchText("");
-        setShowSkillSuggestions(false);
+    // // Fetch skills when domainName changes
+    // useEffect(() => {
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         // roleUnderDomain: "",
+    //         skills: [],
+    //     }));
+    //     setRoleSearchText("");
+    //     setSkills([]);
+    //     setFilteredSkills([]);
+    //     setSkillSearchText("");
+    //     setShowSkillSuggestions(false);
 
-        const fetchSkills = async () => {
-            if (formData.domainName) {
-                try {
-                    const skillsResponse = await fetch(
-                        `http://localhost:3333/api/skills/${formData.domainName}`
-                    );
-                    if (!skillsResponse.ok)
-                        throw new Error("Failed to fetch skills");
-                    const skillsData = await skillsResponse.json();
-                    setSkills(
-                        Array.isArray(skillsData.skills)
-                            ? skillsData.skills
-                            : []
-                    );
-                    setFilteredSkills(
-                        Array.isArray(skillsData.skills)
-                            ? skillsData.skills
-                            : []
-                    );
-                } catch (error) {
-                    console.error("Error fetching skills:", error);
-                    setSkills([]);
-                    setFilteredSkills([]);
-                }
+    //     const fetchSkills = async () => {
+    //         if (formData.domainName) {
+    //             try {
+    //                 const skillsResponse = await fetch(
+    //                     `http://localhost:3333/api/skills/${formData.domainName}`
+    //                 );
+    //                 if (!skillsResponse.ok)
+    //                     throw new Error("Failed to fetch skills");
+    //                 const skillsData = await skillsResponse.json();
+    //                 setSkills(
+    //                     Array.isArray(skillsData.skills)
+    //                         ? skillsData.skills
+    //                         : []
+    //                 );
+    //                 setFilteredSkills(
+    //                     Array.isArray(skillsData.skills)
+    //                         ? skillsData.skills
+    //                         : []
+    //                 );
+    //             } catch (error) {
+    //                 console.error("Error fetching skills:", error);
+    //                 setSkills([]);
+    //                 setFilteredSkills([]);
+    //             }
+    //         }
+    //     };
+    //     fetchSkills();
+    // }, [formData.domainName]);
+    useEffect(() => {
+    setFormData((prev) => ({
+        ...prev,
+        skills: [],
+    }));
+    setSkillSearchText("");
+    setSkills([]);
+    setFilteredSkills([]);
+    setShowSkillSuggestions(false);
+
+    const fetchSkills = async () => {
+        if (formData.domainName) {
+            try {
+                const skillsResponse = await fetch(
+                    `http://localhost:3333/api/skills/${formData.domainName}`,
+                    { method: "GET", credentials: "include" }
+                );
+                if (!skillsResponse.ok) throw new Error("Failed to fetch skills");
+                const skillsData = await skillsResponse.json();
+                const formattedSkills = Array.isArray(skillsData.skills)
+                    ? skillsData.skills.map((skill, idx) => ({
+                          _id: skill._id || `skill-${idx}`,
+                          name: skill.name,
+                      }))
+                    : [];
+                setSkills(formattedSkills);
+                setFilteredSkills(formattedSkills);
+            } catch (error) {
+                console.error("Error fetching skills:", error);
+                setSkills([]);
+                setFilteredSkills([]);
             }
-        };
-        fetchSkills();
-    }, [formData.domainName]);
+        }
+    };
+    fetchSkills();
+}, [formData.domainName]);
 
     // Filter domains, roles, and skills
     useEffect(() => {
@@ -1261,6 +1491,111 @@ if (formData.timeCommitment.value || formData.timeCommitment.unit) {
 
     const handleBack = () => setStep(step - 1);
 
+// const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     if (validateStep3()) {
+//         try {
+//             const domain = domains.find((d) => d.value === formData.domainName);
+//             const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
+
+//             // Map country ISO code to full name
+//             const countryObj = countries.find((c) => c.isoCode === formData.workLocation.country);
+//             const countryName = countryObj ? countryObj.name : formData.workLocation.country;
+
+//             // Map state ISO code to full name
+//             const stateObj = states.find((s) => s.isoCode === formData.workLocation.state);
+//             const stateName = stateObj ? stateObj.name : formData.workLocation.state;
+
+//             const submitData = {
+//                 ...formData,
+//                 domainName: domain ? domain.label : formData.domainName,
+//                 roleUnderDomain: role ? role.label : formData.roleUnderDomain,
+//                 skills: formData.skills.map((skill) => skill.name),
+//                 workBasis: Object.keys(formData.workBasis).filter(
+//                     (key) => formData.workBasis[key]
+//                 ),
+//                 workMode: Object.keys(formData.workMode).filter((key) => formData.workMode[key]),
+//                 call: formData.contact_methods.call.selected
+//                     ? formData.contact_methods.call.value
+//                     : "",
+//                 whatsapp: formData.contact_methods.whatsapp.selected
+//                     ? formData.contact_methods.whatsapp.value
+//                     : "",
+//                 instagram: formData.contact_methods.instagram.selected
+//                     ? formData.contact_methods.instagram.value
+//                     : "",
+//                 linkedin: formData.contact_methods.linkedin.selected
+//                     ? formData.contact_methods.linkedin.value
+//                     : "",
+//                 facebook: formData.contact_methods.facebook.selected
+//                     ? formData.contact_methods.facebook.value
+//                     : "",
+//                 otherContact: formData.contact_methods.other.selected
+//                     ? formData.contact_methods.other.value
+//                     : "",
+//                 workCountry: countryName, // Use full country name
+//                 workState: stateName, // Use full state name
+//                 workCity: formData.workLocation.district,
+//                 internshipTimeType: formData.internshipTimeType || "",
+//                 jobTimeType: formData.jobTimeType || "",
+//                 internshipDuration:
+//                     formData.workBasis.Internship &&
+//                     formData.internshipDuration.value &&
+//                     formData.internshipDuration.unit
+//                         ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
+//                         : "",
+//                 freelancePaymentRange:
+//                     formData.workBasis.Freelance &&
+//                     formData.freelancePaymentRange.min &&
+//                     formData.freelancePaymentRange.max
+//                         ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
+//                         : "",
+//                 internshipStipendRange:
+//                     formData.internshipType === "Paid" &&
+//                     formData.internshipStipendRange.min &&
+//                     formData.internshipStipendRange.max
+//                         ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
+//                         : "",
+//                 experienceRange:
+//                     formData.experienceRange.min &&
+//                     formData.experienceRange.max
+//                         ? `${formData.experienceRange.min}-${formData.experienceRange.max} years`
+//                         : "",
+//                 jobAmountRange:
+//                     formData.workBasis.Job &&
+//                     formData.jobAmountRange.min &&
+//                     formData.jobAmountRange.max
+//                         ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
+//                         : "",
+//                        timeCommitment:
+//     formData.timeCommitment.value && formData.timeCommitment.unit
+//         ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+//         : "",
+//             };
+//             console.log(submitData)
+//             delete submitData.contact_methods;
+//             const response = await fetch(
+//                 "http://localhost:3333/api/founder/add-listing/",
+//                 {
+//                     method: "POST",
+//                     headers: { "Content-Type": "application/json" },
+//                     body: JSON.stringify(submitData),
+//                     credentials: "include",
+//                 }
+//             );
+//             if (response.ok) {
+//                 console.log("Form submitted:", submitData);
+//                 onClose();
+//             } else {
+//                 setErrors({
+//                     submit: "Failed to submit the form. Please try again.",
+//                 });
+//             }
+//         } catch (err) {
+//             setErrors({ submit: "An error occurred. Please try again." });
+//         }
+//     }
+// };
 const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateStep3()) {
@@ -1278,8 +1613,8 @@ const handleSubmit = async (e) => {
 
             const submitData = {
                 ...formData,
-                domainName: domain ? domain.label : formData.domainName,
-                roleUnderDomain: role ? role.label : formData.roleUnderDomain,
+                domainName: domain ? domain.label : "",
+                roleUnderDomain: role ? role.label : "",
                 skills: formData.skills.map((skill) => skill.name),
                 workBasis: Object.keys(formData.workBasis).filter(
                     (key) => formData.workBasis[key]
@@ -1300,11 +1635,11 @@ const handleSubmit = async (e) => {
                 facebook: formData.contact_methods.facebook.selected
                     ? formData.contact_methods.facebook.value
                     : "",
-                otherContact: formData.contact_methods.other.selected
+                other: formData.contact_methods.other.selected
                     ? formData.contact_methods.other.value
                     : "",
-                workCountry: countryName, // Use full country name
-                workState: stateName, // Use full state name
+                workCountry: countryName,
+                workState: stateName,
                 workCity: formData.workLocation.district,
                 internshipTimeType: formData.internshipTimeType || "",
                 jobTimeType: formData.jobTimeType || "",
@@ -1335,19 +1670,20 @@ const handleSubmit = async (e) => {
                     formData.workBasis.Job &&
                     formData.jobAmountRange.min &&
                     formData.jobAmountRange.max
-                        ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
+                        ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} rupees` // Fixed typo: 'ruppes' to 'rupees'
                         : "",
-                       timeCommitment:
-    formData.timeCommitment.value && formData.timeCommitment.unit
-        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
-        : "",
+                timeCommitment:
+                    formData.timeCommitment.value && formData.timeCommitment.unit
+                        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+                        : "",
             };
-            console.log(submitData)
+            console.log("Submitting data:", submitData);
             delete submitData.contact_methods;
+
             const response = await fetch(
-                "http://localhost:3333/api/founder/add-listing/",
+                `http://localhost:3333/api/founder/update-post/${listingId}`,
                 {
-                    method: "POST",
+                    method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(submitData),
                     credentials: "include",
@@ -1357,8 +1693,9 @@ const handleSubmit = async (e) => {
                 console.log("Form submitted:", submitData);
                 onClose();
             } else {
+                const errorData = await response.json();
                 setErrors({
-                    submit: "Failed to submit the form. Please try again.",
+                    submit: errorData.message || "Failed to submit the form. Please try again.",
                 });
             }
         } catch (err) {
@@ -1366,7 +1703,6 @@ const handleSubmit = async (e) => {
         }
     }
 };
-
     const handleCancel = () => {
         setFormData({
            
@@ -2105,6 +2441,47 @@ const handleSubmit = async (e) => {
                             </p>
                         )}
                     </div>
+                    <div className="relative col-span-2">
+    <label
+        htmlFor="skills"
+        className="block text-sm font-medium text-gray-700 mb-1"
+    >
+        Skills
+    </label>
+    <Select
+        isMulti
+        closeMenuOnSelect={false}
+        components={animatedComponents}
+        options={filteredSkills.map((skill) => ({
+            value: skill._id,
+            label: skill.name,
+        }))}
+        value={formData.skills.map((skill) => ({
+            value: skill._id,
+            label: skill.name,
+        }))}
+        onChange={(selectedOptions) => {
+            const selectedSkills = selectedOptions
+                ? selectedOptions.map((option) => ({
+                      _id: option.value,
+                      name: option.label,
+                  }))
+                : [];
+            setFormData((prev) => ({
+                ...prev,
+                skills: selectedSkills,
+            }));
+            setErrors((prev) => ({ ...prev, skills: "" }));
+        }}
+        onInputChange={(inputValue) => setSkillSearchText(inputValue)}
+        inputValue={skillSearchText}
+        placeholder="Select skills"
+        classNamePrefix="react-select"
+    />
+    {errors.skills && (
+        <p className="text-red-500 text-sm mt-1">{errors.skills}</p>
+    )}
+</div>
                 
 
                     <div className="relative col-span-2">

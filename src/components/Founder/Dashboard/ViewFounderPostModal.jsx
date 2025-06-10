@@ -43,6 +43,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
     websiteOfStartupLink,
     internshipType,
     internshipTimeType,
+    jobTimeType,
     internshipDuration,
     internshipStipendRange,
     internshipPerformanceCriteria,
@@ -102,44 +103,33 @@ const workModeObj = {
 
   // Parse ranges and durations
   const experienceRangeObj = experienceRange
-    ? {
-        min: experienceRange.split("-")[0]?.trim() || "",
-        max: experienceRange.split("-")[1]?.trim()?.replace("years", "") || "",
-      }
-    : { min: "", max: "" };
+  ? {
+      min: experienceRange.split("-")[0]?.trim() || "",
+      max: experienceRange.split("-")[1]?.trim()?.replace(/years/, "")?.trim() || "",
+    }
+  : { min: "", max: "" };
 
-  const internshipStipendRangeObj = internshipStipendRange
-    ? {
-        min: internshipStipendRange.split("-")[0]?.trim() || "",
-        max: internshipStipendRange
-          .split("-")[1]
-          ?.trim()
-          ?.replace("rupees", "") || "",
-      }
-    : { min: "", max: "" };
+const internshipStipendRangeObj = internshipStipendRange
+  ? {
+      min: internshipStipendRange.split("-")[0]?.trim() || "",
+      max: internshipStipendRange.split("-")[1]?.trim()?.replace(/rupees|ruppes/, "")?.trim() || "",
+    }
+  : { min: "", max: "" };
 
 const jobAmountRangeObj = jobAmountRange
   ? {
       min: jobAmountRange.split("-")[0]?.trim() || "",
-      max: jobAmountRange.split("-")[1]?.trim()?.replace(" ruppes", "") || "", // Change "rupees" to "ruppes"
+      max: jobAmountRange.split("-")[1]?.trim()?.replace(/rupees|ruppes/, "")?.trim() || "", // Handle both "rupees" and "ruppes"
     }
   : { min: "", max: "" };
   const freelancePaymentRangeObj = freelancePaymentRange
-    ? {
-        min: freelancePaymentRange.split("-")[0]?.trim() || "",
-        max: freelancePaymentRange
-          .split("-")[1]
-          ?.trim()
-          ?.replace("rupees", "") || "",
-      }
-    : { min: "", max: "" };
+  ? {
+      min: freelancePaymentRange.split("-")[0]?.trim() || "",
+      max: freelancePaymentRange.split("-")[1]?.trim()?.replace(/rupees|ruppes/, "")?.trim() || "",
+    }
+  : { min: "", max: "" };
 
-  const internshipDurationObj = internshipDuration
-    ? {
-        value: internshipDuration.split(" ")[0] || "",
-        unit: internshipDuration.split(" ")[1] || "",
-      }
-    : { value: "", unit: "" };
+   
 
   return (
     <div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4">
@@ -598,6 +588,55 @@ const jobAmountRangeObj = jobAmountRange
                     />
                   </div>
                 )}
+                {workBasisObj.Job && (
+  <div className="space-y-4">
+    <div className="relative">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Job Time Type
+      </label>
+      <div className="flex gap-4">
+        {["FullTime", "PartTime"].map((type) => (
+          <label key={type} className="flex items-center">
+            <input
+              type="radio"
+              value={type}
+              checked={jobTimeType === type}
+              disabled
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500"
+            />
+            <span className="ml-2 text-gray-700">
+              {type === "FullTime" ? "Full-time" : "Part-time"}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+    <div className="relative flex gap-4">
+      <div className="w-1/2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Min Amount (₹)
+        </label>
+        <input
+          value={jobAmountRangeObj.min || ""}
+          disabled
+          type="number"
+          className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+        />
+      </div>
+      <div className="w-1/2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Max Amount (₹)
+        </label>
+        <input
+          value={jobAmountRangeObj.max || ""}
+          disabled
+          type="number"
+          className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+        />
+      </div>
+    </div>
+  </div>
+)}
                 {workBasisObj.Internship && (
                   <div className="space-y-4">
                     <div className="relative">
@@ -644,33 +683,17 @@ const jobAmountRangeObj = jobAmountRange
                       </div>
                     </div>
 
-                    <div className="relative flex gap-4">
-                      <div className="w-1/2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Internship Duration
-                        </label>
-                        <input
-                          value={internshipDurationObj.value || ""}
-                          disabled
-                          type="number"
-                          className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        />
-                      </div>
-                      <div className="w-1/2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Unit
-                        </label>
-                        <select
-                          value={internshipDurationObj.unit || ""}
-                          disabled
-                          className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                        >
-                          <option value="">Select Unit</option>
-                          <option value="Weeks">Weeks</option>
-                          <option value="Months">Months</option>
-                        </select>
-                      </div>
-                    </div>
+                    <div className="relative">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Internship Duration
+  </label>
+  <input
+    value={internshipDuration || ""}
+    disabled
+    type="text"
+    className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+  />
+</div>
 
                     {internshipType === "Paid" && (
                       <div className="relative flex gap-4">
@@ -751,32 +774,32 @@ const jobAmountRangeObj = jobAmountRange
     </div>
   </div>
 )}
-                {workBasisObj.Freelance && (
-                  <div className extraneous="relative flex gap-4">
-                    <div className="w-1/2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Min Payment (₹)
-                      </label>
-                      <input
-                        value={freelancePaymentRangeObj.min || ""}
-                        disabled
-                        type="number"
-                        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                      />
-                    </div>
-                    <div className="w-1/2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Max Payment (₹)
-                      </label>
-                      <input
-                        value={freelancePaymentRangeObj.max || ""}
-                        disabled
-                        type="number"
-                        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                      />
-                    </div>
-                  </div>
-                )}
+            {workBasisObj.Freelance && (
+  <div className="relative flex gap-4">
+    <div className="w-1/2">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Min Payment (₹)
+      </label>
+      <input
+        value={freelancePaymentRangeObj.min || ""}
+        disabled
+        type="number"
+        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+      />
+    </div>
+    <div className="w-1/2">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Max Payment (₹)
+      </label>
+      <input
+        value={freelancePaymentRangeObj.max || ""}
+        disabled
+        type="number"
+        className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+      />
+    </div>
+  </div>
+)}
                 {workBasisObj.ProjectBasis && (
                   <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -797,7 +820,7 @@ const jobAmountRangeObj = jobAmountRange
                     <input
                       value={percentageBasisValue || ""}
                       disabled
-                      type="number"
+                      type="text"
                       className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
                     />
                   </div>
