@@ -618,10 +618,7 @@ const ForgotPassword = () => {
                         <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
                         <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
                     </div>
-                    <div className="flex flex-col gap-1 w-[400px] h-fit z-10 bg-white p-8 rounded-4xl shadow-md shadow-[#c598de] text-center text-sm justify-center">
-                        <div className="text-sm text-left text-red-500 font-medium h-4 mb-2">
-                            <p>{formError}</p>
-                        </div>
+                    <div className="flex flex-col gap-1 w-[400px] h-fit z-10 bg-white p-8 rounded-4xl shadow-md shadow-[#c598de] text-center text-sm justify-center">    
                         <div className="flex flex-col mb-2 items-center gap-3">
                             <h2 className="text-4xl mb-3 font-bold text-[#5E0194]">
                                 Forgot Password
@@ -638,6 +635,9 @@ const ForgotPassword = () => {
                                     </a>
                                 </p>
                             )}
+                        </div>
+                        <div className="text-sm text-left text-red-500 font-medium">
+                            <p>{formError}</p>
                         </div>
                         {step === 1 && (
                             <div>

@@ -247,9 +247,8 @@ const Dashboard = () => {
 				{/* Sidebar Lef Side */}
 				<div
 					ref={sidebarRef}
-					className={` bg-white fixed left-[13%] h-fit shadow-sm rounded-2xl transform ${
-						isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-					} md:translate-x-0 transition-transform duration-300`}
+					className={` bg-white fixed left-[13%] h-fit shadow-sm rounded-2xl transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+						} md:translate-x-0 transition-transform duration-300`}
 				>
 					<div className="flex flex-col items-center h-full px-4 py-4 gap-4 overflow-y-auto">
 						{/* <div className="h-[1px] w-full bg-black opacity-30"></div> */}
@@ -266,11 +265,10 @@ const Dashboard = () => {
 							{/* All Post */}
 							<button
 								onClick={() => setFilter("All")}
-								className={` hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
-									filter === "All"
+								className={` hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "All"
 										? "bg-violet-100 text-violet-700"
 										: ""
-								}`}
+									}`}
 							>
 								<LuGalleryVerticalEnd /> All Post
 							</button>
@@ -278,11 +276,10 @@ const Dashboard = () => {
 							{/* Pending post */}
 							<button
 								onClick={() => setFilter("Pending")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
-									filter === "Pending"
+								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "Pending"
 										? "bg-violet-100 text-violet-700"
 										: ""
-								}`}
+									}`}
 							>
 								<div className="h-3.5 w-3.5 bg-[#FFE167] rounded-full"></div>{" "}
 								Pending Post
@@ -291,11 +288,10 @@ const Dashboard = () => {
 							{/* Accepted Post */}
 							<button
 								onClick={() => setFilter("Accepted")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
-									filter === "Accepted"
+								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "Accepted"
 										? "bg-violet-100 text-violet-700"
 										: ""
-								}`}
+									}`}
 							>
 								<div className="h-3.5 w-3.5 bg-[#82FF5F] rounded-full"></div>{" "}
 								Accepted Post
@@ -304,11 +300,10 @@ const Dashboard = () => {
 							{/* Rejected Post */}
 							<button
 								onClick={() => setFilter("Rejected")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${
-									filter === "Rejected"
+								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "Rejected"
 										? "bg-violet-100 text-violet-700"
 										: ""
-								}`}
+									}`}
 							>
 								<div className="h-3.5 w-3.5 bg-[#FF7567] rounded-full"></div>{" "}
 								Rejected Post
@@ -363,9 +358,8 @@ const Dashboard = () => {
 				{/* Sidebar Right side*/}
 				<div
 					ref={sidebarRef}
-					className={` bg-white fixed right-[12%] shadow-sm h-fit rounded-2xl transform ${
-						isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-					} md:translate-x-0 transition-transform duration-300`}
+					className={` bg-white fixed right-[12%] shadow-sm h-fit rounded-2xl transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+						} md:translate-x-0 transition-transform duration-300`}
 				>
 					<div className="flex flex-col items-center h-full py-4 xs:py-4 sm:py-5 px-4 xs:px-4 sm:px-5 gap-3 xs:gap-3 sm:gap-4 md:gap-6 overflow-y-auto">
 						{/* Image and Profile */}
@@ -451,36 +445,36 @@ const Dashboard = () => {
 				<FounderPostForm onClose={closeModal} />
 			</Modal>
 			<Modal
-  isOpen={isAccountSettingsModalOpen}
-  onRequestClose={closeAccountSettingsModal}
-  style={{
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      width: "90%",
-      maxWidth: "800px",
-      maxHeight: "90vh",
-      overflowY: "auto",
-      padding: "2px sm:4px",
-      borderRadius: "0", // Changed from "12px sm:16px" to "0" for sharp borders
-      backgroundColor: "#ffffff",
-      border: "none",
-      zIndex: 1001,
-    },
-    overlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      backdropFilter: "blur(5px)",
-      WebkitBackdropFilter: "blur(5px)",
-      zIndex: 1000,
-    },
-  }}
->
-  <AccountSettings onClose={closeAccountSettingsModal} />
-</Modal>
+				isOpen={isAccountSettingsModalOpen}
+				onRequestClose={closeAccountSettingsModal}
+				style={{
+					content: {
+						top: "50%",
+						left: "50%",
+						right: "auto",
+						bottom: "auto",
+						marginRight: "-50%",
+						transform: "translate(-50%, -50%)",
+						width: "90%",
+						maxWidth: "800px",
+						maxHeight: "90vh",
+						overflowY: "auto",
+						padding: "2px sm:4px",
+						borderRadius: "0", // Changed from "12px sm:16px" to "0" for sharp borders
+						backgroundColor: "#ffffff",
+						border: "none",
+						zIndex: 1001,
+					},
+					overlay: {
+						backgroundColor: "rgba(0, 0, 0, 0.6)",
+						backdropFilter: "blur(5px)",
+						WebkitBackdropFilter: "blur(5px)",
+						zIndex: 1000,
+					},
+				}}
+			>
+				<AccountSettings onClose={closeAccountSettingsModal} />
+			</Modal>
 		</div>
 	);
 };
