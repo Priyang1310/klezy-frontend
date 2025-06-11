@@ -394,55 +394,55 @@ useEffect(() => {
             };
 
             // Fetch domains to set domainName and roleUnderDomain
-            const domainResponse = await fetch(
-                "http://localhost:3333/api/domain/get-all-domains",
-                { method: "GET", credentials: "include" }
-            );
-            if (!domainResponse.ok) throw new Error("Failed to fetch domains");
-            const domainData = await domainResponse.json();
-            if (!domainData.success) throw new Error("Failed to fetch domains");
-            const sortedDomains = domainData.domains
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((domain) => ({
-                    value: domain._id,
-                    label: domain.name,
-                    roles: domain.roles,
-                }));
-            setDomains(sortedDomains);
-            setFilteredDomains(sortedDomains);
+            // const domainResponse = await fetch(
+            //     "http://localhost:3333/api/domain/get-all-domains",
+            //     { method: "GET", credentials: "include" }
+            // );
+            // if (!domainResponse.ok) throw new Error("Failed to fetch domains");
+            // const domainData = await domainResponse.json();
+            // if (!domainData.success) throw new Error("Failed to fetch domains");
+            // const sortedDomains = domainData.domains
+            //     .sort((a, b) => a.name.localeCompare(b.name))
+            //     .map((domain) => ({
+            //         value: domain._id,
+            //         label: domain.name,
+            //         roles: domain.roles,
+            //     }));
+            // setDomains(sortedDomains);
+            // setFilteredDomains(sortedDomains);
 
-            // Set roles
-            const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
-                if (Array.isArray(domain.roles)) {
-                    return [
-                        ...acc,
-                        ...domain.roles.map((role) => ({
-                            value: role._id,
-                            label: role.name,
-                            domainId: domain.value,
-                        })),
-                    ];
-                }
-                return acc;
-            }, []);
-            setAllRoles(rolesFromAllDomains);
+            // // Set roles
+            // const rolesFromAllDomains = sortedDomains.reduce((acc, domain) => {
+            //     if (Array.isArray(domain.roles)) {
+            //         return [
+            //             ...acc,
+            //             ...domain.roles.map((role) => ({
+            //                 value: role._id,
+            //                 label: role.name,
+            //                 domainId: domain.value,
+            //             })),
+            //         ];
+            //     }
+            //     return acc;
+            // }, []);
+            // setAllRoles(rolesFromAllDomains);
 
             // Find the domain and role
-            const domain = sortedDomains.find((d) => d.label === data.domainName);
-            let roleId = "";
-            let roleLabel = "";
-            if (domain) {
-                const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
-                if (role) {
-                    roleId = role._id;
-                    roleLabel = role.name;
-                }
-                setFilteredRoles(
-                    rolesFromAllDomains.filter((r) => r.domainId === domain.value)
-                );
-            } else {
-                setFilteredRoles(rolesFromAllDomains);
-            }
+            // const domain = sortedDomains.find((d) => d.label === data.domainName);
+            // let roleId = "";
+            // let roleLabel = "";
+            // if (domain) {
+            //     const role = domain.roles.find((r) => r.name === data.roleUnderDomain);
+            //     if (role) {
+            //         roleId = role._id;
+            //         roleLabel = role.name;
+            //     }
+            //     setFilteredRoles(
+            //         rolesFromAllDomains.filter((r) => r.domainId === domain.value)
+            //     );
+            // } else {
+            //     setFilteredRoles(rolesFromAllDomains);
+            // }
 
             // Parse experienceRange and log to verify
             const parsedExperienceRange = parseRange(data.experienceRange);
@@ -466,8 +466,8 @@ useEffect(() => {
                     other: { selected: !!data.other, value: data.email || "" },
                 },
                 headline: data.headline || "",
-                domainName: domain ? domain.value : "",
-                roleUnderDomain: roleId,
+                domainName: "",
+                roleUnderDomain: "",
                 skills: data.skills?.map((skill, idx) => ({
                     _id: `temp-${idx}`,
                     name: skill,
@@ -517,17 +517,76 @@ useEffect(() => {
             console.log("newFormData.experienceRange:", newFormData.experienceRange);
             setFormData(newFormData);
 
-            // Set search texts
-            setDomainSearchText(domain ? domain.label : "");
-            setRoleSearchText(roleLabel);
-        } catch (error) {
-            console.error("Error fetching listing:", error);
-        } finally {
-            setLoadingDomains(false);
-        }
-    };
-    fetchListing();
-}, [listingId]);
+            const domainResponse = await fetch(
+                    `http://localhost:3333/api/domain/get-all-domains`
+                );
+                const domainData = await domainResponse.json();
+                const domain = domainData.domains.find(
+                    (d) => d.name === data.domainName
+                );
+                if (domain) {
+                    setDomainSearchText(domain.name);
+                    setFormData((prev) => ({
+                        ...prev,
+                        domainName: domain._id,
+                    }));
+                    
+                    // Set all roles for this domain
+                    const domainRoles = domain.roles.map(role => ({
+                        value: role._id,
+                        label: role.name,
+                        domainId: domain._id
+                    }));
+                    setFilteredRoles(domainRoles);
+                    
+                    const role = domain.roles.find(
+                        (r) => r.name === data.roleUnderDomain
+                    );
+                    if (role) {
+                        setRoleSearchText(role.name);
+                        setFormData((prev) => ({
+                            ...prev,
+                            roleUnderDomain: role._id,
+                        }));
+                    }
+
+                    // Fetch skills for this domain
+                    try {
+                        const skillsResponse = await fetch(
+                            `http://localhost:3333/api/skills/${domain._id}`
+                        );
+                        if (!skillsResponse.ok) throw new Error("Failed to fetch skills");
+                        const skillsData = await skillsResponse.json();
+                        const skills = Array.isArray(skillsData.skills) ? skillsData.skills : [];
+                        setSkills(skills);
+                        setFilteredSkills(skills);
+                        
+                        // Map the skills from the backend data to match the format
+                        const mappedSkills = data.skills.map((skillName, idx) => {
+                            const skill = skills.find(s => s.name === skillName);
+                            return {
+                                _id: skill ? skill._id : `temp-${idx}`,
+                                name: skillName
+                            };
+                        });
+                        
+                        setFormData(prev => ({
+                            ...prev,
+                            skills: mappedSkills
+                        }));
+                    } catch (error) {
+                        console.error("Error fetching skills:", error);
+                    }
+                }
+            } catch (error) {
+                setListingError("Failed to load listing data");
+                console.error("Error fetching listing:", error);
+            } finally {
+                setLoadingListing(false);
+            }
+        };
+        fetchListing();
+    }, [listingId]);
     // Fetch countries
     useEffect(() => {
         setCountries(Country.getAllCountries());
@@ -553,200 +612,184 @@ useEffect(() => {
     }, [formData.workLocation.state]);
 
     // Fetch domains and roles
-    useEffect(() => {
-        const fetchDomains = async () => {
-            console.log("Hi!");
-            try {
-                console.log("Response");
-                const response = await fetch(
-                    "http://localhost:3333/api/domain/get-all-domains"
+     useEffect(() => {
+            const fetchDomains = async () => {
+                console.log("Hi!");
+                try {
+                    console.log("Response");
+                    const response = await fetch(
+                        "http://localhost:3333/api/domain/get-all-domains"
+                    );
+                    const data = await response.json();
+                    if (!data.success) throw new Error("Failed to fetch domains");
+                    // Transform domains into react-select format
+                    const sortedDomains = (data.domains || [])
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((domain) => ({
+                            value: domain._id,
+                            label: domain.name,
+                            roles: domain.roles,
+                        }));
+    
+                    // Set domains for react-select
+                    setDomains(sortedDomains);
+                    setFilteredDomains(sortedDomains);
+                    console.log(sortedDomains);
+                    // Transform roles into react-select format
+                    const rolesFromAllDomains = sortedDomains.reduce(
+                        (acc, domain) => {
+                            if (Array.isArray(domain.roles)) {
+                                return [
+                                    ...acc,
+                                    ...domain.roles.map((role) => ({
+                                        value: role._id,
+                                        label: role.name || role.title, // Adjust based on your role's name field
+                                        domainId: domain.value, // Reference domain by its _id
+                                        // Optional: Add color or other properties if needed
+                                        // color: '#someColor',
+                                        // isFixed: false,
+                                        // isDisabled: false,
+                                    })),
+                                ];
+                            }
+                            return acc;
+                        },
+                        []
+                    );
+    
+                    console.log(rolesFromAllDomains);
+    
+                    // Remove duplicates by role._id
+                    // const uniqueRoles = Array.from(
+                    //     new Map(
+                    //         rolesFromAllDomains.map((role) => [role.value, role])
+                    //     ).values()
+                    // );
+    
+                    // Set roles for react-select
+                    setAllRoles(rolesFromAllDomains);
+                    setFilteredRoles(rolesFromAllDomains);
+                } catch (error) {
+                    console.error("Error fetching domains:", error);
+                    setDomains([]);
+                    setAllRoles([]);
+                    setFilteredDomains([]);
+                    setFilteredRoles([]);
+                } finally {
+                    setLoadingDomains(false);
+                }
+            };
+            fetchDomains();
+        }, []);
+    
+        // Fetch skills when domainName changes
+        useEffect(() => {
+            setFormData((prev) => ({
+                ...prev,
+                // roleUnderDomain: "",
+                skills: [],
+            }));
+            setRoleSearchText("");
+            setSkills([]);
+            setFilteredSkills([]);
+            setSkillSearchText("");
+            setShowSkillSuggestions(false);
+    
+            const fetchSkills = async () => {
+                if (formData.domainName) {
+                    try {
+                        const skillsResponse = await fetch(
+                            `http://localhost:3333/api/skills/${formData.domainName}`
+                        );
+                        if (!skillsResponse.ok)
+                            throw new Error("Failed to fetch skills");
+                        const skillsData = await skillsResponse.json();
+                        setSkills(
+                            Array.isArray(skillsData.skills)
+                                ? skillsData.skills
+                                : []
+                        );
+                        setFilteredSkills(
+                            Array.isArray(skillsData.skills)
+                                ? skillsData.skills
+                                : []
+                        );
+                        skillOptions = filteredSkills.map((skill) => ({
+                            value: skill._id,
+                            label: skill.name,
+                            color: "#a855f7", // Optional: Assign custom color, here purple for example
+                        }));
+    
+                        selectedSkills = formData.skills.map((skill) => ({
+                            value: skill._id,
+                            label: skill.name,
+                            color: "#a855f7",
+                        }));
+                    } catch (error) {
+                        console.error("Error fetching skills:", error);
+                        setSkills([]);
+                        setFilteredSkills([]);
+                    }
+                }
+            };
+            fetchSkills();
+        }, [formData.domainName]);
+    
+        // Filter domains, roles, and skills
+        useEffect(() => {
+            if (!domainSearchText.trim()) {
+                setFilteredDomains(domains);
+            } else {
+                setFilteredDomains(
+                    domains.filter((domain) =>
+                        domain.name
+                            ?.toLowerCase()
+                            .startsWith(domainSearchText.toLowerCase())
+                    )
                 );
-                const data = await response.json();
-                if (!data.success) throw new Error("Failed to fetch domains");
-                // Transform domains into react-select format
-                const sortedDomains = (data.domains || [])
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((domain) => ({
-                        value: domain._id,
-                        label: domain.name,
-                        roles: domain.roles,
-                    }));
-
-                // Set domains for react-select
-                setDomains(sortedDomains);
-                setFilteredDomains(sortedDomains);
-                console.log(sortedDomains);
-                // Transform roles into react-select format
-                const rolesFromAllDomains = sortedDomains.reduce(
-                    (acc, domain) => {
-                        if (Array.isArray(domain.roles)) {
-                            return [
-                                ...acc,
-                                ...domain.roles.map((role) => ({
-                                    value: role._id,
-                                    label: role.name || role.title, // Adjust based on your role's name field
-                                    domainId: domain.value, // Reference domain by its _id
-                                    // Optional: Add color or other properties if needed
-                                    // color: '#someColor',
-                                    // isFixed: false,
-                                    // isDisabled: false,
-                                })),
-                            ];
-                        }
-                        return acc;
-                    },
-                    []
-                );
-
-                console.log(rolesFromAllDomains);
-
-                // Remove duplicates by role._id
-                // const uniqueRoles = Array.from(
-                //     new Map(
-                //         rolesFromAllDomains.map((role) => [role.value, role])
-                //     ).values()
-                // );
-
-                // Set roles for react-select
-                setAllRoles(rolesFromAllDomains);
-                setFilteredRoles(rolesFromAllDomains);
-            } catch (error) {
-                console.error("Error fetching domains:", error);
-                setDomains([]);
-                setAllRoles([]);
-                setFilteredDomains([]);
-                setFilteredRoles([]);
-            } finally {
-                setLoadingDomains(false);
             }
-        };
-        fetchDomains();
-    }, []);
-
-    // // Fetch skills when domainName changes
-    // useEffect(() => {
-    //     setFormData((prev) => ({
-    //         ...prev,
-    //         // roleUnderDomain: "",
-    //         skills: [],
-    //     }));
-    //     setRoleSearchText("");
-    //     setSkills([]);
-    //     setFilteredSkills([]);
-    //     setSkillSearchText("");
-    //     setShowSkillSuggestions(false);
-
-    //     const fetchSkills = async () => {
-    //         if (formData.domainName) {
-    //             try {
-    //                 const skillsResponse = await fetch(
-    //                     `http://localhost:3333/api/skills/${formData.domainName}`
-    //                 );
-    //                 if (!skillsResponse.ok)
-    //                     throw new Error("Failed to fetch skills");
-    //                 const skillsData = await skillsResponse.json();
-    //                 setSkills(
-    //                     Array.isArray(skillsData.skills)
-    //                         ? skillsData.skills
-    //                         : []
-    //                 );
-    //                 setFilteredSkills(
-    //                     Array.isArray(skillsData.skills)
-    //                         ? skillsData.skills
-    //                         : []
-    //                 );
-    //             } catch (error) {
-    //                 console.error("Error fetching skills:", error);
-    //                 setSkills([]);
-    //                 setFilteredSkills([]);
-    //             }
-    //         }
-    //     };
-    //     fetchSkills();
-    // }, [formData.domainName]);
-    useEffect(() => {
-    setFormData((prev) => ({
-        ...prev,
-        skills: [],
-    }));
-    setSkillSearchText("");
-    setSkills([]);
-    setFilteredSkills([]);
-    setShowSkillSuggestions(false);
-
-    const fetchSkills = async () => {
-        if (formData.domainName) {
-            try {
-                const skillsResponse = await fetch(
-                    `http://localhost:3333/api/skills/${formData.domainName}`,
-                    { method: "GET", credentials: "include" }
+        }, [domainSearchText, domains]);
+    
+        useEffect(() => {
+            let filtered = allRoles;
+            if (formData.domainName) {
+                filtered = allRoles.filter(
+                    (role) => role.domainId === formData.domainName
                 );
-                if (!skillsResponse.ok) throw new Error("Failed to fetch skills");
-                const skillsData = await skillsResponse.json();
-                const formattedSkills = Array.isArray(skillsData.skills)
-                    ? skillsData.skills.map((skill, idx) => ({
-                          _id: skill._id || `skill-${idx}`,
-                          name: skill.name,
-                      }))
-                    : [];
-                setSkills(formattedSkills);
-                setFilteredSkills(formattedSkills);
-            } catch (error) {
-                console.error("Error fetching skills:", error);
-                setSkills([]);
-                setFilteredSkills([]);
+                // If we have a selected role, make sure it's included in the filtered list
+                if (formData.roleUnderDomain) {
+                    const selectedRole = allRoles.find(
+                        (role) => role.value === formData.roleUnderDomain
+                    );
+                    if (selectedRole && !filtered.some(role => role.value === selectedRole.value)) {
+                        filtered = [...filtered, selectedRole];
+                    }
+                }
             }
-        }
-    };
-    fetchSkills();
-}, [formData.domainName]);
-
-    // Filter domains, roles, and skills
-    useEffect(() => {
-        if (!domainSearchText.trim()) {
-            setFilteredDomains(domains);
-        } else {
-            setFilteredDomains(
-                domains.filter((domain) =>
-                    domain.name
+            if (roleSearchText.trim()) {
+                filtered = filtered.filter((role) =>
+                    role.label
                         ?.toLowerCase()
-                        .startsWith(domainSearchText.toLowerCase())
-                )
-            );
-        }
-    }, [domainSearchText, domains]);
-
-    useEffect(() => {
-        let filtered = allRoles;
-        if (formData.domainName) {
-            filtered = allRoles.filter(
-                (role) => role.domainId === formData.domainName
-            );
-        }
-        if (roleSearchText.trim()) {
-            filtered = filtered.filter((role) =>
-                role.name
-                    ?.toLowerCase()
-                    .startsWith(roleSearchText.toLowerCase())
-            );
-        }
-        setFilteredRoles(filtered);
-    }, [roleSearchText, allRoles, formData.domainName]);
-
-    useEffect(() => {
-        if (!skillSearchText.trim()) {
-            setFilteredSkills(skills);
-        } else {
-            setFilteredSkills(
-                skills.filter((skill) =>
-                    skill.name
-                        ?.toLowerCase()
-                        .startsWith(skillSearchText.toLowerCase())
-                )
-            );
-        }
-    }, [skillSearchText, skills]);
-
+                        .startsWith(roleSearchText.toLowerCase())
+                );
+            }
+            setFilteredRoles(filtered);
+        }, [roleSearchText, allRoles, formData.domainName, formData.roleUnderDomain]);
+    
+        useEffect(() => {
+            if (!skillSearchText.trim()) {
+                setFilteredSkills(skills);
+            } else {
+                setFilteredSkills(
+                    skills.filter((skill) =>
+                        skill.name
+                            ?.toLowerCase()
+                            .startsWith(skillSearchText.toLowerCase())
+                    )
+                );
+            }
+        }, [skillSearchText, skills]);
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
 

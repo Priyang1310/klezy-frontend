@@ -48,6 +48,7 @@ const NewCard = ({ post }) => {
     freelancePaymentRange = {},
     _id: listingIdFromPost,
   } = post || {};
+  console.log(post)
   console.log("workBasis: ",workBasis)
   // Format work basis
   const jobType = Object.keys(workBasis)
@@ -55,9 +56,16 @@ const NewCard = ({ post }) => {
     .join(", ") || "Not specified";
   console.log("jobtype: ",jobType);
   // Format work mode and location
+
+
   const workModeString = Object.keys(workMode)
     .filter((key) => workMode[key])
     .join(", ") || "";
+    console.log(workModeString)
+    console.log(workMode)
+
+
+
   const locationString = [district, state, country].filter(Boolean).join(", ");
   const location = workModeString ? `${workModeString}${locationString ? `: ${locationString}` : ""}` : "Location not specified";
 
@@ -110,10 +118,10 @@ const NewCard = ({ post }) => {
               <p className="text-md font-semibold">{roleUnderDomain}</p>
               <p className="text-sm font-medium">{domainName}</p>
             </div>
-            <div className="flex items-center gap-1 font-medium">
+            {/* <div className="flex items-center gap-1 font-medium">
               <FaMoneyBills className="text-violet-500 text-lg" />
               {jobType}
-            </div>
+            </div> */}
           </div>
           <div className={`w-3.5 h-3.5 rounded-full ${statusColor[status] || "bg-gray-200"}`}></div>
         </div>
@@ -125,28 +133,28 @@ const NewCard = ({ post }) => {
         </div>
 
         {/* Experience, Work Mode, Work Basis */}
-        <div className="my-1 flex items-center gap-2 text-sm text-gray-600">
+        <div className="my-1 flex flex-wrap items-center gap-2 text-sm text-gray-600">
           {/* Experience */}
           <div className="flex flex-col items-center border-r border-gray-300 pr-4">
-            <div className="flex items-center gap-1 font-medium">
+            <div className="flex items-start gap-1 font-medium">
               <PiBagBold className="text-violet-500 text-lg" />
               Exp: {experienceRange}
             </div>
           </div>
           {/* Locarion */}
           <div className="flex flex-col items-center border-r border-gray-300 pr-4">
-            <div className="flex items-center gap-1 font-medium">
+            <div className="flex item-start gap-1 font-medium">
               <IoLocationOutline className="text-violet-500 text-lg" />
               {location}
             </div>
           </div>
           {/* Partnership */}
-          {/* <div className="flex flex-col items-center">
-            <div className="flex items-center gap-1 font-medium">
+          <div className="flex flex-col items-center">
+            <div className="flex items-start gap-1 font-medium">
               <FaMoneyBills className="text-violet-500 text-lg" />
               {jobType}
             </div>
-          </div> */}
+          </div>
         </div>
 
         {/* Time Commitment and Payment Range */}

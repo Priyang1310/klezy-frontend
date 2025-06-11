@@ -6,7 +6,7 @@ import "react-phone-input-2/lib/style.css";
 function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
     // Helper to get display value for domain
     const modalContentRef = useRef(null);
-
+    console.log("viewing post",post)
     console.log(post.skills);
 
     const getDomainName = (domainId) => {
@@ -43,7 +43,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 
     return (
         <div
-            className="fixed inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+            className="fixed inset-0 bg-opacity-75 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto "
             onClick={handleOverlayClick}
         >
             <div
@@ -547,45 +547,32 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 {post.workBasis.Internship && (
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Internship Time Type{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="flex gap-4">
-                                                {["FullTime", "PartTime"].map(
-                                                    (type) => (
-                                                        <label
-                                                            key={type}
-                                                            className="flex items-center"
-                                                        >
-                                                            <input
-                                                                type="radio"
-                                                                value={type}
-                                                                checked={
-                                                                    post.internshipTimeType ===
-                                                                    type
-                                                                }
-                                                                disabled
-                                                                className="h-4 w-4 text-purple-600"
-                                                            />
-                                                            <span className="ml-2 text-gray-700">
-                                                                {type ===
-                                                                "FullTime"
-                                                                    ? "Full-time"
-                                                                    : "Part-time"}
-                                                            </span>
-                                                        </label>
-                                                    )
-                                                )}
-                                            </div>
-                                            {errors.internshipTimeType && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {errors.internshipTimeType}
-                                                </p>
-                                            )}
-                                        </div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+        Internship Time Type{" "}
+        <span className="text-red-500">*</span>
+    </label>
+    <div className="flex gap-4">
+        {["Full-time", "Part-time"].map((type) => (
+            <label key={type} className="flex items-center">
+                <input
+                    type="radio"
+                    value={type}
+                    checked={post.internshipTimeType === type}
+                    disabled
+                    className="h-4 w-4 text-purple-600"
+                />
+                <span className="ml-2 text-gray-700">
+                    {type === "Full-time" ? "Full-time" : "Part-time"}
+                </span>
+            </label>
+        ))}
+    </div>
+    {errors.internshipTimeType && (
+        <p className="text-red-500 text-sm mt-1">
+            {errors.internshipTimeType}
+        </p>
+    )}
+</div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                                 Internship Type{" "}
@@ -813,46 +800,33 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 )}
                                 {post.workBasis.Job && (
                                     <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Job Time Type{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="flex gap-4">
-                                                {["FullTime", "PartTime"].map(
-                                                    (type) => (
-                                                        <label
-                                                            key={type}
-                                                            className="flex items-center"
-                                                        >
-                                                            <input
-                                                                type="radio"
-                                                                value={type}
-                                                                checked={
-                                                                    post.jobTimeType ===
-                                                                    type
-                                                                }
-                                                                disabled
-                                                                className="h-4 w-4 text-purple-600"
-                                                            />
-                                                            <span className="ml-2 text-gray-700">
-                                                                {type ===
-                                                                "FullTime"
-                                                                    ? "Full-time"
-                                                                    : "Part-time"}
-                                                            </span>
-                                                        </label>
-                                                    )
-                                                )}
-                                            </div>
-                                            {errors.jobTimeType && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {errors.jobTimeType}
-                                                </p>
-                                            )}
-                                        </div>
+                                       <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+        Job Time Type{" "}
+        <span className="text-red-500">*</span>
+    </label>
+    <div className="flex gap-4">
+        {["Full-time", "Part-time"].map((type) => (
+            <label key={type} className="flex items-center">
+                <input
+                    type="radio"
+                    value={type}
+                    checked={post.jobTimeType === type}
+                    disabled
+                    className="h-4 w-4 text-purple-600"
+                />
+                <span className="ml-2 text-gray-700">
+                    {type === "Full-time" ? "Full-time" : "Part-time"}
+                </span>
+            </label>
+        ))}
+    </div>
+    {errors.jobTimeType && (
+        <p className="text-red-500 text-sm mt-1">
+            {errors.jobTimeType}
+        </p>
+    )}
+</div>
                                         <div className="flex gap-4">
                                             <div className="w-1/2">
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1284,58 +1258,63 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 </p>
                             )}
                         </div>
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Work Experience
-                            </label>
-                            {post.workExperience?.length > 0 ? (
-                                post.workExperience.map((experience, index) => (
-                                    <div
-                                        key={index}
-                                        className="mb-4 p-4 border rounded-lg bg-gray-200"
-                                    >
-                                        <h4 className="text-sm font-medium text-gray-700">
-                                            Experience {index + 1}
-                                        </h4>
-                                        <div className="mt-2 space-y-2">
-                                            <input
-                                                value={experience.startDate}
-                                                disabled
-                                                type="date"
-                                                className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                                            />
-                                            <input
-                                                value={experience.endDate}
-                                                disabled
-                                                type="date"
-                                                className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                                            />
-                                            <input
-                                                value={experience.companyName}
-                                                disabled
-                                                type="text"
-                                                className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                                            />
-                                            <input
-                                                value={experience.role}
-                                                disabled
-                                                type="text"
-                                                className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-                                            />
-                                            <textarea
-                                                value={experience.description}
-                                                disabled
-                                                className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px]"
-                                            />
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-500">
-                                    No work experience added.
-                                </p>
-                            )}
-                        </div>
+                       <div className="col-span-2">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Work Experience
+  </label>
+  {post.workExperience?.length > 0 ? (
+    post.workExperience.map((experience, index) => {
+      // Parse the duration string to extract startDate and endDate
+      const [startDate, endDate] = experience.duration
+        ? experience.duration.split(" - ")
+        : ["", ""]; // Fallback to empty strings if duration is missing
+
+      return (
+        <div
+          key={index}
+          className="mb-4 p-4 border rounded-lg bg-gray-200"
+        >
+          <h4 className="text-sm font-medium text-gray-700">
+            Experience {index + 1}
+          </h4>
+          <div className="mt-2 space-y-2">
+            <input
+              value={startDate} // Use parsed startDate
+              disabled
+              type="date"
+              className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+            />
+            <input
+              value={endDate} // Use parsed endDate
+              disabled
+              type="date"
+              className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+            />
+            <input
+              value={experience.company}
+              disabled
+              type="text"
+              className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+            />
+            <input
+              value={experience.role}
+              disabled
+              type="text"
+              className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
+            />
+            <textarea
+              value={experience.description}
+              disabled
+              className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px]"
+            />
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <p className="text-gray-500">No work experience added.</p>
+  )}
+</div>
                         <div className="col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Other Links

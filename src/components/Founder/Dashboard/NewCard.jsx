@@ -279,7 +279,10 @@ const NewCard = ({ post }) => {
       if (e.target === e.currentTarget) setIsModalOpen(false);
     }}
   >
-    <div className="bg-white rounded-3xl p-8 w-full max-w-[800px] max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
+    <div
+      className="bg-white rounded-3xl  w-full max-w-[800px] max-h-[95vh]  border border-violet-200 shadow-2xl"
+      onClick={(e) => e.stopPropagation()} // Add this to prevent clicks inside the modal from closing it
+    >
       <ViewFounderPostModal
         post={post}
         onClose={() => setIsModalOpen(false)}
