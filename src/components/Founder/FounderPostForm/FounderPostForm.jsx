@@ -155,7 +155,7 @@ function FounderPostForm({ onClose }) {
         }
     }, [formData.workLocation.state]);
 
-     let skillOptions = filteredSkills.map((skill) => ({
+    let skillOptions = filteredSkills.map((skill) => ({
         value: skill._id,
         label: skill.name,
         color: "#a855f7", // Optional: Assign custom color, here purple for example
@@ -177,17 +177,17 @@ function FounderPostForm({ onClose }) {
                 backgroundColor: isDisabled
                     ? undefined
                     : isSelected
-                    ? data.color
-                    : isFocused
-                    ? color.alpha(0.1).css()
-                    : undefined,
+                        ? data.color
+                        : isFocused
+                            ? color.alpha(0.1).css()
+                            : undefined,
                 color: isDisabled
                     ? "#ccc"
                     : isSelected
-                    ? chroma.contrast(color, "white") > 2
-                        ? "white"
-                        : "black"
-                    : data.color,
+                        ? chroma.contrast(color, "white") > 2
+                            ? "white"
+                            : "black"
+                        : data.color,
                 cursor: isDisabled ? "not-allowed" : "default",
 
                 ":active": {
@@ -427,8 +427,8 @@ function FounderPostForm({ onClose }) {
                 ? { otherRequirementType: "" }
                 : {}),
             ...(name === "requirementType" &&
-            value !== "Business" &&
-            value !== "Startup"
+                value !== "Business" &&
+                value !== "Startup"
                 ? { startUpName: "" }
                 : {}),
         }));
@@ -569,21 +569,22 @@ function FounderPostForm({ onClose }) {
     };
 
     const handleInternshipTypeChange = (value) => {
-    setFormData((prev) => ({
-        ...prev,
-        internshipType: value,
-        internshipDuration: value ? prev.internshipDuration : { value: "", unit: "" },
-        internshipStipendRange: value === "Paid" ? prev.internshipStipendRange : { min: "", max: "" },
-        internshipPerformanceCriteria: value === "PerformanceBased" ? prev.internshipPerformanceCriteria : "",
-    }));
-    setErrors((prev) => ({
-        ...prev,
-        internshipType: "",
-        internshipTimeType: "",
-        internshipStipendRange: { min: "", max: "" },
-        internshipPerformanceCriteria: "",
-    }));
-};
+        setFormData((prev) => ({
+            ...prev,
+            internshipType: value,
+            internshipDuration: value ? prev.internshipDuration : { value: "", unit: "" },
+            internshipStipendRange: value === "Paid" ? prev.internshipStipendRange : { min: "", max: "" },
+            internshipPerformanceCriteria: value === "PerformanceBased" ? prev.internshipPerformanceCriteria : "",
+        }));
+        setErrors((prev) => ({
+            ...prev,
+            internshipType: "",
+            internshipTimeType: "",
+            internshipStipendRange: { min: "", max: "" },
+            internshipPerformanceCriteria: "",
+        }));
+    };
+    
     const handleInternshipTimeTypeChange = (value) => {
         setFormData((prev) => ({
             ...prev,
@@ -810,11 +811,10 @@ function FounderPostForm({ onClose }) {
                 if (selected && !value.trim()) {
                     newErrors[
                         `${method}Value`
-                    ] = `Please provide your ${method} ${
-                        method === "whatsapp" || method === "call"
+                    ] = `Please provide your ${method} ${method === "whatsapp" || method === "call"
                             ? "number"
                             : "URL"
-                    }`;
+                        }`;
                 } else if (
                     selected &&
                     (method === "whatsapp" || method === "call") &&
@@ -892,7 +892,7 @@ function FounderPostForm({ onClose }) {
                     !formData.internshipStipendRange.max.trim() ||
                     isNaN(formData.internshipStipendRange.max) ||
                     Number(formData.internshipStipendRange.max) <
-                        Number(formData.internshipStipendRange.min)
+                    Number(formData.internshipStipendRange.min)
                 )
                     newErrors.internshipStipendRange = {
                         ...newErrors.internshipStipendRange,
@@ -952,7 +952,7 @@ function FounderPostForm({ onClose }) {
                 !formData.freelancePaymentRange.max.trim() ||
                 isNaN(formData.freelancePaymentRange.max) ||
                 Number(formData.freelancePaymentRange.max) <
-                    Number(formData.freelancePaymentRange.min)
+                Number(formData.freelancePaymentRange.min)
             )
                 newErrors.freelancePaymentRange = {
                     ...newErrors.freelancePaymentRange,
@@ -1005,31 +1005,31 @@ function FounderPostForm({ onClose }) {
             !formData.experienceRange.max.trim() ||
             isNaN(formData.experienceRange.max) ||
             Number(formData.experienceRange.max) <
-                Number(formData.experienceRange.min)
+            Number(formData.experienceRange.min)
         )
             newErrors.experienceRange = {
                 ...newErrors.experienceRange,
                 max: "Valid maximum experience is required",
             };
-            // Validate timeCommitment only if at least one field is filled
-if (formData.timeCommitment.value || formData.timeCommitment.unit) {
-    if (
-        !formData.timeCommitment.value.trim() ||
-        isNaN(formData.timeCommitment.value) ||
-        Number(formData.timeCommitment.value) <= 0
-    ) {
-        newErrors.timeCommitment = {
-            ...newErrors.timeCommitment,
-            value: "Valid time commitment value is required",
-        };
-    }
-    if (!formData.timeCommitment.unit) {
-        newErrors.timeCommitment = {
-            ...newErrors.timeCommitment,
-            unit: "Time commitment unit is required",
-        };
-    }
-}
+        // Validate timeCommitment only if at least one field is filled
+        if (formData.timeCommitment.value || formData.timeCommitment.unit) {
+            if (
+                !formData.timeCommitment.value.trim() ||
+                isNaN(formData.timeCommitment.value) ||
+                Number(formData.timeCommitment.value) <= 0
+            ) {
+                newErrors.timeCommitment = {
+                    ...newErrors.timeCommitment,
+                    value: "Valid time commitment value is required",
+                };
+            }
+            if (!formData.timeCommitment.unit) {
+                newErrors.timeCommitment = {
+                    ...newErrors.timeCommitment,
+                    unit: "Time commitment unit is required",
+                };
+            }
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -1129,8 +1129,8 @@ if (formData.timeCommitment.value || formData.timeCommitment.unit) {
                     field: "percentageBasisValue",
                     value: formData.percentageBasisValue,
                 },
-               { field: "timeCommitment.value", value: formData.timeCommitment.value },
-{ field: "timeCommitment.unit", value: formData.timeCommitment.unit },
+                { field: "timeCommitment.value", value: formData.timeCommitment.value },
+                { field: "timeCommitment.unit", value: formData.timeCommitment.unit },
                 { field: "equityBasisValue", value: formData.equityBasisValue },
                 { field: "otherWorkBasis", value: formData.otherWorkBasis },
                 {
@@ -1150,111 +1150,111 @@ if (formData.timeCommitment.value || formData.timeCommitment.unit) {
 
     const handleBack = () => setStep(step - 1);
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validateStep3()) {
-        try {
-            const domain = domains.find((d) => d.value === formData.domainName);
-            const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (validateStep3()) {
+            try {
+                const domain = domains.find((d) => d.value === formData.domainName);
+                const role = allRoles.find((r) => r.value === formData.roleUnderDomain);
 
-            // Map country ISO code to full name
-            const countryObj = countries.find((c) => c.isoCode === formData.workLocation.country);
-            const countryName = countryObj ? countryObj.name : formData.workLocation.country;
+                // Map country ISO code to full name
+                const countryObj = countries.find((c) => c.isoCode === formData.workLocation.country);
+                const countryName = countryObj ? countryObj.name : formData.workLocation.country;
 
-            // Map state ISO code to full name
-            const stateObj = states.find((s) => s.isoCode === formData.workLocation.state);
-            const stateName = stateObj ? stateObj.name : formData.workLocation.state;
+                // Map state ISO code to full name
+                const stateObj = states.find((s) => s.isoCode === formData.workLocation.state);
+                const stateName = stateObj ? stateObj.name : formData.workLocation.state;
 
-            const submitData = {
-                ...formData,
-                domainName: domain ? domain.label : formData.domainName,
-                roleUnderDomain: role ? role.label : formData.roleUnderDomain,
-                skills: formData.skills.map((skill) => skill.name),
-                workBasis: Object.keys(formData.workBasis).filter(
-                    (key) => formData.workBasis[key]
-                ),
-                workMode: Object.keys(formData.workMode).filter((key) => formData.workMode[key]),
-                call: formData.contact_methods.call.selected
-                    ? formData.contact_methods.call.value
-                    : "",
-                whatsapp: formData.contact_methods.whatsapp.selected
-                    ? formData.contact_methods.whatsapp.value
-                    : "",
-                instagram: formData.contact_methods.instagram.selected
-                    ? formData.contact_methods.instagram.value
-                    : "",
-                linkedin: formData.contact_methods.linkedin.selected
-                    ? formData.contact_methods.linkedin.value
-                    : "",
-                facebook: formData.contact_methods.facebook.selected
-                    ? formData.contact_methods.facebook.value
-                    : "",
-                otherContact: formData.contact_methods.other.selected
-                    ? formData.contact_methods.other.value
-                    : "",
-                workCountry: countryName, // Use full country name
-                workState: stateName, // Use full state name
-                workCity: formData.workLocation.district,
-                internshipTimeType: formData.internshipTimeType || "",
-                jobTimeType: formData.jobTimeType || "",
-                internshipDuration:
-                    formData.workBasis.Internship &&
-                    formData.internshipDuration.value &&
-                    formData.internshipDuration.unit
-                        ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
+                const submitData = {
+                    ...formData,
+                    domainName: domain ? domain.label : formData.domainName,
+                    roleUnderDomain: role ? role.label : formData.roleUnderDomain,
+                    skills: formData.skills.map((skill) => skill.name),
+                    workBasis: Object.keys(formData.workBasis).filter(
+                        (key) => formData.workBasis[key]
+                    ),
+                    workMode: Object.keys(formData.workMode).filter((key) => formData.workMode[key]),
+                    call: formData.contact_methods.call.selected
+                        ? formData.contact_methods.call.value
                         : "",
-                freelancePaymentRange:
-                    formData.workBasis.Freelance &&
-                    formData.freelancePaymentRange.min &&
-                    formData.freelancePaymentRange.max
-                        ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
+                    whatsapp: formData.contact_methods.whatsapp.selected
+                        ? formData.contact_methods.whatsapp.value
                         : "",
-                internshipStipendRange:
-                    formData.internshipType === "Paid" &&
-                    formData.internshipStipendRange.min &&
-                    formData.internshipStipendRange.max
-                        ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
+                    instagram: formData.contact_methods.instagram.selected
+                        ? formData.contact_methods.instagram.value
                         : "",
-                experienceRange:
-                    formData.experienceRange.min &&
-                    formData.experienceRange.max
-                        ? `${formData.experienceRange.min}-${formData.experienceRange.max} years`
+                    linkedin: formData.contact_methods.linkedin.selected
+                        ? formData.contact_methods.linkedin.value
                         : "",
-                jobAmountRange:
-                    formData.workBasis.Job &&
-                    formData.jobAmountRange.min &&
-                    formData.jobAmountRange.max
-                        ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
+                    facebook: formData.contact_methods.facebook.selected
+                        ? formData.contact_methods.facebook.value
                         : "",
-                        timeCommitment:
-    formData.timeCommitment.value && formData.timeCommitment.unit
-        ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
-        : "",
-            };
-            console.log(submitData)
-            delete submitData.contact_methods;
-            const response = await fetch(
-                "http://localhost:3333/api/founder/add-listing/",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(submitData),
-                    credentials: "include",
+                    otherContact: formData.contact_methods.other.selected
+                        ? formData.contact_methods.other.value
+                        : "",
+                    workCountry: countryName, // Use full country name
+                    workState: stateName, // Use full state name
+                    workCity: formData.workLocation.district,
+                    internshipTimeType: formData.internshipTimeType || "",
+                    jobTimeType: formData.jobTimeType || "",
+                    internshipDuration:
+                        formData.workBasis.Internship &&
+                            formData.internshipDuration.value &&
+                            formData.internshipDuration.unit
+                            ? `${formData.internshipDuration.value} ${formData.internshipDuration.unit}`
+                            : "",
+                    freelancePaymentRange:
+                        formData.workBasis.Freelance &&
+                            formData.freelancePaymentRange.min &&
+                            formData.freelancePaymentRange.max
+                            ? `${formData.freelancePaymentRange.min}-${formData.freelancePaymentRange.max} rupees`
+                            : "",
+                    internshipStipendRange:
+                        formData.internshipType === "Paid" &&
+                            formData.internshipStipendRange.min &&
+                            formData.internshipStipendRange.max
+                            ? `${formData.internshipStipendRange.min}-${formData.internshipStipendRange.max} rupees`
+                            : "",
+                    experienceRange:
+                        formData.experienceRange.min &&
+                            formData.experienceRange.max
+                            ? `${formData.experienceRange.min}-${formData.experienceRange.max} years`
+                            : "",
+                    jobAmountRange:
+                        formData.workBasis.Job &&
+                            formData.jobAmountRange.min &&
+                            formData.jobAmountRange.max
+                            ? `${formData.jobAmountRange.min}-${formData.jobAmountRange.max} ruppes`
+                            : "",
+                    timeCommitment:
+                        formData.timeCommitment.value && formData.timeCommitment.unit
+                            ? `${formData.timeCommitment.value} ${formData.timeCommitment.unit}`
+                            : "",
+                };
+                console.log(submitData)
+                delete submitData.contact_methods;
+                const response = await fetch(
+                    "http://localhost:3333/api/founder/add-listing/",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(submitData),
+                        credentials: "include",
+                    }
+                );
+                if (response.ok) {
+                    console.log("Form submitted:", submitData);
+                    onClose();
+                } else {
+                    setErrors({
+                        submit: "Failed to submit the form. Please try again.",
+                    });
                 }
-            );
-            if (response.ok) {
-                console.log("Form submitted:", submitData);
-                onClose();
-            } else {
-                setErrors({
-                    submit: "Failed to submit the form. Please try again.",
-                });
+            } catch (err) {
+                setErrors({ submit: "An error occurred. Please try again." });
             }
-        } catch (err) {
-            setErrors({ submit: "An error occurred. Please try again." });
         }
-    }
-};
+    };
 
     const handleCancel = () => {
         setFormData({
@@ -1354,9 +1354,8 @@ const handleSubmit = async (e) => {
                             ✓
                         </div>
                         <div
-                            className={`w-[150px] h-1 ${
-                                step > 1 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
+                            className={`w-[150px] h-1 ${step > 1 ? "bg-violet-600" : "bg-gray-200"
+                                }`}
                         ></div>
                     </div>
                 </div>
@@ -1364,25 +1363,22 @@ const handleSubmit = async (e) => {
                     <p className="flex items-center gap-2">
                         02{" "}
                         <span
-                            className={`text-sm ${
-                                step > 1 ? "text-violet-600" : "text-black"
-                            }`}
+                            className={`text-sm ${step > 1 ? "text-violet-600" : "text-black"
+                                }`}
                         >
                             Skills and Strength
                         </span>
                     </p>
                     <div className="flex items-center gap-1">
                         <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 1 ? "bg-violet-600" : "bg-white"
-                            }`}
+                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 1 ? "bg-violet-600" : "bg-white"
+                                }`}
                         >
                             ✓
                         </div>
                         <div
-                            className={`w-[150px] h-1 ${
-                                step > 2 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
+                            className={`w-[150px] h-1 ${step > 2 ? "bg-violet-600" : "bg-gray-200"
+                                }`}
                         ></div>
                     </div>
                 </div>
@@ -1390,18 +1386,16 @@ const handleSubmit = async (e) => {
                     <p className="flex items-center gap-2 w-[150px]">
                         03{" "}
                         <span
-                            className={`text-sm ${
-                                step > 2 ? "text-violet-600" : "text-black"
-                            }`}
+                            className={`text-sm ${step > 2 ? "text-violet-600" : "text-black"
+                                }`}
                         >
                             Looking for
                         </span>
                     </p>
                     <div className="flex items-center gap-1">
                         <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 2 ? "bg-violet-600" : "bg-white"
-                            }`}
+                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 2 ? "bg-violet-600" : "bg-white"
+                                }`}
                         >
                             ✓
                         </div>
@@ -1658,11 +1652,10 @@ const handleSubmit = async (e) => {
                                 onChange={handleChange}
                                 type="url"
                                 placeholder="Enter website URL (https://)"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.websiteOfStartupLink
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.websiteOfStartupLink
                                         ? "border-red-500"
                                         : "border-gray-300"
-                                }`}
+                                    }`}
                             />
                         </div>
                         {errors.websiteOfStartupLink && (
@@ -1721,11 +1714,10 @@ const handleSubmit = async (e) => {
                                         onChange={handleChange}
                                         type="text"
                                         placeholder="Specify your user type"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.otherUserType
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.otherUserType
                                                 ? "border-red-500"
                                                 : "border-gray-300"
-                                        }`}
+                                            }`}
                                     />
                                     {/* <button
                     type="button"
@@ -1797,11 +1789,10 @@ const handleSubmit = async (e) => {
                                         onChange={handleChange}
                                         type="text"
                                         placeholder="Specify requirement type"
-                                        className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.otherRequirementType
+                                        className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.otherRequirementType
                                                 ? "border-red-500"
                                                 : "border-gray-300"
-                                        }`}
+                                            }`}
                                     />
                                     {/* <button
                     type="button"
@@ -1822,29 +1813,28 @@ const handleSubmit = async (e) => {
                         {["Startup", "Business"].includes(
                             formData.requirementType
                         ) && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="startUpName"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Business/Startup Name{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        id="startUpName"
-                                        name="startUpName"
-                                        value={formData.startUpName}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Enter business/startup name"
-                                        className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                            errors.startUpName
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                    {/* <button
+                                <div className="mt-4">
+                                    <label
+                                        htmlFor="startUpName"
+                                        className="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Business/Startup Name{" "}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            id="startUpName"
+                                            name="startUpName"
+                                            value={formData.startUpName}
+                                            onChange={handleChange}
+                                            type="text"
+                                            placeholder="Enter business/startup name"
+                                            className={`w-[50%] px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.startUpName
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                                }`}
+                                        />
+                                        {/* <button
                     type="button"
                     onClick={() => enhanceField('startUpName', formData.startUpName)}
                     disabled={enhanceLoading.startUpName}
@@ -1852,17 +1842,17 @@ const handleSubmit = async (e) => {
                   >
                     {enhanceLoading.startUpName ? 'Enhancing...' : 'Enhance'}
                   </button> */}
+                                    </div>
+                                    {errors.startUpName && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {errors.startUpName}
+                                        </p>
+                                    )}
                                 </div>
-                                {errors.startUpName && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.startUpName}
-                                    </p>
-                                )}
-                            </div>
-                        )}
+                            )}
                     </div>
                     {/* About Me */}
-                    {formData.requirementType&& <div className="relative col-span-2">
+                    {formData.requirementType && <div className="relative col-span-2">
                         <label
                             htmlFor="aboutEntity"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -1888,11 +1878,10 @@ const handleSubmit = async (e) => {
                                     )
                                 }
                                 disabled={enhanceLoading.aboutEntity}
-                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.aboutEntity
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.aboutEntity
                                         ? "animate-pulse"
                                         : ""
-                                }`}
+                                    }`}
                                 title={
                                     enhanceLoading.aboutEntity
                                         ? "Enhancing..."
@@ -1903,7 +1892,7 @@ const handleSubmit = async (e) => {
                             </button>
                         </div>
                     </div>
-}
+                    }
                     <div className="relative col-span-3">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             How people can reach out to you (select at least
@@ -1960,7 +1949,7 @@ const handleSubmit = async (e) => {
                                                     .toUpperCase() +
                                                     method.slice(1)}{" "}
                                                 {method === "whatsapp" ||
-                                                method === "call"
+                                                    method === "call"
                                                     ? "Number"
                                                     : "URL"}{" "}
                                                 <span className="text-red-500">
@@ -1969,7 +1958,7 @@ const handleSubmit = async (e) => {
                                             </label>
                                             <div className="gap-2">
                                                 {method === "call" ||
-                                                method === "whatsapp" ? (
+                                                    method === "whatsapp" ? (
                                                     <div className="text-left ">
                                                         <PhoneInput
                                                             country="in"
@@ -1982,13 +1971,12 @@ const handleSubmit = async (e) => {
                                                             }
                                                             // disabled={method === 'call'}
                                                             containerClass="w-full"
-                                                            inputClass={`w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 ${
-                                                                errors[
+                                                            inputClass={`w-full h-12 px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 ${errors[
                                                                     `${method}Value`
                                                                 ]
                                                                     ? "border-red-500"
                                                                     : ""
-                                                            } `}
+                                                                } `}
                                                             buttonClass="border-gray-300 h-14 w-16"
                                                             dropdownClass="h-28"
                                                             containerStyle={{
@@ -2025,13 +2013,12 @@ const handleSubmit = async (e) => {
                                                             )
                                                         }
                                                         placeholder={`Enter your ${method} URL (https://)`}
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors[
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors[
                                                                 `${method}Value`
                                                             ]
                                                                 ? "border-red-500"
                                                                 : "border-gray-300"
-                                                        }`}
+                                                            }`}
                                                     />
                                                 )}
                                             </div>
@@ -2088,11 +2075,10 @@ const handleSubmit = async (e) => {
                                 onChange={handleChange}
                                 maxLength={80}
                                 placeholder="Enter a catchy headline"
-                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                    errors.headline
+                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.headline
                                         ? "border-red-500"
                                         : "border-gray-300"
-                                }`}
+                                    }`}
                             />
                             <button
                                 type="button"
@@ -2100,11 +2086,10 @@ const handleSubmit = async (e) => {
                                     enhanceField("headline", formData.headline)
                                 }
                                 disabled={enhanceLoading.headline}
-                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.headline
+                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.headline
                                         ? "animate-pulse"
                                         : ""
-                                }`}
+                                    }`}
                                 title={
                                     enhanceLoading.headline
                                         ? "Enhancing..."
@@ -2181,42 +2166,42 @@ const handleSubmit = async (e) => {
                         )}
                     </div>
                     {formData.domainName && (
-    <div className="relative col-span-2">
-      <label
-        htmlFor="skills"
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        Skills <span className="text-red-500">*</span>
-      </label>
+                        <div className="relative col-span-2">
+                            <label
+                                htmlFor="skills"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Skills <span className="text-red-500">*</span>
+                            </label>
 
-      <Select
-        id="skills"
-        isMulti
-        name="skills"
-        value={selectedSkills}
-        options={skillOptions.filter(
-          (skill) => !formData.skills.some((s) => s._id === skill.value)
-        )}
-        onChange={(selectedOptions) => {
-          // Convert selectedOptions back to your schema format
-          const updatedSkills = selectedOptions.map((opt) => ({
-            _id: opt.value,
-            name: opt.label,
-          }));
-          setFormData({ ...formData, skills: updatedSkills });
-        }}
-        styles={colourStyles}
-        placeholder="Type to search skills"
-        closeMenuOnSelect={false}
-      />
+                            <Select
+                                id="skills"
+                                isMulti
+                                name="skills"
+                                value={selectedSkills}
+                                options={skillOptions.filter(
+                                    (skill) => !formData.skills.some((s) => s._id === skill.value)
+                                )}
+                                onChange={(selectedOptions) => {
+                                    // Convert selectedOptions back to your schema format
+                                    const updatedSkills = selectedOptions.map((opt) => ({
+                                        _id: opt.value,
+                                        name: opt.label,
+                                    }));
+                                    setFormData({ ...formData, skills: updatedSkills });
+                                }}
+                                styles={colourStyles}
+                                placeholder="Type to search skills"
+                                closeMenuOnSelect={false}
+                            />
 
-      {errors.skills && (
-        <p className="text-red-500 text-sm mt-1">
-          {errors.skills}
-        </p>
-      )}
-    </div>
-  )}
+                            {errors.skills && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.skills}
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2278,11 +2263,10 @@ const handleSubmit = async (e) => {
                                             value={formData.partnershipCriteria}
                                             onChange={handleChange}
                                             placeholder="Describe the partnership criteria"
-                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.partnershipCriteria
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${errors.partnershipCriteria
                                                     ? "border-red-500"
                                                     : "border-gray-300"
-                                            }`}
+                                                }`}
                                         />
                                         <button
                                             type="button"
@@ -2295,11 +2279,10 @@ const handleSubmit = async (e) => {
                                             disabled={
                                                 enhanceLoading.partnershipCriteria
                                             }
-                                            className={`absolute right-3 top-3  text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                                enhanceLoading.partnershipCriteria
+                                            className={`absolute right-3 top-3  text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.partnershipCriteria
                                                     ? "animate-pulse"
                                                     : ""
-                                            }`}
+                                                }`}
                                             title={
                                                 enhanceLoading.partnershipCriteria
                                                     ? "Enhancing..."
@@ -2443,25 +2426,24 @@ const handleSubmit = async (e) => {
                                                     type="number"
                                                     min="1"
                                                     placeholder="Duration"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors
                                                             .internshipDuration
                                                             ?.value
                                                             ? "border-red-500"
                                                             : "border-gray-300"
-                                                    }`}
+                                                        }`}
                                                 />
                                             </div>
                                             {errors.internshipDuration
                                                 ?.value && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {
-                                                        errors
-                                                            .internshipDuration
-                                                            .value
-                                                    }
-                                                </p>
-                                            )}
+                                                    <p className="text-red-500 text-sm mt-1">
+                                                        {
+                                                            errors
+                                                                .internshipDuration
+                                                                .value
+                                                        }
+                                                    </p>
+                                                )}
                                         </div>
                                         <div className="w-1/2">
                                             <label
@@ -2487,12 +2469,11 @@ const handleSubmit = async (e) => {
                                                         e.target.value
                                                     )
                                                 }
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.internshipDuration
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.internshipDuration
                                                         ?.unit
                                                         ? "border-red-500"
                                                         : "border-gray-300"
-                                                }`}
+                                                    }`}
                                             >
                                                 <option value="">
                                                     Select Unit
@@ -2509,14 +2490,14 @@ const handleSubmit = async (e) => {
                                             </select>
                                             {errors.internshipDuration
                                                 ?.unit && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {
-                                                        errors
-                                                            .internshipDuration
-                                                            .unit
-                                                    }
-                                                </p>
-                                            )}
+                                                    <p className="text-red-500 text-sm mt-1">
+                                                        {
+                                                            errors
+                                                                .internshipDuration
+                                                                .unit
+                                                        }
+                                                    </p>
+                                                )}
                                         </div>
                                     </div>
 
@@ -2551,25 +2532,24 @@ const handleSubmit = async (e) => {
                                                         type="number"
                                                         min="0"
                                                         placeholder="Min stipend"
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors
                                                                 .internshipStipendRange
                                                                 ?.min
                                                                 ? "border-red-500"
                                                                 : "border-gray-300"
-                                                        }`}
+                                                            }`}
                                                     />
                                                 </div>
                                                 {errors.internshipStipendRange
                                                     ?.min && (
-                                                    <p className="text-red-500 text-sm mt-1">
-                                                        {
-                                                            errors
-                                                                .internshipStipendRange
-                                                                .min
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm mt-1">
+                                                            {
+                                                                errors
+                                                                    .internshipStipendRange
+                                                                    .min
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                             <div className="w-1/2">
                                                 <label
@@ -2600,90 +2580,87 @@ const handleSubmit = async (e) => {
                                                         type="number"
                                                         min="0"
                                                         placeholder="Max stipend"
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors
                                                                 .internshipStipendRange
                                                                 ?.max
                                                                 ? "border-red-500"
                                                                 : "border-gray-300"
-                                                        }`}
+                                                            }`}
                                                     />
                                                 </div>
                                                 {errors.internshipStipendRange
                                                     ?.max && (
-                                                    <p className="text-red-500 text-sm mt-1">
-                                                        {
-                                                            errors
-                                                                .internshipStipendRange
-                                                                .max
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm mt-1">
+                                                            {
+                                                                errors
+                                                                    .internshipStipendRange
+                                                                    .max
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         </div>
                                     )}
 
                                     {formData.internshipType ===
                                         "PerformanceBased" && (
-                                        <div className="relative">
-                                            <label
-                                                htmlFor="internshipPerformanceCriteria"
-                                                className="block text-sm font-medium text-gray-700 mb-1"
-                                            >
-                                                Performance Criteria{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
                                             <div className="relative">
-                                                <textarea
-                                                    id="internshipPerformanceCriteria"
-                                                    name="internshipPerformanceCriteria"
-                                                    value={
-                                                        formData.internshipPerformanceCriteria
-                                                    }
-                                                    onChange={handleChange}
-                                                    placeholder="Describe performance criteria"
-                                                    className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                        errors.internshipPerformanceCriteria
-                                                            ? "border-red-500"
-                                                            : "border-gray-300"
-                                                    }`}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        enhanceField(
-                                                            "internshipPerformanceCriteria",
-                                                            formData.internshipPerformanceCriteria
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        enhanceLoading.internshipPerformanceCriteria
-                                                    }
-                                                    className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                                        enhanceLoading.internshipPerformanceCriteria
-                                                            ? "animate-pulse"
-                                                            : ""
-                                                    }`}
-                                                    title={
-                                                        enhanceLoading.internshipPerformanceCriteria
-                                                            ? "Enhancing..."
-                                                            : "Enhance"
-                                                    }
+                                                <label
+                                                    htmlFor="internshipPerformanceCriteria"
+                                                    className="block text-sm font-medium text-gray-700 mb-1"
                                                 >
-                                                    <FaMagic className="w-5 h-5" />
-                                                </button>
+                                                    Performance Criteria{" "}
+                                                    <span className="text-red-500">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <div className="relative">
+                                                    <textarea
+                                                        id="internshipPerformanceCriteria"
+                                                        name="internshipPerformanceCriteria"
+                                                        value={
+                                                            formData.internshipPerformanceCriteria
+                                                        }
+                                                        onChange={handleChange}
+                                                        placeholder="Describe performance criteria"
+                                                        className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${errors.internshipPerformanceCriteria
+                                                                ? "border-red-500"
+                                                                : "border-gray-300"
+                                                            }`}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            enhanceField(
+                                                                "internshipPerformanceCriteria",
+                                                                formData.internshipPerformanceCriteria
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            enhanceLoading.internshipPerformanceCriteria
+                                                        }
+                                                        className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.internshipPerformanceCriteria
+                                                                ? "animate-pulse"
+                                                                : ""
+                                                            }`}
+                                                        title={
+                                                            enhanceLoading.internshipPerformanceCriteria
+                                                                ? "Enhancing..."
+                                                                : "Enhance"
+                                                        }
+                                                    >
+                                                        <FaMagic className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                                {errors.internshipPerformanceCriteria && (
+                                                    <p className="text-red-500 text-sm mt-1">
+                                                        {
+                                                            errors.internshipPerformanceCriteria
+                                                        }
+                                                    </p>
+                                                )}
                                             </div>
-                                            {errors.internshipPerformanceCriteria && (
-                                                <p className="text-red-500 text-sm mt-1">
-                                                    {
-                                                        errors.internshipPerformanceCriteria
-                                                    }
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
+                                        )}
                                 </div>
                             )}
 
@@ -2705,11 +2682,10 @@ const handleSubmit = async (e) => {
                                             }
                                             onChange={handleChange}
                                             placeholder="Describe the collaboration"
-                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.collaborationDescription
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${errors.collaborationDescription
                                                     ? "border-red-500"
                                                     : "border-gray-300"
-                                            }`}
+                                                }`}
                                         />
                                         <button
                                             type="button"
@@ -2722,11 +2698,10 @@ const handleSubmit = async (e) => {
                                             disabled={
                                                 enhanceLoading.collaborationDescription
                                             }
-                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                                enhanceLoading.collaborationDescription
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.collaborationDescription
                                                     ? "animate-pulse"
                                                     : ""
-                                            }`}
+                                                }`}
                                             title={
                                                 enhanceLoading.collaborationDescription
                                                     ? "Enhancing..."
@@ -2822,12 +2797,11 @@ const handleSubmit = async (e) => {
                                                     type="number"
                                                     min="0"
                                                     placeholder="Min amount"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors.jobAmountRange
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.jobAmountRange
                                                             ?.min
                                                             ? "border-red-500"
                                                             : "border-gray-300"
-                                                    }`}
+                                                        }`}
                                                 />
                                             </div>
                                             {errors.jobAmountRange?.min && (
@@ -2864,12 +2838,11 @@ const handleSubmit = async (e) => {
                                                     type="number"
                                                     min="0"
                                                     placeholder="Max amount"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                        errors.jobAmountRange
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.jobAmountRange
                                                             ?.max
                                                             ? "border-red-500"
                                                             : "border-gray-300"
-                                                    }`}
+                                                        }`}
                                                 />
                                             </div>
                                             {errors.jobAmountRange?.max && (
@@ -2913,12 +2886,11 @@ const handleSubmit = async (e) => {
                                                 type="number"
                                                 min="0"
                                                 placeholder="Min payment"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.freelancePaymentRange
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.freelancePaymentRange
                                                         ?.min
                                                         ? "border-red-500"
                                                         : "border-gray-300"
-                                                }`}
+                                                    }`}
                                             />
                                         </div>
                                         {errors.freelancePaymentRange?.min && (
@@ -2959,12 +2931,11 @@ const handleSubmit = async (e) => {
                                                 type="number"
                                                 min="0"
                                                 placeholder="Max payment"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                    errors.freelancePaymentRange
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.freelancePaymentRange
                                                         ?.max
                                                         ? "border-red-500"
                                                         : "border-gray-300"
-                                                }`}
+                                                    }`}
                                             />
                                         </div>
                                         {errors.freelancePaymentRange?.max && (
@@ -2995,11 +2966,10 @@ const handleSubmit = async (e) => {
                                             value={formData.projectDescription}
                                             onChange={handleChange}
                                             placeholder="Describe the project"
-                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.projectDescription
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${errors.projectDescription
                                                     ? "border-red-500"
                                                     : "border-gray-300"
-                                            }`}
+                                                }`}
                                         />
                                         <button
                                             type="button"
@@ -3012,11 +2982,10 @@ const handleSubmit = async (e) => {
                                             disabled={
                                                 enhanceLoading.projectDescription
                                             }
-                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                                enhanceLoading.projectDescription
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.projectDescription
                                                     ? "animate-pulse"
                                                     : ""
-                                            }`}
+                                                }`}
                                             title={
                                                 enhanceLoading.projectDescription
                                                     ? "Enhancing..."
@@ -3053,11 +3022,10 @@ const handleSubmit = async (e) => {
                                             onChange={handleChange}
                                             type="text"
                                             placeholder="Enter percentage value"
-                                            className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.percentageBasisValue
+                                            className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.percentageBasisValue
                                                     ? "border-red-500"
                                                     : "border-gray-300"
-                                            }`}
+                                                }`}
                                         />
                                     </div>
                                     {errors.percentageBasisValue && (
@@ -3085,11 +3053,10 @@ const handleSubmit = async (e) => {
                                             onChange={handleChange}
                                             type="text"
                                             placeholder="Enter equity value"
-                                            className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                errors.equityBasisValue
+                                            className={`w-1/2 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.equityBasisValue
                                                     ? "border-red-500"
                                                     : "border-gray-300"
-                                            }`}
+                                                }`}
                                         />
                                     </div>
                                     {errors.equityBasisValue && (
@@ -3116,11 +3083,10 @@ const handleSubmit = async (e) => {
                                             value={formData.otherWorkBasis}
                                             onChange={handleChange}
                                             placeholder="Describe other work basis"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
-                                                errors.otherWorkBasis
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${errors.otherWorkBasis
                                                     ? "border-red-500"
                                                     : "border-gray-300"
-                                            }`}
+                                                }`}
                                         />
                                     </div>
                                     {errors.otherWorkBasis && (
@@ -3134,61 +3100,59 @@ const handleSubmit = async (e) => {
                     </div>
 
                     <div className="relative col-span-2 flex gap-4">
-    <div className="w-1/3">
-        <label
-            htmlFor="timeCommitmentValue"
-            className="block text-sm font-medium text-gray-700 mb-1"
-        >
-            Time Commitment
-        </label>
-        <div className="flex items-center gap-2">
-            <input
-                id="timeCommitmentValue"
-                name="timeCommitment.value"
-                value={formData.timeCommitment.value}
-                onChange={(e) =>
-                    handleNestedChange("timeCommitment", "value", e.target.value)
-                }
-                type="number"
-                min="1"
-                placeholder="Enter value"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                    errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
-                }`}
-            />
-        </div>
-        {errors.timeCommitment?.value && (
-            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
-        )}
-    </div>
-    <div className="w-1/3">
-        <label
-            htmlFor="timeCommitmentUnit"
-            className="block text-sm font-medium text-gray-700 mb-1"
-        >
-            Unit
-        </label>
-        <select
-            id="timeCommitmentUnit"
-            name="timeCommitment.unit"
-            value={formData.timeCommitment.unit}
-            onChange={(e) =>
-                handleNestedChange("timeCommitment", "unit", e.target.value)
-            }
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
-            }`}
-        >
-            <option value="">Select Unit</option>
-            <option value="hours/day">Hours/Day</option>
-            <option value="hours/week">Hours/Week</option>
-            <option value="hours/month">Hours/Month</option>
-        </select>
-        {errors.timeCommitment?.unit && (
-            <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
-        )}
-    </div>
-</div>
+                        <div className="w-1/3">
+                            <label
+                                htmlFor="timeCommitmentValue"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Time Commitment
+                            </label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    id="timeCommitmentValue"
+                                    name="timeCommitment.value"
+                                    value={formData.timeCommitment.value}
+                                    onChange={(e) =>
+                                        handleNestedChange("timeCommitment", "value", e.target.value)
+                                    }
+                                    type="number"
+                                    min="1"
+                                    placeholder="Enter value"
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
+                                        }`}
+                                />
+                            </div>
+                            {errors.timeCommitment?.value && (
+                                <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.value}</p>
+                            )}
+                        </div>
+                        <div className="w-1/3">
+                            <label
+                                htmlFor="timeCommitmentUnit"
+                                className="block text-sm font-medium text-gray-700 mb-1"
+                            >
+                                Unit
+                            </label>
+                            <select
+                                id="timeCommitmentUnit"
+                                name="timeCommitment.unit"
+                                value={formData.timeCommitment.unit}
+                                onChange={(e) =>
+                                    handleNestedChange("timeCommitment", "unit", e.target.value)
+                                }
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
+                                    }`}
+                            >
+                                <option value="">Select Unit</option>
+                                <option value="hours/day">Hours/Day</option>
+                                <option value="hours/week">Hours/Week</option>
+                                <option value="hours/month">Hours/Month</option>
+                            </select>
+                            {errors.timeCommitment?.unit && (
+                                <p className="text-red-500 text-sm mt-1">{errors.timeCommitment.unit}</p>
+                            )}
+                        </div>
+                    </div>
 
                     <div className="relative col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -3243,11 +3207,10 @@ const handleSubmit = async (e) => {
                                             e.target.value
                                         )
                                     }
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.workLocation?.country
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.workLocation?.country
                                             ? "border-red-500"
                                             : "border-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     <option value="">Select Country</option>
                                     {countries.map((country) => (
@@ -3284,11 +3247,10 @@ const handleSubmit = async (e) => {
                                             e.target.value
                                         )
                                     }
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.workLocation?.state
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.workLocation?.state
                                             ? "border-red-500"
                                             : "border-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     <option value="">Select State</option>
                                     {states.map((state) => (
@@ -3325,11 +3287,10 @@ const handleSubmit = async (e) => {
                                             e.target.value
                                         )
                                     }
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.workLocation?.district
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.workLocation?.district
                                             ? "border-red-500"
                                             : "border-gray-300"
-                                    }`}
+                                        }`}
                                 >
                                     <option value="">Select District</option>
                                     {districts.map((district, index) => (
@@ -3374,11 +3335,10 @@ const handleSubmit = async (e) => {
                                     type="number"
                                     min="0"
                                     placeholder="Min experience"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experienceRange?.min
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.experienceRange?.min
                                             ? "border-red-500"
                                             : "border-gray-300"
-                                    }`}
+                                        }`}
                                 />
                             </div>
                             {errors.experienceRange?.min && (
@@ -3410,11 +3370,10 @@ const handleSubmit = async (e) => {
                                     type="number"
                                     min="0"
                                     placeholder="Max experience"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.experienceRange?.max
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${errors.experienceRange?.max
                                             ? "border-red-500"
                                             : "border-gray-300"
-                                    }`}
+                                        }`}
                                 />
                             </div>
                             {errors.experienceRange?.max && (
@@ -3482,11 +3441,10 @@ const handleSubmit = async (e) => {
                                     )
                                 }
                                 disabled={enhanceLoading.responsibilities}
-                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.responsibilities
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.responsibilities
                                         ? "animate-pulse"
                                         : ""
-                                }`}
+                                    }`}
                                 title={
                                     enhanceLoading.responsibilities
                                         ? "Enhancing..."
@@ -3530,11 +3488,10 @@ const handleSubmit = async (e) => {
                                     )
                                 }
                                 disabled={enhanceLoading.whyShouldJoin}
-                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.whyShouldJoin
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.whyShouldJoin
                                         ? "animate-pulse"
                                         : ""
-                                }`}
+                                    }`}
                                 title={
                                     enhanceLoading.whyShouldJoin
                                         ? "Enhancing..."
@@ -3577,11 +3534,10 @@ const handleSubmit = async (e) => {
                                     )
                                 }
                                 disabled={enhanceLoading.anyOtherInfo}
-                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.anyOtherInfo
+                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${enhanceLoading.anyOtherInfo
                                         ? "animate-pulse"
                                         : ""
-                                }`}
+                                    }`}
                                 title={
                                     enhanceLoading.anyOtherInfo
                                         ? "Enhancing..."

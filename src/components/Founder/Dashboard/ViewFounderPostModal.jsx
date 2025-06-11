@@ -2,6 +2,7 @@ import React from "react";
 import { Country, State, City } from "country-state-city";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { IoMdClose } from "react-icons/io";
 
 const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
 	// Helper to get country, state, city names from codes
@@ -166,14 +167,14 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
 		: { min: "", max: "" };
 
 	return (
-		<div className="bg-white rounded-3xl p-8 w-[100%]  max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
-			<div className="flex justify-between items-center mb-6">
+		<div className="bg-white rounded-3xl px-4 pt-4 pb-8 w-[100%]  max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl">
+			<div className="flex justify-between items-center px-4">
 				<h2 className="text-2xl font-bold text-violet-900 tracking-tight">
 					View Post Details
 				</h2>
-				<div className="flex gap-4">
+				<div className=" flex items-center justify-center gap-3">
 					<button
-						className="bg-purple-600 text-white text-sm font-medium px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+						className="bg-purple-600 text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-purple-700 transition-colors"
 						onClick={(e) => {
 							e.stopPropagation();
 							onUpdate();
@@ -182,18 +183,18 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
 						Update
 					</button>
 					<button
-						className="text-red-600 text-sm font-medium px-6 py-3 rounded-lg bg-red-50 border border-red-200 hover:bg-red-100 transition-colors"
+						className="text-gray-600 text-xl p-1 font-medium rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"
 						onClick={(e) => {
 							e.stopPropagation();
 							onClose();
 						}}
 					>
-						Close
+						<IoMdClose />
 					</button>
 				</div>
 			</div>
-
-			<div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
+			<div className="h-[2px] bg-gray-300 w-[95%] mx-auto my-2"></div>
+			<div className="bg-white p-6 sm:p-4 rounded-2xl w-full h-[70vh] overflow-y-auto">
 				{/* Step Indicator (Static for View Mode) */}
 				{/* <div className="h-20 flex items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-[50%] mx-auto text-xl">
             <div className="flex flex-col">
@@ -640,7 +641,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
 									/>
 									<label className="ml-2 text-gray-700">
 										{basis
-											.replace(/([A-Z])/g, " $1 ")
+											.replace(/([A-Z])/g, " $1")
 											.trim()}
 									</label>
 								</div>
@@ -865,32 +866,6 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
 										disabled
 										className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px]"
 									/>
-								</div>
-							)}
-							{workBasisObj.Job && (
-								<div className="relative flex gap-4">
-									<div className="w-1/2">
-										<label className="block text-sm font-medium text-gray-700 mb-1">
-											Min Amount (₹)
-										</label>
-										<input
-											value={jobAmountRangeObj.min || ""}
-											disabled
-											type="number"
-											className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-										/>
-									</div>
-									<div className="w-1/2">
-										<label className="block text-sm font-medium text-gray-700 mb-1">
-											Max Amount (₹)
-										</label>
-										<input
-											value={jobAmountRangeObj.max || ""}
-											disabled
-											type="number"
-											className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300"
-										/>
-									</div>
 								</div>
 							)}
 							{workBasisObj.Freelance && (

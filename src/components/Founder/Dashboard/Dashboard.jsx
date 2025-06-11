@@ -38,18 +38,14 @@ const Dashboard = () => {
 	const [filter, setFilter] = useState("All");
 	const [posts, setPosts] = useState([]);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [isAccountSettingsModalOpen, setIsAccountSettingsModalOpen] =
-		useState(false);
+	const [isAccountSettingsModalOpen, setIsAccountSettingsModalOpen] = useState(false);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
 	const sidebarRef = useRef(null);
 	const hamburgerRef = useRef(null);
-
 	const firstName = localStorage.getItem("firstName");
 	const email = localStorage.getItem("email");
 	const openAccountSettingsModal = () => setIsAccountSettingsModalOpen(true);
-	const closeAccountSettingsModal = () =>
-		setIsAccountSettingsModalOpen(false);
+	const closeAccountSettingsModal = () => setIsAccountSettingsModalOpen(false);
 
 	const fetchListings = async () => {
 		try {
@@ -266,8 +262,8 @@ const Dashboard = () => {
 							<button
 								onClick={() => setFilter("All")}
 								className={` hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "All"
-										? "bg-violet-100 text-violet-700"
-										: ""
+									? "bg-violet-100 text-violet-700"
+									: ""
 									}`}
 							>
 								<LuGalleryVerticalEnd /> All Post
@@ -277,8 +273,8 @@ const Dashboard = () => {
 							<button
 								onClick={() => setFilter("Pending")}
 								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "Pending"
-										? "bg-violet-100 text-violet-700"
-										: ""
+									? "bg-violet-100 text-violet-700"
+									: ""
 									}`}
 							>
 								<div className="h-3.5 w-3.5 bg-[#FFE167] rounded-full"></div>{" "}
@@ -289,8 +285,8 @@ const Dashboard = () => {
 							<button
 								onClick={() => setFilter("Accepted")}
 								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "Accepted"
-										? "bg-violet-100 text-violet-700"
-										: ""
+									? "bg-violet-100 text-violet-700"
+									: ""
 									}`}
 							>
 								<div className="h-3.5 w-3.5 bg-[#82FF5F] rounded-full"></div>{" "}
@@ -301,8 +297,8 @@ const Dashboard = () => {
 							<button
 								onClick={() => setFilter("Rejected")}
 								className={`hover:bg-[#F4F4F4] hover:text-violet-700 font-medium transition-all duration-300 flex items-center gap-3 xs:gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs xs:text-xs sm:text-sm md:text-base ${filter === "Rejected"
-										? "bg-violet-100 text-violet-700"
-										: ""
+									? "bg-violet-100 text-violet-700"
+									: ""
 									}`}
 							>
 								<div className="h-3.5 w-3.5 bg-[#FF7567] rounded-full"></div>{" "}
@@ -411,7 +407,7 @@ const Dashboard = () => {
 				</div>
 			</div>
 			{/* Modal */}
-			<Modal
+			{/* <Modal
 				isOpen={isModalOpen}
 				onRequestClose={closeModal}
 				style={{
@@ -443,7 +439,30 @@ const Dashboard = () => {
 				}}
 			>
 				<FounderPostForm onClose={closeModal} />
-			</Modal>
+			</Modal> */}
+			{isModalOpen && (
+				<div
+					className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+					// onClick={(e) => {
+					// 	if (e.target === e.currentTarget) closeModal;
+					// }}
+				>
+					<div className="bg-white rounded-3xl p-8 w-full max-w-[70vw] max-h-[90vh] overflow-y-auto border border-violet-200 shadow-2xl">
+						<div className="flex justify-between items-center mb-6">
+							<h2 className="text-2xl font-bold text-violet-900 tracking-tight">
+								Update Post
+							</h2>
+							<button
+								className="text-gray-600 text-sm font-medium px-4 py-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"
+								onClick={() => closeModal(false)}
+							>
+								Close
+							</button>
+						</div>
+						<FounderPostForm onClose={closeModal} />
+					</div>
+				</div>
+			)}
 			<Modal
 				isOpen={isAccountSettingsModalOpen}
 				onRequestClose={closeAccountSettingsModal}
