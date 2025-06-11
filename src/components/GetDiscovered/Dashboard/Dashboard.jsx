@@ -9,7 +9,7 @@ import { BsBookmarkStar } from "react-icons/bs";
 import { IoIdCard } from "react-icons/io5";
 import { IoLogOutOutline } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
-// import { IoIdCard, IoLogOutOutline, IoMdSettings } from "react-icons/io5";
+import { IoClose } from "react-icons/io5"; // Added close icon
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import NewCard from "./NewCard";
@@ -17,6 +17,7 @@ import TalentPostForm from "../TalentPostForm/TalentPostForm";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import AccountSettings from "./AccountSettings";
+
 // Bind modal to root element
 Modal.setAppElement("#root");
 
@@ -27,15 +28,21 @@ const Dashboard = () => {
 	const [filter, setFilter] = useState("All");
 	const [posts, setPosts] = useState([]);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [isAccountSettingsModalOpen, setIsAccountSettingsModalOpen] =
-		useState(false);
+	const [isAccountSettingsModalOpen, setIsAccountSettingsModalOpen] = useState(false);
 	const sidebarRef = useRef(null);
 	const hamburgerRef = useRef(null);
 
 	const firstName = localStorage.getItem("firstName");
+
+	// Modal handlers
+	const openModal = () => setIsModalOpen(true);
+	const closeModal = () => setIsModalOpen(false);
 	const openAccountSettingsModal = () => setIsAccountSettingsModalOpen(true);
-	const closeAccountSettingsModal = () =>
-		setIsAccountSettingsModalOpen(false);
+	const closeAccountSettingsModal = () => setIsAccountSettingsModalOpen(false);
+	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+	const closeSidebar = () => setIsSidebarOpen(false); // Added close sidebar function
+
+	// API functions
 	const fetchListings = async () => {
 		try {
 			const role = localStorage.getItem("role");
@@ -81,6 +88,7 @@ const Dashboard = () => {
 		}
 	};
 
+	// Effects
 	useEffect(() => {
 		fetchCredits();
 		fetchListings();
@@ -99,218 +107,321 @@ const Dashboard = () => {
 				setIsSidebarOpen(false);
 			}
 		};
-		if (isSidebarOpen)
+		if (isSidebarOpen) {
 			document.addEventListener("mousedown", handleClickOutside);
-		return () =>
+			document.body.style.overflow = "hidden"; // Prevent background scroll on mobile
+		} else {
+			document.body.style.overflow = "unset";
+		}
+		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
+			document.body.style.overflow = "unset";
+		};
 	}, [isSidebarOpen]);
 
-	const openModal = () => setIsModalOpen(true);
-	const closeModal = () => setIsModalOpen(false);
-	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-	const postsFiltered =
-		filter === "All"
-			? posts
-			: posts.filter((post) => post.status === filter);
+	const postsFiltered = filter === "All" ? posts : posts.filter((post) => post.status === filter);
 
 	return (
-		<div className="flex flex-col bg-gray-100 h-fit min-h-screen poppins-medium items-center">
+		<div className="flex flex-col bg-gray-50 min-h-screen poppins-medium">
 			{/* Navbar */}
-			<div className="fixed w-full bg-white flex items-center justify-center">
-				<div className="h-[60px] w-[90%] px-[7.5%] bg-white flex items-center justify-between">
-					<div className="flex items-center text-lg sm:text-xl md:text-3xl font-bold">
-						<img src="./Logo.svg" alt="" className="scale-75" />
-						<div className="flex items-center gap-2">
-							lezy{" "}
-							<span className="mt-2 font-light border border-[#A100FF] text-[#A100FF] text-[0.7rem] px-2.5 py-0.5 rounded-full">
-								BETA
-							</span>
+			<nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex items-center justify-between h-16">
+						{/* Logo - Made more compact on mobile */}
+						<div className="flex items-center flex-shrink-0 min-w-0">
+							<img src="./Logo.svg" alt="Lezy Logo" className="h-6 sm:h-8 w-auto flex-shrink-0" />
+							<div className="ml-1 sm:ml-2 flex items-center gap-1 sm:gap-2 min-w-0">
+								<span className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">lezy</span>
+								<span className="px-1.5 sm:px-2 py-0.5 text-[0.65rem] sm:text-xs font-medium text-purple-600 bg-purple-100 border border-purple-200 rounded-full flex-shrink-0">
+									BETA
+								</span>
+							</div>
 						</div>
-					</div>
-					<div className="flex items-center gap-2 sm:gap-4 md:gap-8">
-						<IoMdNotificationsOutline className="text-xl sm:text-2xl md:text-3xl text-violet-800" />
-						<p className="text-xs sm:text-sm px-4 py-1 bg-purple-100 text-violet-600 rounded-lg">
-							Market place opening soon
-						</p>
-						<div className="hidden lg:flex items-center gap-2 sm:gap-4">
+
+						{/* Desktop Navigation */}
+						<div className="hidden lg:flex items-center space-x-4">
+							<IoMdNotificationsOutline className="w-6 h-6 text-violet-600 hover:text-violet-700 cursor-pointer" />
+							<div className="px-3 py-1 text-sm text-violet-600 bg-purple-50 rounded-lg border border-purple-200 whitespace-nowrap">
+								Market place opening soon
+							</div>
 							<button
 								onClick={openModal}
-								className="bg-[#A100FF] px-2 py-1 sm:px-3 md:px-4 sm:py-1 md:py-2 rounded-lg flex items-center gap-1 sm:gap-2 text-white text-xs sm:text-sm md:text-base"
+								className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-200"
 							>
-								<MdOutlineAddToPhotos className="text-lg sm:text-xl md:text-2xl" />
+								<MdOutlineAddToPhotos className="w-5 h-5 mr-2" />
 								Add Post
 							</button>
 						</div>
-						<button
-							ref={hamburgerRef}
-							onClick={toggleSidebar}
-							className="md:hidden bg-violet-600 p-2 rounded-lg text-white"
+
+						{/* Mobile Actions - Compact layout */}
+						<div className="flex lg:hidden items-center space-x-2">
+							{/* Add Post Button - Mobile */}
+							<button
+								onClick={openModal}
+								className="inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-md transition-colors duration-200"
+							>
+								<MdOutlineAddToPhotos className="w-4 h-4 sm:mr-1" />
+								<span className="hidden sm:inline ml-1">Add</span>
+							</button>
+
+							{/* Hamburger menu button */}
+							<button
+								ref={hamburgerRef}
+								onClick={toggleSidebar}
+								className="inline-flex items-center justify-center p-2 text-white bg-violet-600 hover:bg-violet-700 rounded-md transition-colors duration-200"
+							>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				{/* Mobile notification bar - Made more compact */}
+				<div className="lg:hidden px-4 py-2 bg-purple-50 border-t border-purple-200">
+					<div className="flex items-center justify-center">
+						<div className="flex items-center space-x-2">
+							<IoMdNotificationsOutline className="w-4 h-4 text-violet-600 flex-shrink-0" />
+							<span className="text-xs sm:text-sm text-violet-600 text-center">Market place opening soon</span>
+						</div>
+					</div>
+				</div>
+			</nav>
+
+			{/* Overlay for mobile sidebar */}
+			{isSidebarOpen && (
+				<div className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity duration-300 lg:hidden" />
+			)}
+
+			{/* Main Layout Container */}
+			<div className="flex-1 pt-20 sm:pt-20 lg:pt-16 flex">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex w-full">
+					<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
+						{/* Left Sidebar */}
+						<aside
+							ref={sidebarRef}
+							className={`lg:col-span-3 fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:shadow-sm lg:rounded-xl lg:w-auto lg:inset-y-auto lg:z-auto lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] ${
+								isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+							} lg:pt-0`}
 						>
-							<svg
-								className="w-5 h-5 sm:w-6 sm:h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2"
-									d="M4 6h16M4 12h16M4 18h16"
-								></path>
-							</svg>
-						</button>
-					</div>
-				</div>
-			</div>
-
-			{/* Main Content */}
-			<div className="mt-[60px] flex justify-center w-[90%] bg-gray-100 px-[7.5%] py-5 h-full">
-				{/* Left Sidebar */}
-				<div
-					ref={sidebarRef}
-					className={`bg-white fixed left-[13%] h-fit shadow-sm rounded-2xl transform ${
-						isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-					} md:translate-x-0 transition-transform duration-300`}
-				>
-					<div className="flex flex-col items-center h-full px-4 py-4 gap-4 overflow-y-auto">
-						<div className="flex flex-col w-full items-center gap-1">
-							<button className="bg-[#A100FF] text-white font-medium flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base">
-								<AiOutlineShop className="text-xl" /> Market
-								Place
-							</button>
-						</div>
-						<div className="h-[1px] w-full bg-black opacity-30"></div>
-						<div className="flex flex-col w-full items-center gap-1">
-							<button
-								onClick={() => setFilter("All")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base ${
-									filter === "All"
-										? "bg-violet-100 text-violet-700"
-										: ""
-								}`}
-							>
-								<LuGalleryVerticalEnd /> All Post
-							</button>
-							<button
-								onClick={() => setFilter("Pending")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base ${
-									filter === "Pending"
-										? "bg-violet-100 text-violet-700"
-										: ""
-								}`}
-							>
-								<div className="h-3.5 w-3.5 bg-[#FFE167] rounded-full"></div>{" "}
-								Pending Post
-							</button>
-							<button
-								onClick={() => setFilter("Accepted")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base ${
-									filter === "Accepted"
-										? "bg-violet-100 text-violet-700"
-										: ""
-								}`}
-							>
-								<div className="h-3.5 w-3.5 bg-[#82FF5F] rounded-full"></div>{" "}
-								Accepted Post
-							</button>
-							<button
-								onClick={() => setFilter("Rejected")}
-								className={`hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base ${
-									filter === "Rejected"
-										? "bg-violet-100 text-violet-700"
-										: ""
-								}`}
-							>
-								<div className="h-3.5 w-3.5 bg-[#FF7567] rounded-full"></div>{" "}
-								Rejected Post
-							</button>
-						</div>
-						<div className="h-[1px] w-full bg-black opacity-30"></div>
-						<div className="flex flex-col w-full items-center gap-1">
-							<button className="hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base">
-								<BsBookmarkStar /> Favourite Post
-							</button>
-							<button className="hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base">
-								<IoIdCard /> Purchased Post
-							</button>
-							<button className="hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base">
-								<MdOutlineHistory /> Purchase History
-							</button>
-						</div>
-					</div>
-				</div>
-
-				{/* Cards Section */}
-				<div className="flex-1 flex justify-center h-full">
-					<div className="flex flex-col gap-5">
-						{postsFiltered.length === 0 ? (
-							<p className="text-gray-500">
-								No posts found. Create a new talent post!
-							</p>
-						) : (
-							postsFiltered.map((post) => (
-								<div key={post._id} className="w-full">
-									<NewCard post={post} />
+							<div className="h-full flex flex-col lg:h-auto lg:max-h-full">
+								{/* Mobile Sidebar Header - Only visible on small screens */}
+								<div className="lg:hidden px-6 py-4 border-b border-gray-200 bg-white">
+									<div className="flex items-center justify-between">
+										{/* Logo in mobile sidebar */}
+										<div className="flex items-center">
+											<img src="./Logo.svg" alt="Lezy Logo" className="h-6 w-auto flex-shrink-0" />
+											<div className="ml-2 flex items-center gap-2">
+												<span className="text-lg font-bold text-gray-900">lezy</span>
+												<span className="px-2 py-0.5 text-xs font-medium text-purple-600 bg-purple-100 border border-purple-200 rounded-full">
+													BETA
+												</span>
+											</div>
+										</div>
+										{/* Close button */}
+										<button
+											onClick={closeSidebar}
+											className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+										>
+											<IoClose className="w-5 h-5" />
+										</button>
+									</div>
 								</div>
-							))
-						)}
-					</div>
-				</div>
 
-				{/* Right Sidebar */}
-				<div
-					ref={sidebarRef}
-					className={`bg-white fixed right-[12%] shadow-sm h-fit rounded-2xl transform ${
-						isSidebarOpen ? "translate-x-0" : "translate-x-full"
-					} md:translate-x-0 transition-transform duration-300`}
-				>
-					<div className="flex flex-col items-center h-full py-4 sm:py-5 px-4 sm:px-5 gap-3 sm:gap-4 md:gap-6 overflow-y-auto">
-						<div className="flex gap-2 items-center w-full">
-							<div className="h-8 sm:h-10 w-8 sm:w-10 rounded-full overflow-hidden">
-								<img
-									src="https://i.pinimg.com/736x/df/f2/c6/dff2c64108660e659bc12bfa306b56a3.jpg"
-									alt="Profile"
-								/>
+								<div className="flex-1 overflow-y-auto lg:overflow-y-auto p-6 space-y-6">
+									{/* User Profile - Only visible on mobile sidebar */}
+									<div className="lg:hidden">
+										<div className="flex items-center space-x-3">
+											<div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+												<img
+													src="https://i.pinimg.com/736x/df/f2/c6/dff2c64108660e659bc12bfa306b56a3.jpg"
+													alt="Profile"
+													className="w-full h-full object-cover"
+												/>
+											</div>
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-medium text-gray-900 truncate">Hi, {firstName}</p>
+												<p className="text-xs text-gray-500">Good to see you again!</p>
+											</div>
+										</div>
+										<hr className="border-gray-200 mt-4" />
+									</div>
+
+									{/* Marketplace Button */}
+									<div>
+										<button className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-200">
+											<AiOutlineShop className="w-5 h-5 mr-3" />
+											Market Place
+										</button>
+									</div>
+
+									<hr className="border-gray-200" />
+
+									{/* Filter Buttons */}
+									<div className="space-y-2 ">
+										<h3 className="text-sm font-medium text-gray-900 mb-3">Filter Posts</h3>
+										{[
+											{ key: "All", label: "All Posts", icon: <LuGalleryVerticalEnd className="w-5 h-5" /> },
+											{ key: "Pending", label: "Pending Posts", icon: <div className="w-3.5 h-3.5 bg-yellow-400 rounded-full" /> },
+											{ key: "Accepted", label: "Accepted Posts", icon: <div className="w-3.5 h-3.5 bg-green-400 rounded-full" /> },
+											{ key: "Rejected", label: "Rejected Posts", icon: <div className="w-3.5 h-3.5 bg-red-400 rounded-full" /> },
+										].map(({ key, label, icon }) => (
+											<button
+												key={key}
+												onClick={() => {
+													setFilter(key);
+													setIsSidebarOpen(false); // Close sidebar on mobile after selection
+												}}
+												className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+													filter === key
+														? "bg-violet-100 text-violet-700"
+														: "text-gray-700 hover:bg-gray-100 hover:text-violet-700"
+												}`}
+											>
+												{icon}
+												<span className="ml-3">{label}</span>
+											</button>
+										))}
+									</div>
+
+									<hr className="border-gray-200" />
+
+									{/* Additional Menu Items */}
+									<div className="space-y-2">
+										<h3 className="text-sm font-medium text-gray-900 mb-3">Your Activity</h3>
+										{[
+											{ icon: <BsBookmarkStar className="w-5 h-5" />, label: "Favourite Posts" },
+											{ icon: <IoIdCard className="w-5 h-5" />, label: "Purchased Posts" },
+											{ icon: <MdOutlineHistory className="w-5 h-5" />, label: "Purchase History" },
+										].map(({ icon, label }) => (
+											<button
+												key={label}
+												className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-violet-700 rounded-lg transition-colors duration-200"
+											>
+												{icon}
+												<span className="ml-3">{label}</span>
+											</button>
+										))}
+									</div>
+
+									{/* Mobile-only Account Settings */}
+									<div className="lg:hidden">
+										<hr className="border-gray-200" />
+										<div className="space-y-2 mt-6">
+											<h3 className="text-sm font-medium text-gray-900 mb-3">Account</h3>
+											<button
+												onClick={() => {
+													openAccountSettingsModal();
+													setIsSidebarOpen(false);
+												}}
+												className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-violet-700 rounded-lg transition-colors duration-200"
+											>
+												<IoMdSettings className="w-5 h-5 mr-3" />
+												Account Settings
+											</button>
+											<button
+												onClick={() => {
+													logout();
+													setIsSidebarOpen(false);
+												}}
+												className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors duration-200"
+											>
+												<IoLogOutOutline className="w-5 h-5 mr-3" />
+												Logout
+											</button>
+										</div>
+									</div>
+								</div>
 							</div>
-							<div className="flex flex-col">
-								<p className="text-xs sm:text-sm md:text-md">
-									Hi, {firstName}
-								</p>
-								<p className="opacity-40 text-xs sm:text-sm">
-									Good to see you again!
-								</p>
+						</aside>
+
+						{/* Main Content Area - Scrollable */}
+						<div className="lg:col-span-6 flex flex-col min-h-0">
+							<div className="flex-1 overflow-y-auto">
+								{postsFiltered.length === 0 ? (
+									<div className="text-center py-12">
+										<div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+											<LuGalleryVerticalEnd className="w-10 h-10 text-gray-400" />
+										</div>
+										<h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+										<p className="text-gray-500 mb-4">Create your first talent post to get started!</p>
+										<button
+											onClick={openModal}
+											className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-200"
+										>
+											<MdOutlineAddToPhotos className="w-5 h-5 mr-2" />
+											Create Post
+										</button>
+									</div>
+								) : (
+									<div className="space-y-6 pb-6">
+										{postsFiltered.map((post) => (
+											<NewCard key={post._id} post={post} />
+										))}
+									</div>
+								)}
 							</div>
 						</div>
-						<div className="h-[1px] w-full bg-black opacity-30"></div>
-						<div className="flex flex-col justify-end h-full w-full gap-1">
-							<button
-								onClick={openAccountSettingsModal}
-								className="hover:bg-[#F4F4F4F4] hover:text-[#A100E2]violet-700 flex items-center gap-3 sm:3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base"
-							>
-								<IoMdSettings /> Account Setting
-							</button>
-							<button
-								onClick={logout}
-								className="hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-base"
-							>
-								<IoLogOutOutline /> Logout
-							</button>
-						</div>
-						<div className="flex flex-col justify-end h-full w-full">
-							<button className="hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-sm">
-								Feedback
-							</button>
-							<button className="hover:bg-[#F4F4F4] hover:text-violet-700 flex items-center gap-3 sm:gap-5 px-4 py-2 w-full rounded-md text-xs sm:text-sm md:text-sm">
-								Terms & Conditions
-							</button>
-						</div>
+
+						{/* Right Sidebar - Desktop only */}
+						<aside className="lg:col-span-3 hidden lg:block">
+							<div className="sticky top-24 bg-white rounded-xl shadow-sm p-6 space-y-6 max-h-[calc(100vh-7rem)] overflow-y-auto">
+								{/* User Profile */}
+								<div className="flex items-center space-x-3">
+									<div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+										<img
+											src="https://i.pinimg.com/736x/df/f2/c6/dff2c64108660e659bc12bfa306b56a3.jpg"
+											alt="Profile"
+											className="w-full h-full object-cover"
+										/>
+									</div>
+									<div className="flex-1 min-w-0">
+										<p className="text-sm font-medium text-gray-900 truncate">Hi, {firstName}</p>
+										<p className="text-xs text-gray-500">Good to see you again!</p>
+									</div>
+								</div>
+
+								<hr className="border-gray-200" />
+
+								{/* Account Actions */}
+								<div className="space-y-2">
+									<button
+										onClick={openAccountSettingsModal}
+										className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-violet-700 rounded-lg transition-colors duration-200"
+									>
+										<IoMdSettings className="w-5 h-5 mr-3" />
+										Account Settings
+									</button>
+									<button
+										onClick={logout}
+										className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-red-600 rounded-lg transition-colors duration-200"
+									>
+										<IoLogOutOutline className="w-5 h-5 mr-3" />
+										Logout
+									</button>
+								</div>
+
+								<hr className="border-gray-200" />
+
+								{/* Footer Links */}
+								<div className="space-y-2">
+									{["Feedback", "Terms & Conditions"].map((item) => (
+										<button
+											key={item}
+											className="w-full px-4 py-2 text-sm text-gray-600 hover:text-violet-700 hover:bg-gray-50 rounded-lg transition-colors duration-200 text-left"
+										>
+											{item}
+										</button>
+									))}
+								</div>
+							</div>
+						</aside>
 					</div>
 				</div>
 			</div>
 
-			{/* Modal */}
+			{/* Modals */}
 			<Modal
 				isOpen={isModalOpen}
 				onRequestClose={closeModal}
@@ -322,54 +433,54 @@ const Dashboard = () => {
 						bottom: "auto",
 						marginRight: "-50%",
 						transform: "translate(-50%, -50%)",
-						width: "90%",
+						width: "95%",
 						maxWidth: "800px",
 						maxHeight: "90vh",
 						overflowY: "auto",
-						padding: "2px sm:4px",
-						borderRadius: "12px sm:16px",
+						padding: "0",
+						borderRadius: "12px",
 						backgroundColor: "#ffffff",
 						border: "none",
 					},
 					overlay: {
-						backgroundColor: "rgba(0, 0, 0, 0.6)",
+						backgroundColor: "rgba(0, 0, 0, 0.75)",
 						zIndex: 1000,
 					},
 				}}
 			>
 				<TalentPostForm onClose={closeModal} />
 			</Modal>
+
 			<Modal
-  isOpen={isAccountSettingsModalOpen}
-  onRequestClose={closeAccountSettingsModal}
-  style={{
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      width: "90%",
-      maxWidth: "800px",
-      maxHeight: "90vh",
-      overflowY: "auto",
-      padding: "2px sm:4px",
-      borderRadius: "0", // Changed from "12px sm:16px" to "0" for sharp borders
-      backgroundColor: "#ffffff",
-      border: "none",
-      zIndex: 1001,
-    },
-    overlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      backdropFilter: "blur(5px)",
-      WebkitBackdropFilter: "blur(5px)",
-      zIndex: 1000,
-    },
-  }}
->
-  <AccountSettings onClose={closeAccountSettingsModal} />
-</Modal>
+				isOpen={isAccountSettingsModalOpen}
+				onRequestClose={closeAccountSettingsModal}
+				style={{
+					content: {
+						top: "50%",
+						left: "50%",
+						right: "auto",
+						bottom: "auto",
+						marginRight: "-50%",
+						transform: "translate(-50%, -50%)",
+						width: "95%",
+						maxWidth: "800px",
+						maxHeight: "90vh",
+						overflowY: "auto",
+						padding: "0",
+						borderRadius: "12px",
+						backgroundColor: "#ffffff",
+						border: "none",
+					},
+					overlay: {
+						backgroundColor: "rgba(0, 0, 0, 0.75)",
+						backdropFilter: "blur(8px)",
+						WebkitBackdropFilter: "blur(8px)",
+						zIndex: 1000,
+					},
+				}}
+			>
+				<AccountSettings onClose={closeAccountSettingsModal} />
+			</Modal>
 		</div>
 	);
 };

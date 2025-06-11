@@ -45,6 +45,10 @@ const NewCard = ({ post }) => {
     otherLinks = [],
     expectations = "",
     anyOtherInfo = "",
+    instagram = "",
+    linkedin = "",
+    whatsapp = "",
+    email = "",
     freelancePaymentRange = {},
     _id: listingIdFromPost,
   } = post || {};
@@ -110,13 +114,13 @@ const NewCard = ({ post }) => {
 
   return (
     <>
-      <div className="text-gray-800 flex shadow-[1px_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[1px_1px_13px_rgba(0,0,0,0.2)] transition-all duration-300 flex-col h-fit w-[650px] bg-white rounded-3xl p-5 gap-0.5 hover:cursor-pointer">
+      <div className="text-gray-800 flex shadow-[1px_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[1px_1px_13px_rgba(0,0,0,0.2)] transition-all duration-300 flex-col h-fit w-full max-w-[650px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
         {/* Role, Domain, Status */}
         <div className="flex w-full items-start justify-between" onClick={() => setIsModalOpen(true)}>
-          <div className="flex items-start gap-5 ">
-            <div className="flex flex-col border-r border-gray-300 pr-4">
-              <p className="text-md font-semibold">{roleUnderDomain}</p>
-              <p className="text-sm font-medium">{domainName}</p>
+          <div className="flex items-start gap-2 sm:gap-5">
+            <div className="flex flex-col border-r border-gray-300 pr-2 sm:pr-4">
+              <p className="text-sm sm:text-md font-semibold">{roleUnderDomain}</p>
+              <p className="text-xs sm:text-sm font-medium">{domainName}</p>
             </div>
             {/* <div className="flex items-center gap-1 font-medium">
               <FaMoneyBills className="text-violet-500 text-lg" />
@@ -129,47 +133,47 @@ const NewCard = ({ post }) => {
 
         {/* Headline */}
         <div className="h-fit mt-1 mb-1" onClick={() => setIsModalOpen(true)}>
-          <h2 className="text-md font-medium">{headline}</h2>
+          <h2 className="text-sm sm:text-md font-medium">{headline}</h2>
         </div>
 
         {/* Experience, Work Mode, Work Basis */}
-        <div className="my-1 flex flex-wrap items-center gap-2 text-sm text-gray-600">
+        <div className="my-1 flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 text-xs sm:text-sm text-gray-600">
           {/* Experience */}
-          <div className="flex flex-col items-center border-r border-gray-300 pr-4">
+          <div className="flex flex-col items-start sm:items-center border-b sm:border-b-0 sm:border-r border-gray-300 pb-2 sm:pb-0 sm:pr-4 w-full sm:w-auto">
             <div className="flex items-start gap-1 font-medium">
-              <PiBagBold className="text-violet-500 text-lg" />
-              Exp: {experienceRange}
+              <PiBagBold className="text-violet-500 text-base sm:text-lg" />
+              <span className="text-xs sm:text-sm">Exp: {experienceRange}</span>
             </div>
           </div>
-          {/* Locarion */}
-          <div className="flex flex-col items-center border-r border-gray-300 pr-4">
-            <div className="flex item-start gap-1 font-medium">
-              <IoLocationOutline className="text-violet-500 text-lg" />
-              {location}
+          {/* Location */}
+          <div className="flex flex-col items-start sm:items-center border-b sm:border-b-0 sm:border-r border-gray-300 pb-2 sm:pb-0 sm:pr-4 w-full sm:w-auto">
+            <div className="flex items-start gap-1 font-medium">
+              <IoLocationOutline className="text-violet-500 text-base sm:text-lg" />
+              <span className="text-xs sm:text-sm">{location}</span>
             </div>
           </div>
           {/* Partnership */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-start sm:items-center w-full sm:w-auto">
             <div className="flex items-start gap-1 font-medium">
-              <FaMoneyBills className="text-violet-500 text-lg" />
-              {jobType}
+              <FaMoneyBills className="text-violet-500 text-base sm:text-lg" />
+              <span className="text-xs sm:text-sm">{jobType}</span>
             </div>
           </div>
         </div>
 
         {/* Time Commitment and Payment Range */}
         {(timeCommitment || paymentRange) && (
-          <div className="my-1 flex items-center gap-4 text-sm text-gray-600">
+          <div className="my-1 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
             {timeCommitment && (
               <div className="flex items-center gap-1 font-medium">
                 <IoMdTime className="text-violet-500" />
-                Time: {timeCommitment}
+                <span>Time: {timeCommitment}</span>
               </div>
             )}
             {paymentRange && (
               <div className="flex items-center gap-1 font-medium">
                 <FaMoneyBills className="text-violet-500" />
-                Rate: {paymentRange}
+                <span>Rate: {paymentRange}</span>
               </div>
             )}
           </div>
@@ -178,7 +182,7 @@ const NewCard = ({ post }) => {
         {/* Skills */}
         <div className="mt-1 flex flex-wrap items-center gap-1.5 w-full text-sm" onClick={() => setIsModalOpen(true)}>
           {visibleSkills.map((skill, index) => (
-            <span key={index} className="border border-[#ECCCFF] text-gray-700 text-[0.7rem] px-2.5 py-0.5 rounded-full">
+            <span key={index} className="border border-[#ECCCFF] text-gray-700 text-[0.6rem] sm:text-[0.7rem] px-2 sm:px-2.5 py-0.5 rounded-full">
               {skill}
             </span>
           ))}
@@ -189,51 +193,58 @@ const NewCard = ({ post }) => {
         <hr className="mt-4 text-gray-200 w-full" />
 
         {/* Contact Methods and Buttons */}
-        <div className="flex items-center justify-between w-full mt-2">
-          <div className="flex items-center gap-1.5 w-fit">
-            {contact_methods.facebook?.value && (
-              <img src="./facebook.svg" alt="Facebook" className="h-4 w-4 object-cover" />
-            )}
-            {contact_methods.instagram?.value && (
-              <img src="./instagram.svg" alt="Instagram" className="h-4 w-4 object-cover" />
-            )}
-            {contact_methods.linkedin?.value && (
-              <img src="./linkedIn.svg" alt="LinkedIn" className="h-4 w-4 object-cover" />
-            )}
-            {contact_methods.whatsapp?.value && (
-              <img src="./whatsapp.svg" alt="WhatsApp" className="h-5 w-5 object-cover" />
-            )}
-            {contact_methods.call?.value && (
-              <img src="./phone.svg" alt="Call" className="h-5 w-5 object-cover" />
-            )}
-            {contact_methods.otherContact?.value && (
-              <img src="./link.svg" alt="Other" className="h-5 w-5 object-cover" />
-            )}
-          </div>
-          <div className="flex justify-end gap-2 mt-1 w-full">
-            <button
-              className=" text-[#A100FF] text-xl p-2 rounded-full hover:bg-purple-50 transition-colors"
-              onClick={() => {
-                setListingId(listingIdFromPost);
-                setIsUpdateModalOpen(true);
-              }}
-            >
-              <CiEdit />
-            </button>
-            <button
-              className="text-[#A100FF] text-xl p-2 rounded-full hover:bg-purple-50 transition-colors"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <MdOutlineRemoveRedEye />
-            </button>
-            <button className="text-[#A100FF] border-[2px] border-[#A100FF] w-[25%] text-xs font-medium px-2 py-2 rounded-full hover:bg-purple-50" onClick={() => setIsViewApplicantsModalOpen(true)}>
-              Start Searching
-            </button>
-            <button className="text-white bg-[#A100FF] border-[2px] border-[#A100FF] w-[25%] text-xs font-medium px-2 py-2 rounded-full hover:bg-purple-700" onClick={() => setIsViewApplicantsModalOpen(true)}>
-              View Applications
-            </button>
-          </div>
-        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full mt-2 gap-3 sm:gap-4">
+  {/* Social Media Icons */}
+  <div className="flex items-center gap-1.5 w-fit">
+    
+    {instagram && (
+      <img src="./instagram.svg" alt="Instagram" className="h-4 w-4 object-cover" />
+    )}
+    {linkedin && (
+      <img src="./linkedIn.svg" alt="LinkedIn" className="h-4 w-4 object-cover" />
+    )}
+    {whatsapp && (
+      <img src="./whatsapp.svg" alt="WhatsApp" className="h-5 w-5 object-cover" />
+    )}
+    {email && (
+      <img src="./email.svg" alt="Email" className="h-5 w-5 object-cover" />
+    )}
+  </div>
+  
+  {/* Action Buttons */}
+  <div className="flex justify-space gap-1 sm:gap-3 mt-1 w-full sm:w-auto">
+    {/* Icon Buttons */}
+    <div className="flex gap-1 sm:gap-2">
+      <button
+        className="text-[#A100FF] text-lg sm:text-xl p-1.5 sm:p-2 rounded-full hover:bg-purple-50 transition-colors duration-200 flex items-center justify-center"
+        onClick={() => {
+          setListingId(listingIdFromPost);
+          setIsUpdateModalOpen(true);
+        }}
+        title="Edit"
+      >
+        <CiEdit />
+      </button>
+      <button
+        className="text-[#A100FF] text-lg sm:text-xl p-1.5 sm:p-2 rounded-full hover:bg-purple-50 transition-colors duration-200 flex items-center justify-center"
+        onClick={() => setIsModalOpen(true)}
+        title="View Details"
+      >
+        <MdOutlineRemoveRedEye />
+      </button>
+    </div>
+    
+    {/* Text Buttons */}
+    <div className="flex gap-1 sm:gap-3 w-full sm:w-auto">
+      <button className="text-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-2 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-50 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
+        Start Searching
+      </button>
+      <button className="text-white bg-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-1 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-700 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
+        View Applications
+      </button>
+    </div>
+  </div>
+</div>
       </div>
 
       {/* View Modal */}
@@ -261,7 +272,7 @@ const NewCard = ({ post }) => {
           onClick={() => setIsUpdateModalOpen(false)} // Close on overlay click
         >
           <div
-            className="bg-white p-6 sm:p-8 rounded-2xl w-full max-w-4xl m-4 relative max-h-[90vh] overflow-y-auto"
+            className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-4xl m-4 relative max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
             {/* Close Button */}
@@ -275,7 +286,7 @@ const NewCard = ({ post }) => {
             </button>
 
             {/* Header */}
-            <h2 className="text-2xl font-semibold text-[#7900BF] mb-6 text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold text-[#7900BF] mb-6 text-center">
               Update Talent Profile
             </h2>
 
