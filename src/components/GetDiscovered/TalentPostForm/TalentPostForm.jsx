@@ -5,7 +5,7 @@ import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
 import Select from "react-select";
 import chroma from "chroma-js";
 import makeAnimated from "react-select/animated";
-
+import RequestDomainRoleSkills from "./RequestDomainRoleSkills";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -73,7 +73,7 @@ function GetDiscoveredForm({ onClose }) {
 		expectations: "",
 		anyOtherInfo: "",
 	});
-
+	const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 	const [resumeFile, setResumeFile] = useState(null);
 	const [errors, setErrors] = useState({});
 	const [domains, setDomains] = useState([]);
@@ -2102,10 +2102,19 @@ function GetDiscoveredForm({ onClose }) {
 
 			{step === 2 && (
 				<form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					
 					<h3 className="col-span-2 text-xl font-semibold text-[#7900BF] mb-4">
 						Showcase your skills and what you're open to.
 					</h3>
+				
 					<div className="relative col-span-2">
+						<button
+        type="button"
+        onClick={() => setIsRequestModalOpen(true)}
+        className="mb-2 text-sm text-purple-600 hover:text-purple-800 underline"
+      >
+        Request Domain, Role, Skill
+      </button>
 						<label
 							htmlFor="headline"
 							className="block text-sm font-medium text-gray-700 mb-1"
@@ -2210,6 +2219,7 @@ function GetDiscoveredForm({ onClose }) {
 								{errors.domainName}
 							</p>
 						)}
+						
 					</div>
 					{formData.domainName && (
 						<div className="relative col-span-2">
@@ -3952,9 +3962,22 @@ function GetDiscoveredForm({ onClose }) {
 							Submit
 						</button>
 					</div>
+					
 				</form>
+					
 			)}
+			{isRequestModalOpen && (
+						<RequestDomainRoleSkills
+						onClose={() => setIsRequestModalOpen(false)}
+						onSubmit={(data) => {
+							console.log("Submitted request:", data);
+							setIsRequestModalOpen(false);
+						}}
+						/>
+					)}
+			
 		</div>
+		
 	);
 }
 
