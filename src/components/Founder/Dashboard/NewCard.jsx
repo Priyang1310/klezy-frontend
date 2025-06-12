@@ -281,12 +281,44 @@ const NewCard = ({ post }) => {
 
       {/* View Modal */}
       {isModalOpen && (
-        <ViewFounderPostModal
-          post={post}
-          onClose={handleViewModalClose}
-          errors={{}}
-        />
-      )}
+  <div
+    className="fixed inset-0  bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+    onClick={() => handleViewModalClose()}
+  >
+ 
+      {/* Close Button */}
+      <button
+        onClick={() => handleViewModalClose()}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
+
+      <ViewFounderPostModal
+        post={post}
+        onClose={handleViewModalClose}
+        onUpdate={() => {
+          setListingId(listingIdFromPost);
+          setIsUpdateModalOpen(true);
+          setIsModalOpen(false);
+        }}
+      />
+    </div>
+  
+)}
 
       {/* Update Modal */}
       {isUpdateModalOpen && (

@@ -452,8 +452,8 @@ const Dashboard = () => {
 
 			{/* Modals */}
 			{isModalOpen && (
-				<div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-					<div className="bg-white rounded-3xl p-8 w-full max-w-[95%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto border border-violet-200 shadow-2xl">
+				<div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50">
+					<div className="bg-white rounded-3xl p-5 w-full max-w-[95%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto border border-violet-200 shadow-2xl">
 						<div className="flex justify-between items-center mb-6">
 							<h2 className="text-2xl font-bold text-violet-900 tracking-tight">
 								Founder Post
