@@ -334,221 +334,259 @@ const AccountSettings = ({ onClose }) => {
   };
 
   if (loading) {
-    return <div className="p-4 text-center text-gray-600">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center p-8 md:p-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A100FF] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your account details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="relative p-4 sm:p-6 poppins-medium rounded-4xl">
-      <button
-        onClick={onClose}
-        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-      >
-        <FaTimes className="w-5 h-5" />
-      </button>
-      <h2 className="text-xl sm:text-2xl font-semibold text-[#A100FF] mb-4">
-        Account Settings
-      </h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-4xl">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            First Name <span className="text-[#A100FF]">*</span>
-          </label>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 border ${errors.firstName ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-            placeholder="First name"
-          />
-          {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Middle Name
-          </label>
-          <input
-            type="text"
-            name="middleName"
-            value={formData.middleName}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 border ${errors.middleName ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-            placeholder="Middle name"
-          />
-          {errors.middleName && <p className="text-red-500 text-xs mt-1">{errors.middleName}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Last Name <span className="text-[#A100FF]">*</span>
-          </label>
-          <input
-            type="text"
-            name="lastName"
- Nationwide
-            value={formData.lastName}
-            onChange={handleChange}
-            className={`w-full text-sm px-4 py-2 border ${errors.lastName ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-            placeholder="Last name"
-          />
-          {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
-        </div>
-        <div className="col-span-full">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email <span className="text-[#A100FF]">*</span>
-          </label>
-          <div className="flex gap-4 items-end">
-            <div className="w-[70%]">
+    <div className="relative max-w-4xl mx-auto p-4 md:p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 md:mb-8">
+        <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-[#A100FF] poppins-medium">
+          Account Settings
+        </h2>
+        <button
+          onClick={onClose}
+          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all duration-200"
+        >
+          <FaTimes className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="space-y-6 md:space-y-8">
+        {/* Personal Information Section */}
+        <div className="bg-gray-50 rounded-2xl p-4 md:p-6">
+          <h3 className="text-lg font-medium text-gray-800 mb-4 md:mb-6">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                First Name <span className="text-[#A100FF]">*</span>
+              </label>
               <input
                 type="text"
-                name="email"
-                value={formData.email}
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-                placeholder="Enter email"
+                className={`w-full px-4 py-3 border ${
+                  errors.firstName ? "border-red-500" : "border-gray-300"
+                } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base`}
+                placeholder="Enter your first name"
               />
-              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
             </div>
-            {formData.email !== originalEmail && formData.email && (
-              <button
-                type="button"
-                onClick={handleSendEmailOTP}
-                disabled={emailTimer > 0 || isSendingOTP}
-                className="bg-[#A100FF] text-white w-24 h-10 px-2 py-1 text-xs rounded-lg shadow-md hover:bg-[#8E00E6] transition-all duration-300 disabled:opacity-85 flex items-center justify-center"
-              >
-                {isSendingOTP ? (
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                ) : emailTimer > 0 ? (
-                  `Resending OTP (${emailTimer}s)`
-                ) : (
-                  "Send OTP"
-                )}
-              </button>
-            )}
-          </div>
-          {showEmailOTPInput && (
-            <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Verification Code
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Middle Name
               </label>
-              <div className="flex gap-4 items-end">
-                <div className="w-[70%]">
+              <input
+                type="text"
+                name="middleName"
+                value={formData.middleName}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border ${
+                  errors.middleName ? "border-red-500" : "border-gray-300"
+                } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base`}
+                placeholder="Enter your middle name"
+              />
+              {errors.middleName && <p className="text-red-500 text-xs mt-1">{errors.middleName}</p>}
+            </div>
+
+            <div className="space-y-2 md:col-span-2 lg:col-span-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Last Name <span className="text-[#A100FF]">*</span>
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border ${
+                  errors.lastName ? "border-red-500" : "border-gray-300"
+                } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base`}
+                placeholder="Enter your last name"
+              />
+              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Email Section */}
+        <div className="bg-blue-50 rounded-2xl p-4 md:p-6">
+          <h3 className="text-lg font-medium text-gray-800 mb-4 md:mb-6">Email Settings</h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Email Address <span className="text-[#A100FF]">*</span>
+              </label>
+              <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
+                <div className="flex-1">
                   <input
-                    type="text"
-                    value={emailOTP}
-                    onChange={handleEmailOTPChange}
-                    className={`w-full px-4 py-2 border ${
-                      errors.emailOTP ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-                    placeholder="Enter OTP"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border ${
+                      errors.email ? "border-red-500" : "border-gray-300"
+                    } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base`}
+                    placeholder="Enter your email address"
                   />
-                  {errors.emailOTP && (
-                    <p className="text-red-500 text-xs mt-1">{errors.emailOTP}</p>
-                  )}
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
-                <button
-                  type="button"
-                  onClick={handleVerifyEmailOTP}
-                  className="bg-[#A100FF] text-white w-24 h-10 px-2 py-1 text-xs rounded-lg shadow-md hover:bg-[#8E00E6] transition-all duration-300"
-                >
-                  Verify OTP
-                </button>
+                {formData.email !== originalEmail && formData.email && (
+                  <button
+                    type="button"
+                    onClick={handleSendEmailOTP}
+                    disabled={emailTimer > 0 || isSendingOTP}
+                    className="bg-[#A100FF] text-white px-4 py-3 text-sm rounded-xl shadow-md hover:bg-[#8E00E6] transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap min-w-fit"
+                  >
+                    {isSendingOTP ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </>
+                    ) : emailTimer > 0 ? (
+                      `Resend (${emailTimer}s)`
+                    ) : (
+                      "Send OTP"
+                    )}
+                  </button>
+                )}
               </div>
             </div>
-          )}
+
+            {showEmailOTPInput && (
+              <div className="space-y-3 bg-white rounded-xl p-4 border border-blue-200">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email Verification Code
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={emailOTP}
+                      onChange={handleEmailOTPChange}
+                      className={`w-full px-4 py-3 border ${
+                        errors.emailOTP ? "border-red-500" : "border-gray-300"
+                      } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base`}
+                      placeholder="Enter the 6-digit code"
+                    />
+                    {errors.emailOTP && <p className="text-red-500 text-xs mt-1">{errors.emailOTP}</p>}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleVerifyEmailOTP}
+                    className="bg-green-600 text-white px-6 py-3 text-sm rounded-xl shadow-md hover:bg-green-700 transition-all duration-300 whitespace-nowrap"
+                  >
+                    Verify Code
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Country <span className="text-[#A100FF]">*</span>
-          </label>
-          <select
-            name="country"
-            value={formData.country}
-            onChange={handleCountryChange}
-            className={`w-full px-4 py-2 border ${errors.country ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-          >
-            <option value="">Select country</option>
-            {countries.map((country) => (
-              <option key={country.value} value={country.value}>
-                {country.label}
-              </option>
-            ))}
-          </select>
-          {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
+
+        {/* Location Section */}
+        <div className="bg-green-50 rounded-2xl p-4 md:p-6">
+          <h3 className="text-lg font-medium text-gray-800 mb-4 md:mb-6">Location Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Country <span className="text-[#A100FF]">*</span>
+              </label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleCountryChange}
+                className={`w-full px-4 py-3 border ${
+                  errors.country ? "border-red-500" : "border-gray-300"
+                } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base bg-white`}
+              >
+                <option value="">Select your country</option>
+                {countries.map((country) => (
+                  <option key={country.value} value={country.value}>
+                    {country.label}
+                  </option>
+                ))}
+              </select>
+              {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                State <span className="text-[#A100FF]">*</span>
+              </label>
+              <select
+                name="state"
+                value={formData.state}
+                onChange={handleStateChange}
+                className={`w-full px-4 py-3 border ${
+                  errors.state ? "border-red-500" : "border-gray-300"
+                } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base bg-white disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                disabled={!formData.country}
+              >
+                <option value="">Select your state</option>
+                {availableStates.map((state) => (
+                  <option key={state.value} value={state.value}>
+                    {state.label}
+                  </option>
+                ))}
+              </select>
+              {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
+            </div>
+
+            <div className="space-y-2 md:col-span-2 lg:col-span-1">
+              <label className="block text-sm font-medium text-gray-700">
+                City <span className="text-[#A100FF]">*</span>
+              </label>
+              <select
+                name="city"
+                value={formData.city}
+                onChange={handleCityChange}
+                className={`w-full px-4 py-3 border ${
+                  errors.city ? "border-red-500" : "border-gray-300"
+                } rounded-xl focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF] text-sm md:text-base bg-white disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                disabled={!formData.state}
+              >
+                <option value="">Select your city</option>
+                {availableCities.map((city) => (
+                  <option key={city.value} value={city.value}>
+                    {city.label}
+                  </option>
+                ))}
+              </select>
+              {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            State <span className="text-[#A100FF]">*</span>
-          </label>
-          <select
-            name="state"
-            value={formData.state}
-            onChange={handleStateChange}
-            className={`w-full px-4 py-2 border ${errors.state ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-            disabled={!formData.country}
-          >
-            <option value="">Select state</option>
-            {availableStates.map((state) => (
-              <option key={state.value} value={state.value}>
-                {state.label}
-              </option>
-            ))}
-          </select>
-          {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            City <span className="text-[#A100FF]">*</span>
-          </label>
-          <select
-            name="city"
-            value={formData.city}
-            onChange={handleCityChange}
-            className={`w-full px-4 py-2 border ${errors.city ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-[#A100FF] focus:border-[#A100FF] transition-all hover:border-[#A100FF]`}
-            disabled={!formData.state}
-          >
-            <option value="">Select city</option>
-            {availableCities.map((city) => (
-              <option key={city.value} value={city.value}>
-                {city.label}
-              </option>
-            ))}
-          </select>
-          {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-        </div>
-        <div className="col-span-2 flex justify-end gap-2 mt-4">
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-end pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all"
+            className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all duration-200 font-medium text-sm md:text-base order-2 sm:order-1"
           >
             Cancel
           </button>
           <button
-            type="submit"
-            className="px-4 py-2 bg-[#A100FF] text-white rounded-lg hover:bg-[#8E00E6] transition-all"
+            type="button"
+            onClick={handleSubmit}
+            className="px-8 py-3 bg-[#A100FF] text-white rounded-xl hover:bg-[#8E00E6] transition-all duration-200 font-medium text-sm md:text-base shadow-lg hover:shadow-xl order-1 sm:order-2"
           >
             Save Changes
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
