@@ -2,7 +2,7 @@ import React from 'react';
 import { IoMdClose } from "react-icons/io";
 
 
-const PrivecyPolicies = ({ onClose }) => {
+const PrivacyPolicies = ({ onClose }) => {
     return (
         <div className="max-w-4xl mx-auto text-gray-800">
             <div className='flex items-center justify-between pb-2 mb-2 border-b border-gray-300'>
@@ -122,4 +122,4 @@ const PrivecyPolicies = ({ onClose }) => {
     );
 };
 
-export default PrivecyPolicies;
+export default PrivacyPolicies;

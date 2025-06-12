@@ -428,6 +428,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { LuPhone } from "react-icons/lu";
+import { MdOutlineMail } from "react-icons/md";
+import OtpInput from "react-otp-input";
+import "../Auth.css";
+import PasswordValidator from "password-validator";
+
+const schema = new PasswordValidator();
+schema
+    .is().min(8)
+    .has().uppercase()
+    .has().lowercase()
+    .has().digits()
+    .has().symbols()
+    .has().not().spaces();
 
 const ForgotPassword = () => {
     const [step, setStep] = useState(1);
@@ -444,6 +458,7 @@ const ForgotPassword = () => {
     const [errors, setErrors] = useState({});
     const [formError, setFormError] = useState("");
     const navigate = useNavigate();
+    const [isOTPLoading, setIsOTPLoading] = useState(false);
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -456,8 +471,20 @@ const ForgotPassword = () => {
         return phoneRegex.test(cleanedPhone);
     };
 
-    const validatePassword = (pwd) => {
-        return pwd.length >= 8;
+    // const validatePassword = (pwd) => {
+    //     return pwd.length >= 8;
+    // };
+
+    const validatePassword = (password) => {
+        const validationErrors = schema.validate(password, { details: true });
+        if (validationErrors.length > 0) {
+            setErrors((prev) => ({
+                ...prev,
+                password: "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space",
+            }));
+            return false;
+        }
+        return true;
     };
 
     useEffect(() => {
@@ -477,8 +504,10 @@ const ForgotPassword = () => {
     }, [resendDisabled, resendCountdown]);
 
     const handleSendOtp = async (e, isResend = false) => {
+        setResendDisabled(true);
         e.preventDefault();
         setFormError("");
+        setIsOTPLoading(true);
         const newErrors = { emailOrPhone: !emailOrPhone };
 
         if (method === "email" && !validateEmail(emailOrPhone)) {
@@ -493,6 +522,7 @@ const ForgotPassword = () => {
         }
 
         setErrors(newErrors);
+        console.log(errors);
         if (Object.values(newErrors).some((error) => error)) return;
 
         try {
@@ -511,6 +541,8 @@ const ForgotPassword = () => {
                     setFormError("");
                     setErrors({});
                 } else {
+                    setResendDisabled(false);
+                    setResendCountdown(0);
                     setFormError(data.message || "Failed to send OTP.");
                 }
             } else {
@@ -518,6 +550,9 @@ const ForgotPassword = () => {
             }
         } catch (error) {
             setFormError("An error occurred. Please try again.");
+        }
+        finally {
+            setIsOTPLoading(false); // Stop loading
         }
     };
 
@@ -562,16 +597,21 @@ const ForgotPassword = () => {
         e.preventDefault();
         setFormError("");
         const newErrors = {
-            password: !password || !validatePassword(password),
+            password: !validatePassword(password),
             confirmPassword: password !== confirmPassword,
         };
 
         if (newErrors.password) {
-            newErrors.password = "Password must be at least 8 characters!";
-            setFormError("Password must be at least 8 characters!");
-        } else if (newErrors.confirmPassword) {
+            newErrors.password = "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space";
+            // setFormError("Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space");
+        }
+        if (newErrors.confirmPassword) {
             newErrors.confirmPassword = "Passwords do not match!";
-            setFormError("Passwords do not match!");
+            setErrors((prev) => ({
+                ...prev,
+                confirmPassword: "Passwords do not match!",
+            }));
+            // setFormError("Passwords do not match!");
         }
 
         setErrors(newErrors);
@@ -606,35 +646,26 @@ const ForgotPassword = () => {
             <AnimatePresence mode="wait">
                 <motion.div
                     key={`step${step}`}
-                    className="flex w-screen justify-center items-center h-screen bg-[#ffffff] overflow-hidden"
+                    className="font-sans min-h-screen bg-violet-100 flex flex-col gap-5 items-center justify-center p-4 bg-cover bg-center"
                     initial="initial"
                     animate="animate"
                     exit="exit"
                     variants={pageVariants}
                 >
                     <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
-                        <div className="absolute -right-[50%] top-[100%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
-                        <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-40 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+                        <div className="absolute -right-[50%] top-[120%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+                        <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
                         <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
                         <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
                     </div>
-                    <div className="flex flex-col gap-1 w-[400px] h-fit z-10 bg-white p-8 rounded-4xl shadow-md shadow-[#c598de] text-center text-sm justify-center">    
+                    <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md z-10">
                         <div className="flex flex-col mb-2 items-center gap-3">
-                            <h2 className="text-4xl mb-3 font-bold text-[#5E0194]">
+                            <h2 className="text-xl font-semibold text-gray-800 text-center">
                                 Forgot Password
                             </h2>
-                            {step === 1 && (
-                                <p className="w-full text-left text-[#786D7F] opacity-[86%] text-sm">
-                                    Back to{" "}
-                                    <a
-                                        href="#"
-                                        className="text-[#A100FF] font-medium underline"
-                                        onClick={() => navigate("/login")}
-                                    >
-                                        Sign in
-                                    </a>
-                                </p>
-                            )}
+                            <p className="text-sm text-gray-500 mb-6 text-center font-sans">
+                                Enter your credentials to set new password
+                            </p>
                         </div>
                         <div className="text-sm text-left text-red-500 font-medium">
                             <p>{formError}</p>
@@ -645,8 +676,46 @@ const ForgotPassword = () => {
                                     <label className="block font-medium mb-1 text-black opacity-[73%]">
                                         Reset using
                                     </label>
-                                    <div className="flex gap-4">
-                                        <label className="flex items-center gap-1">
+                                    {/* <div className="flex gap-4"> */}
+                                    <div className="flex justify-center  w-full border border-gray-200 rounded-lg p-0.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMethod("phone");
+                                                setEmailOrPhone("");
+                                                setShowOtpInput(false);
+                                                setOtp("");
+                                                setErrors({});
+                                                setFormError("");
+                                                setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
+                                            }}
+                                            className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${method === "phone"
+                                                ? "bg-purple-600 text-white rounded-lg"
+                                                : "text-gray-500"
+                                                }`}
+                                        >
+                                            <span className="text-lg"><LuPhone /> </span> Phone
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMethod("email");
+                                                setEmailOrPhone("");
+                                                setShowOtpInput(false);
+                                                setOtp("");
+                                                setErrors({});
+                                                setFormError("");
+                                                setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
+                                            }}
+                                            className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${method === "email"
+                                                ? "bg-purple-600 text-white rounded-lg"
+                                                : "text-gray-500"
+                                                } transition-all duration-200`}
+                                        >
+                                            <span className="text-lg"><MdOutlineMail /> </span> Email
+                                        </button>
+                                    </div>
+                                    {/* <label className="flex items-center gap-1">
                                             <input
                                                 type="radio"
                                                 value="phone"
@@ -662,8 +731,8 @@ const ForgotPassword = () => {
                                                 className="h-4 w-4 border-gray-300"
                                             />
                                             Phone
-                                        </label>
-                                        <label className="flex items-center gap-1">
+                                        </label> */}
+                                    {/* <label className="flex items-center gap-1">
                                             <input
                                                 type="radio"
                                                 value="email"
@@ -679,18 +748,20 @@ const ForgotPassword = () => {
                                                 className="h-4 w-4 text-violet-500 focus:ring-violet-500 border-gray-300"
                                             />
                                             Email
-                                        </label>
-                                    </div>
+                                        </label> */}
+
+
+                                    {/* </div> */}
                                 </div>
                                 {method === "phone" ? (
                                     <div className="text-left mb-4">
-                                        <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                                        <label className="flex items-center gap-1 font-medium mb-2 text-black opacity-[73%]">
                                             Phone number
                                             {errors.emailOrPhone && (
                                                 <p className="text-red-500 text-sm">{errors.emailOrPhone ? "*" : ""}</p>
                                             )}
                                         </label>
-                                        <PhoneInput
+                                        {/* <PhoneInput
                                             country={"in"}
                                             value={emailOrPhone}
                                             onChange={(value) => {
@@ -699,9 +770,8 @@ const ForgotPassword = () => {
                                                 setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
                                             }}
                                             containerClass="w-full"
-                                            inputClass={`w-full h-12 px-4 text-gray-900 border ${
-                                                errors.emailOrPhone ? "border-red-500" : "border-gray-300"
-                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            inputClass={`w-full h-12 px-4 text-gray-900 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             buttonClass="border-gray-300 h-14 w-16"
                                             dropdownClass="h-28"
                                             containerStyle={{
@@ -723,11 +793,37 @@ const ForgotPassword = () => {
                                                 border: "none",
                                                 outline: "none",
                                             }}
+                                        /> */}
+                                        <PhoneInput
+                                            country={"in"}
+                                            value={emailOrPhone}
+                                            onChange={(value) => {
+                                                setEmailOrPhone(value);
+                                                setFormError("");
+                                                setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
+                                            }}
+                                            containerClass="w-full"
+                                            inputClass={`w-full h-12 px-4 text-gray-900 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
+                                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+                                            buttonClass="border-gray-300 h-12"
+                                            dropdownClass="h-28"
+                                            containerStyle={{ height: "48px", width: "100%" }}
+                                            inputStyle={{ height: "48px", width: "100%", border: "1px #e5e7eb solid" }}
+                                            buttonStyle={{
+                                                position: "absolute",
+                                                left: "5px",
+                                                top: "5px",
+                                                height: "40px",
+                                                width: "40px",
+                                                backgroundColor: "transparent",
+                                                border: "none",
+                                                outline: "none",
+                                            }}
                                         />
                                     </div>
                                 ) : (
                                     <div className="text-left mb-4">
-                                        <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                                        <label className="flex items-center gap-1 font-medium mb-2 text-black opacity-[73%]">
                                             Email address
                                             {errors.emailOrPhone && (
                                                 <p className="text-red-500 text-sm">{errors.emailOrPhone ? "*" : ""}</p>
@@ -741,22 +837,21 @@ const ForgotPassword = () => {
                                                 setFormError("");
                                                 setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
                                             }}
-                                            className={`w-full h-11 px-3 border ${
-                                                errors.emailOrPhone ? "border-red-500" : "border-gray-300"
-                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            className={`w-full h-12 px-4 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-200"
+                                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
                                             placeholder="Enter your email"
                                         />
                                     </div>
                                 )}
                                 {showOtpInput && (
-                                    <div className="text-left mb-2">
-                                        <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                                    <div className="text-left mb-1">
+                                        <label className="flex items-center gap-1 font-medium mb-2 text-black opacity-[73%]">
                                             Enter OTP
                                             {errors.otp && (
                                                 <p className="text-red-500 text-sm">{errors.otp ? "*" : ""}</p>
                                             )}
                                         </label>
-                                        <input
+                                        {/* <input
                                             type="text"
                                             value={otp}
                                             onChange={(e) => {
@@ -764,14 +859,37 @@ const ForgotPassword = () => {
                                                 setFormError("");
                                                 setErrors((prev) => ({ ...prev, otp: "" }));
                                             }}
-                                            className={`w-full h-10 px-3 border ${
-                                                errors.otp ? "border-red-500" : "border-gray-300"
-                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            className={`w-full h-10 px-3 border ${errors.otp ? "border-red-500" : "border-gray-300"
+                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             placeholder="Enter OTP"
+                                        /> */}
+                                        <OtpInput
+                                            value={otp}
+                                            onChange={setOtp}
+                                            numInputs={6}
+                                            renderInput={(props) => (
+                                                <input
+                                                    {...props}
+                                                    style={{
+                                                        width: "48px",
+                                                        height: "48px",
+                                                        fontSize: "20px",
+                                                        textAlign: "center",
+                                                        border: "1px solid #ccc",
+                                                        borderRadius: "8px",
+                                                        margin: "auto",
+                                                        transition: "border 0.2s ease",
+                                                        ":focus": {
+                                                            outline: "none",
+                                                            border: "2px solid #7c3aed",
+                                                        },
+                                                    }}
+                                                />
+                                            )}
                                         />
                                     </div>
                                 )}
-                                <div className="w-full text-end text-xs mb-2">
+                                {/* <div className="w-full text-end text-xs mb-2">
                                     {!showOtpInput ? (
                                         <button
                                             onClick={handleSendOtp}
@@ -783,91 +901,144 @@ const ForgotPassword = () => {
                                         <button
                                             onClick={(e) => handleSendOtp(e, true)}
                                             disabled={resendDisabled}
-                                            className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${
-                                                resendDisabled
-                                                    ? "text-gray-400 cursor-not-allowed"
-                                                    : "text-[#5E0194] hover:text-violet-800"
-                                            }`}
+                                            className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${resendDisabled
+                                                ? "text-gray-400 cursor-not-allowed"
+                                                : "text-[#5E0194] hover:text-violet-800"
+                                                }`}
+                                        >
+                                            Resend OTP {resendDisabled ? `(${resendCountdown}s)` : ""}
+                                        </button>
+                                    )}
+                                </div> */}
+                                <div className="w-full text-start text-xs mb-4">
+                                    {!showOtpInput ? (
+                                        <></>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => handleSendOtp(e, true)}
+                                            disabled={resendDisabled}
+                                            className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${resendDisabled
+                                                ? "text-gray-400 cursor-not-allowed border-gray-300"
+                                                : "text-[#5E0194] hover:text-violet-800"
+                                                }`}
                                         >
                                             Resend OTP {resendDisabled ? `(${resendCountdown}s)` : ""}
                                         </button>
                                     )}
                                 </div>
-                                {showOtpInput && (
+                                {/* {showOtpInput && (
                                     <button
                                         onClick={handleVerifyOtp}
                                         className="bg-[#5E0194] text-white w-[40%] p-3 rounded-lg shadow-md hover:bg-violet-800 mt-4 transition-all duration-300"
                                     >
                                         Verify OTP
                                     </button>
-                                )}
+                                )} */}
+                                <div className="w-full text-end text-xs mb-4">
+                                    {!showOtpInput ? (
+                                        <button
+                                            onClick={handleSendOtp}
+                                            className="bg-[#A100FF] text-white w-full p-3 rounded-lg shadow-md hover:shadow-purple-400 hover:bg-purple-600 mx-auto transition-all duration-300 text-lg font-semibold flex items-center justify-center"
+                                            // className="bg-[#A011FF] text-white text-lg font-semibold w-full p-2.5 rounded-lg shadow-md hover:bg-violet-800 transition-all duration-300 flex items-center justify-center"
+                                            disabled={isOTPLoading}
+                                        >
+                                            {isOTPLoading ? (
+                                                <>
+                                                    <span className="loader mr-2"></span>
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                "Send OTP"
+                                            )}
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleVerifyOtp}
+                                            className={` w-full p-3 rounded-lg shadow-md mx-auto text-lg font-semibold flex items-center justify-center ${otp.length === 6 ? "bg-[#A100FF] text-white hover:shadow-purple-400 hover:bg-purple-600" : "bg-gray-300 text-gray-700"} transition-all duration-300`}
+                                            disabled={otp.length !== 6}
+                                        >
+                                            Next
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         )}
                         {step === 2 && (
                             <div>
-                                <div className="text-left relative mb-4">
-                                    <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
-                                        New Password
-                                        {errors.password && (
-                                            <p className="text-red-500 text-sm">{errors.password ? "*" : ""}</p>
-                                        )}
-                                    </label>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        value={password}
-                                        onChange={(e) => {
-                                            setPassword(e.target.value);
-                                            setFormError("");
-                                            setErrors((prev) => ({ ...prev, password: "" }));
-                                        }}
-                                        className={`w-full h-10 px-2 pr-10 border ${
-                                            errors.password ? "border-red-500" : "border-gray-300"
-                                        } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                        placeholder="Enter new password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-2 top-[35px] text-gray-500"
-                                    >
-                                        {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
-                                    </button>
+                                <div className="flex flex-col gap-1 mb-4">
+                                    <div className="text-left relative">
+                                        <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                                            New Password *
+                                        </label>
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => {
+                                                setPassword(e.target.value);
+                                                setFormError("");
+                                                setErrors((prev) => ({ ...prev, password: "" }));
+                                            }}
+                                            className={`w-full h-12 px-4 border ${errors.password ? "border-red-500" : "border-gray-200"
+                                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+                                            placeholder="Enter new password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-2 bottom-3.5 text-gray-500"
+                                        >
+                                            {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                                        </button>
+                                    </div>
+                                    {errors.password && (
+                                        <p className="text-red-500 text-xs">{errors.password ? `${errors.password}` : ""}</p>
+                                    )}
                                 </div>
-                                <div className="text-left relative mb-4">
-                                    <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
-                                        Confirm Password
-                                        {errors.confirmPassword && (
-                                            <p className="text-red-500 text-sm">{errors.confirmPassword ? "*" : ""}</p>
-                                        )}
-                                    </label>
-                                    <input
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        value={confirmPassword}
-                                        onChange={(e) => {
-                                            setConfirmPassword(e.target.value);
-                                            setFormError("");
-                                            setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-                                        }}
-                                        className={`w-full h-10 px-2 pr-10 border ${
-                                            errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                                        } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
-                                        placeholder="Confirm new password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-2 top-[35px] text-gray-500"
-                                    >
-                                        {showConfirmPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
-                                    </button>
+                                <div className="flex flex-col gap-1 mb-4">
+                                    <div className="text-left relative">
+                                        <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
+                                            Confirm Password *
+                                        </label>
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            value={confirmPassword}
+                                            onChange={(e) => {
+                                                setConfirmPassword(e.target.value);
+                                                setFormError("");
+                                                setErrors((prev) => ({ ...prev, confirmPassword: "" }));
+                                            }}
+                                            className={`w-full h-12 px-4 border ${errors.confirmPassword ? "border-red-500" : "border-gray-200"
+                                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+                                            placeholder="Confirm new password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-2 bottom-3.5 text-gray-500"
+                                        >
+                                            {showConfirmPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                                        </button>
+                                    </div>
+                                    {errors.confirmPassword && (
+                                        <p className="text-red-500 text-xs">{errors.confirmPassword ? `${errors.confirmPassword}` : ""}</p>
+                                    )}
                                 </div>
                                 <button
                                     onClick={handleResetPassword}
-                                    className="bg-[#5E0194] text-white w-[50%] p-3 rounded-lg shadow-md hover:bg-violet-800 mx-auto transition-all duration-300"
+                                    className="bg-[#A100FF] text-white w-full p-3 rounded-lg shadow-md hover:shadow-purple-400 hover:bg-purple-600 mx-auto transition-all duration-300 text-lg font-semibold"
                                 >
                                     Reset Password
                                 </button>
                             </div>
+
+                        )}
+                        {step === 1 && (
+                            <p className="text-gray-500 opacity-[99%] text-sm text-center ">
+                                Already have an account?{" "}
+                                <a href="../login" className="text-[#A100FF] font-medium hover:underline" >
+                                    Sign in
+                                </a>
+                            </p>
                         )}
                     </div>
                 </motion.div>
