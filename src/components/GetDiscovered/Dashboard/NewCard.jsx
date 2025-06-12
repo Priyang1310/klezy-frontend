@@ -45,30 +45,37 @@ const NewCard = ({ post }) => {
     otherLinks = [],
     expectations = "",
     anyOtherInfo = "",
-    instagram = "",
-    linkedin = "",
-    whatsapp = "",
-    email = "",
     freelancePaymentRange = {},
     _id: listingIdFromPost,
   } = post || {};
+  
+  // Extract contact methods from the nested structure
+  const {
+    instagram = {},
+    linkedin = {},
+    whatsapp = {},
+    email = {},
+    facebook = {},
+    call = {},
+    other = {}
+  } = contact_methods || {};
+
   console.log(post)
   console.log("workBasis: ",workBasis)
+  console.log("contact_methods: ", contact_methods)
+  
   // Format work basis
   const jobType = Object.keys(workBasis)
     .filter((key) => workBasis[key])
     .join(", ") || "Not specified";
   console.log("jobtype: ",jobType);
+  
   // Format work mode and location
-
-
   const workModeString = Object.keys(workMode)
     .filter((key) => workMode[key])
     .join(", ") || "";
     console.log(workModeString)
     console.log(workMode)
-
-
 
   const locationString = [district, state, country].filter(Boolean).join(", ");
   const location = workModeString ? `${workModeString}${locationString ? `: ${locationString}` : ""}` : "Location not specified";
@@ -118,14 +125,10 @@ const NewCard = ({ post }) => {
         {/* Role, Domain, Status */}
         <div className="flex w-full items-start justify-between" onClick={() => setIsModalOpen(true)}>
           <div className="flex items-start gap-2 sm:gap-5">
-            <div className="flex flex-col border-r border-gray-300 pr-2 sm:pr-4">
+            <div className="flex flex-col   pr-2 sm:pr-4">
               <p className="text-sm sm:text-md font-semibold">{roleUnderDomain}</p>
               <p className="text-xs sm:text-sm font-medium">{domainName}</p>
             </div>
-            {/* <div className="flex items-center gap-1 font-medium">
-              <FaMoneyBills className="text-violet-500 text-lg" />
-              {jobType}
-            </div> */}
           </div>
           <div className={`w-3.5 h-3.5 rounded-full ${statusColor[status] || "bg-gray-200"}`}></div>
         </div>
@@ -194,57 +197,62 @@ const NewCard = ({ post }) => {
 
         {/* Contact Methods and Buttons */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full mt-2 gap-3 sm:gap-4">
-  {/* Social Media Icons */}
-  <div className="flex items-center gap-1.5 w-fit">
-    
-    {instagram && (
-      <img src="./instagram.svg" alt="Instagram" className="h-4 w-4 object-cover" />
-    )}
-    {linkedin && (
-      <img src="./linkedIn.svg" alt="LinkedIn" className="h-4 w-4 object-cover" />
-    )}
-    {whatsapp && (
-      <img src="./whatsapp.svg" alt="WhatsApp" className="h-5 w-5 object-cover" />
-    )}
-    {email && (
-      <img src="./email.svg" alt="Email" className="h-5 w-5 object-cover" />
-    )}
-  </div>
-  
-  {/* Action Buttons */}
-  <div className="flex justify-space gap-1 sm:gap-3 mt-1 w-full sm:w-auto">
-    {/* Icon Buttons */}
-    <div className="flex gap-1 sm:gap-2">
-      <button
-        className="text-[#A100FF] text-lg sm:text-xl p-1.5 sm:p-2 rounded-full hover:bg-purple-50 transition-colors duration-200 flex items-center justify-center"
-        onClick={() => {
-          setListingId(listingIdFromPost);
-          setIsUpdateModalOpen(true);
-        }}
-        title="Edit"
-      >
-        <CiEdit />
-      </button>
-      <button
-        className="text-[#A100FF] text-lg sm:text-xl p-1.5 sm:p-2 rounded-full hover:bg-purple-50 transition-colors duration-200 flex items-center justify-center"
-        onClick={() => setIsModalOpen(true)}
-        title="View Details"
-      >
-        <MdOutlineRemoveRedEye />
-      </button>
-    </div>
-    
-    {/* Text Buttons */}
-    <div className="flex gap-1 sm:gap-3 w-full sm:w-auto">
-      <button className="text-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-2 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-50 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
-        Start Searching
-      </button>
-      <button className="text-white bg-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-1 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-700 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
-        View Applications
-      </button>
-    </div>
-  </div>
-</div>
+          {/* Social Media Icons */}
+          <div className="flex items-center gap-1.5 w-fit">
+            {instagram?.selected && (
+              <img src="./instagram.svg" alt="Instagram" className="h-4 w-4 object-cover" />
+            )}
+            {linkedin?.selected && (
+              <img src="./linkedIn.svg" alt="LinkedIn" className="h-4 w-4 object-cover" />
+            )}
+            {whatsapp?.selected && (
+              <img src="./whatsapp.svg" alt="WhatsApp" className="h-5 w-5 object-cover" />
+            )}
+            {email?.selected && (
+              <img src="./email.svg" alt="Email" className="h-5 w-5 object-cover" />
+            )}
+            {facebook?.selected && (
+              <img src="./facebook.svg" alt="Facebook" className="h-4 w-4 object-cover" />
+            )}
+            {call?.selected && (
+              <img src="./phone.svg" alt="Phone" className="h-4 w-4 object-cover" />
+            )}
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex justify-space gap-1 sm:gap-3 mt-1 w-full sm:w-auto">
+            {/* Icon Buttons */}
+            <div className="flex gap-1 sm:gap-2">
+              <button
+                className="text-[#A100FF] text-lg sm:text-xl p-1.5 sm:p-2 rounded-full hover:bg-purple-50 transition-colors duration-200 flex items-center justify-center"
+                onClick={() => {
+                  setListingId(listingIdFromPost);
+                  setIsUpdateModalOpen(true);
+                }}
+                title="Edit"
+              >
+                <CiEdit />
+              </button>
+              <button
+                className="text-[#A100FF] text-lg sm:text-xl p-1.5 sm:p-2 rounded-full hover:bg-purple-50 transition-colors duration-200 flex items-center justify-center"
+                onClick={() => setIsModalOpen(true)}
+                title="View Details"
+              >
+                <MdOutlineRemoveRedEye />
+              </button>
+            </div>
+            
+            {/* Text Buttons */}
+            <div className="flex gap-1 sm:gap-3 w-full sm:w-auto">
+              <button className="text-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-2 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-50 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
+                Start Searching
+              </button>
+              <button className="text-white bg-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-1 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-700 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
+                View Applications
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* View Modal */}
