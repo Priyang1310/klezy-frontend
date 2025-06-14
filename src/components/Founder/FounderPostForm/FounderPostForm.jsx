@@ -72,6 +72,7 @@ function FounderPostForm({ onClose }) {
         responsibilities: "",
         whyShouldJoin: "",
         anyOtherInfo: "",
+        profile_pic : "",
     });
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [errors, setErrors] = useState({});
@@ -94,7 +95,12 @@ function FounderPostForm({ onClose }) {
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [profileError, setProfileError] = useState("");
     const [enhanceLoading, setEnhanceLoading] = useState({}); // Track loading state for each field
-
+    const totalSteps = 3;
+     const stepTitles = [
+    "Let's introduce you to the world.",
+    "Tell us about your preferences.",
+    "Almost done! Final details."
+  ];
     // Fetch profile data
     useEffect(() => {
         const fetchProfile = async () => {
@@ -109,17 +115,18 @@ function FounderPostForm({ onClose }) {
                 if (!response.ok) throw new Error("Failed to fetch profile");
                 const data = await response.json();
 
-                console.log(data);
+                console.log("profile",data.user);
                 setFormData((prev) => ({
                     ...prev,
                     first_name: data.user.firstName || "",
                     middle_name: data.user.middleName || "",
-                    last_name: data.user.lastName || "",
+                    last_name: data.user.lastName || "",  
                     gender: data.user.gender || "",
                     email: data.user.email || "",
                     country: data.user.country || "",
                     state: data.user.state || "",
                     district: data.user.city || "",
+                    profile_pic: data.profile_pic || "",
                 }));
             } catch (error) {
                 setProfileError("Failed to load profile data");
@@ -1045,6 +1052,7 @@ function FounderPostForm({ onClose }) {
         return Object.keys(newErrors).length === 0;
     };
 
+
     const handleNext = async () => {
         let isValid = false;
         if (step === 1) isValid = validateStep1();
@@ -1336,771 +1344,628 @@ function FounderPostForm({ onClose }) {
     if (profileError) {
         return <div className="text-red-500">{profileError}</div>;
     }
+const handleProfilePhotoChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formDataToUpload = new FormData();
+  formDataToUpload.append("media", file);
+
+  try {
+    const response = await fetch("http://localhost:3333/api/media/upload", {
+      method: "POST",
+      body: formDataToUpload,
+      credentials: "include", // if you use cookies/session
+    });
+
+    if (!response.ok) throw new Error("Failed to upload image");
+
+    const result = await response.json();
+    console.log(result)
+
+    // Set the returned URL as profilePhoto
+    setFormData((prev) => ({ ...prev, profile_pic: result.url }));
+  } catch (error) {
+    console.error("Error uploading profile photo:", error);
+    alert("Failed to upload profile photo. Please try again.");
+  }
+};
 
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
-            <div className="hidden md:flex h-20 items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-full max-w-4xl mx-auto text-xl">
-    <div className="flex flex-col">
-        <p className="flex items-center gap-2">
-            01{" "}
-            <span className="text-sm text-violet-600">
-                About Founder
-            </span>
-        </p>
-        <div className="flex items-center gap-1">
-            <div className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600">
-                ✓
-            </div>
-            <div className={`w-[100px] lg:w-[150px] h-1 ${step > 1 ? "bg-violet-600" : "bg-gray-200"}`}></div>
-        </div>
-    </div>
-    <div className="flex flex-col">
-        <p className="flex items-center gap-2">
-            02{" "}
-            <span className={`text-sm ${step > 1 ? "text-violet-600" : "text-black"}`}>
-                Skills and Strength
-            </span>
-        </p>
-        <div className="flex items-center gap-1">
-            <div className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 1 ? "bg-violet-600" : "bg-white"}`}>
-                ✓
-            </div>
-            <div className={`w-[100px] lg:w-[150px] h-1 ${step > 2 ? "bg-violet-600" : "bg-gray-200"}`}></div>
-        </div>
-    </div>
-    <div className="flex flex-col">
-        <p className="flex items-center gap-2 w-[100px] lg:w-[150px]">
-            03{" "}
-            <span className={`text-sm ${step > 2 ? "text-violet-600" : "text-black"}`}>
-                Looking for
-            </span>
-        </p>
-        <div className="flex items-center gap-1">
-            <div className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 2 ? "bg-violet-600" : "bg-white"}`}>
-                ✓
-            </div>
-        </div>
-    </div>
+        <div className="bg-white p-4 sm:pt-3 rounded-2xl w-full">
+          {/* Simple Progress Bar Line */}
+<div className=" sm:mb-4">
+  {/* Progress Bar Container */}
+  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+    <div 
+      className="bg-[#7900BF] h-2 rounded-full transition-all duration-500 ease-out"
+      style={{ width: `${(step / 3) * 100}%` }}
+    ></div>
+  </div>
+  
+  {/* Step Title */}
+  <h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
+    {step === 1 ? "Let's introduce you to the world." : 
+     step === 2 ? "Tell us about your preferences." : 
+     "Almost done! Final details."}
+  </h3>
+  
+  {/* Step indicator */}
+  <p className="text-sm text-gray-500">
+    Step {step} of 3
+  </p>
 </div>
-
 {/* Mobile Layout */}
-<div className="md:hidden rounded-t-2xl mb-6 border-b border-gray-200 w-full mx-auto py-4">
-    {/* Progress Bar */}
-    <div className="flex items-center justify-center mb-4 px-4">
-        <div className="flex items-center w-full max-w-sm">
-            <div className="flex items-center justify-center h-6 w-6 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600">
-                ✓
-            </div>
-            <div className={`flex-1 h-1 mx-2 ${step > 1 ? "bg-violet-600" : "bg-gray-200"}`}></div>
-            <div className={`flex items-center justify-center h-6 w-6 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 1 ? "bg-violet-600" : "bg-white"}`}>
-                ✓
-            </div>
-            <div className={`flex-1 h-1 mx-2 ${step > 2 ? "bg-violet-600" : "bg-gray-200"}`}></div>
-            <div className={`flex items-center justify-center h-6 w-6 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 2 ? "bg-violet-600" : "bg-white"}`}>
-                ✓
-            </div>
-        </div>
-    </div>
 
-    {/* Step Labels */}
-    <div className="flex justify-between items-center px-4 text-sm">
-        <div className="flex flex-col items-center">
-            <span className="text-xs font-medium mb-1">01</span>
-            <span className="text-violet-600 text-center leading-tight">About Founder</span>
-        </div>
-        <div className="flex flex-col items-center">
-            <span className="text-xs font-medium mb-1">02</span>
-            <span className={`text-center leading-tight ${step > 1 ? "text-violet-600" : "text-black"}`}>
-                Skills & Strength
-            </span>
-        </div>
-        <div className="flex flex-col items-center">
-            <span className="text-xs font-medium mb-1">03</span>
-            <span className={`text-center leading-tight ${step > 2 ? "text-violet-600" : "text-black"}`}>
-                Looking for
-            </span>
-        </div>
-    </div>
-</div>
-
-{step === 1 && (
-    <div className="flex flex-col sm:flex-row items-center w-full bg-violet-100 px-3 sm:px-5 py-4 sm:py-0 rounded-2xl mb-5 gap-3 sm:gap-0">
-        <div className="flex flex-col text-center sm:text-left">
-            <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-                Stay It Your Way
-            </p>
-            <p className="text-violet-400 text-sm sm:text-base">
-                This isn't your typical hiring form. In a few short
-                questions, you'll paint a picture of your world and
-                who you're looking for — no corporate lingo
-                required.
-            </p>
-        </div>
-        <img 
-            src="./FormImage1.svg" 
-            alt="Stay It Your Way" 
-            className="scale-125 sm:scale-150 w-16 h-16 sm:w-auto sm:h-auto flex-shrink-0" 
-        />
-    </div>
-)}
-
-{step === 2 && (
-    <div className="flex flex-col sm:flex-row items-center w-full bg-violet-100 px-3 sm:px-5 py-4 sm:py-0 rounded-2xl mb-5 gap-3 sm:gap-0">
-        <div className="flex flex-col text-center sm:text-left">
-            <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-                You're almost there!
-            </p>
-            <p className="text-violet-400 text-sm sm:text-base">
-                This fun little form helps you describe your vibe
-                and your need — quick, casual, and human. No
-                resumes, no HR jargon. Just say it like it is.
-            </p>
-        </div>
-        <img 
-            src="./FormImage2.svg" 
-            alt="You're almost there!" 
-            className="w-16 h-16 sm:w-auto sm:h-auto flex-shrink-0" 
-        />
-    </div>
-)}
-
-{step === 3 && (
-    <div className="flex flex-col sm:flex-row items-center w-full bg-violet-100 px-3 sm:px-5 py-4 sm:py-0 rounded-2xl mb-5 gap-3 sm:gap-0">
-        <div className="flex flex-col text-center sm:text-left">
-            <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-                You've made it to the final step!
-            </p>
-            <p className="text-violet-400 text-sm sm:text-base">
-                This short form captures who you are, what you need,
-                and how your team works — no fluff, no lengthy job
-                descriptions. Just clear, honest details. Done in
-                minutes.
-            </p>
-        </div>
-        <img 
-            src="./FormImage3.svg" 
-            alt="You've made it to the final step!" 
-            className="w-16 h-16 sm:w-auto sm:h-auto flex-shrink-0" 
-        />
-    </div>
-)}
 
             {step === 1 && (
-                <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    <h3 className="col-span-full text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
-                        Let's introduce you to the world.
-                    </h3>
-                    
-                    {/* Name Fields */}
-                    <div className="relative">
-                        <label
-                            htmlFor="first_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            First Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="first_name"
-                            name="first_name"
-                            value={formData.first_name}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                        {errors.first_name && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.first_name}
-                            </p>
-                        )}
-                    </div>
+  <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+    {/* <h3 className="col-span-full text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
+      Let's introduce you to the world.
+    </h3> */}
 
-                    <div className="relative">
-                        <label
-                            htmlFor="middle_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Middle Name
-                        </label>
-                        <input
-                            id="middle_name"
-                            name="middle_name"
-                            value={formData.middle_name}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                    </div>
+    {/* Profile Photo Section */}
+<div className="col-span-full flex flex-col items-center gap-3 sm:gap-4">
+  <div className="relative">
+    <img
+      src={formData.profile_pic || `https://api.dicebear.com/8.x/initials/svg?seed=${formData.first_name || 'User'}`}
+      alt="Profile"
+      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-purple-300 shadow-md"
+    />
+    {/* Optional overlay edit icon */}
+    <label htmlFor="profilePhotoUpload" className="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow cursor-pointer hover:bg-gray-100">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 text-purple-600"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path d="M17.414 2.586a2 2 0 010 2.828l-9.95 9.95a2 2 0 01-.878.516l-3.535 1.01a1 1 0 01-1.213-1.213l1.01-3.535a2 2 0 01.516-.878l9.95-9.95a2 2 0 012.828 0z" />
+      </svg>
+      <input
+        type="file"
+        id="profilePhotoUpload"
+        accept="image/*"
+        onChange={handleProfilePhotoChange}
+        className="hidden"
+      />
+    </label>
+  </div>
+  <button
+    type="button"
+    onClick={() => document.getElementById('profilePhotoUpload')?.click()}
+    className="text-sm font-medium text-purple-700 hover:underline"
+  >
+    Update Photo
+  </button>
+</div>
 
-                    <div className="relative md:col-span-2 lg:col-span-1">
-                        <label
-                            htmlFor="last_name"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Last Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="last_name"
-                            name="last_name"
-                            value={formData.last_name}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                        {errors.last_name && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.last_name}
-                            </p>
-                        )}
-                    </div>
 
-                    {/* Location Fields */}
-                    <div className="relative">
-                        <label
-                            htmlFor="country"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Country <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="country"
-                            name="country"
-                            value={formData.country}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                        {errors.country && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.country}
-                            </p>
-                        )}
-                    </div>
+    {/* Name Fields */}
+    <div className="relative">
+      <label
+        htmlFor="first_name"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        First Name <span className="text-red-500">*</span>
+      </label>
+      <input
+        id="first_name"
+        name="first_name"
+        value={formData.first_name}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+      {errors.first_name && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.first_name}
+        </p>
+      )}
+    </div>
 
-                    <div className="relative">
-                        <label
-                            htmlFor="state"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            State <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="state"
-                            name="state"
-                            value={formData.state}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                        {errors.state && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.state}
-                            </p>
-                        )}
-                    </div>
+    <div className="relative">
+      <label
+        htmlFor="middle_name"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Middle Name
+      </label>
+      <input
+        id="middle_name"
+        name="middle_name"
+        value={formData.middle_name}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+    </div>
 
-                    <div className="relative md:col-span-2 lg:col-span-1">
-                        <label
-                            htmlFor="district"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            City <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="district"
-                            name="district"
-                            value={formData.district}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                        {errors.district && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.district}
-                            </p>
-                        )}
-                    </div>
+    <div className="relative md:col-span-2 lg:col-span-1">
+      <label
+        htmlFor="last_name"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Last Name <span className="text-red-500">*</span>
+      </label>
+      <input
+        id="last_name"
+        name="last_name"
+        value={formData.last_name}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+      {errors.last_name && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.last_name}
+        </p>
+      )}
+    </div>
 
-                    {/* Gender and Email */}
-                    <div className="relative">
-                        <label
-                            htmlFor="gender"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Gender <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="gender"
-                            name="gender"
-                            value={formData.gender}
-                            disabled
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Prefer not to specify">
-                                Prefer not to specify
-                            </option>
-                        </select>
-                        {errors.gender && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.gender}
-                            </p>
-                        )}
-                    </div>
+    {/* Location Fields */}
+    <div className="relative">
+      <label
+        htmlFor="country"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Country <span className="text-red-500">*</span>
+      </label>
+      <input
+        id="country"
+        name="country"
+        value={formData.country}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+      {errors.country && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.country}
+        </p>
+      )}
+    </div>
 
-                    <div className="relative md:col-span-1 lg:col-span-2">
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            disabled
-                            type="text"
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
-                        />
-                        {errors.email && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.email}
-                            </p>
-                        )}
-                    </div>
+    <div className="relative">
+      <label
+        htmlFor="state"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        State <span className="text-red-500">*</span>
+      </label>
+      <input
+        id="state"
+        name="state"
+        value={formData.state}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+      {errors.state && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.state}
+        </p>
+      )}
+    </div>
 
-                    {/* Personal Website */}
-                    <div className="relative col-span-full">
-                        <label
-                            htmlFor="websiteOfStartupLink"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Personal website
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                id="websiteOfStartupLink"
-                                name="websiteOfStartupLink"
-                                value={formData.websiteOfStartupLink}
-                                onChange={handleChange}
-                                type="url"
-                                placeholder="Enter website URL (https://)"
-                                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                                    errors.websiteOfStartupLink
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                            />
-                        </div>
-                        {errors.websiteOfStartupLink && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.websiteOfStartupLink}
-                            </p>
-                        )}
-                    </div>
+    <div className="relative md:col-span-2 lg:col-span-1">
+      <label
+        htmlFor="district"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        City <span className="text-red-500">*</span>
+      </label>
+      <input
+        id="district"
+        name="district"
+        value={formData.district}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+      {errors.district && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.district}
+        </p>
+      )}
+    </div>
 
-                    {/* User Type */}
-                    <div className="relative col-span-full">
-                        <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-1">
-                            You are a <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                            {[
-                                "Business Owner",
-                                "Startup Founder",
-                                "Working Professional",
-                                "Freelancer",
-                                "Student",
-                                "Other",
-                            ].map((type) => (
-                                <label key={type} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="userType"
-                                        value={type}
-                                        checked={formData.userType === type}
-                                        onChange={handleChange}
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <span className="ml-2 text-sm sm:text-base text-gray-700">
-                                        {type}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.userType && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.userType}
-                            </p>
-                        )}
-                        {formData.userType === "Other" && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="otherUserType"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Specify User Type{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <input
-                                        id="otherUserType"
-                                        name="otherUserType"
-                                        value={formData.otherUserType}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Specify your user type"
-                                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                                            errors.otherUserType
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                </div>
-                                {errors.otherUserType && (
-                                    <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                        {errors.otherUserType}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    </div>
+    {/* Gender and Email */}
+    <div className="relative">
+      <label
+        htmlFor="gender"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Gender <span className="text-red-500">*</span>
+      </label>
+      <select
+        id="gender"
+        name="gender"
+        value={formData.gender}
+        disabled
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      >
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Prefer not to specify">
+          Prefer not to specify
+        </option>
+      </select>
+      {errors.gender && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.gender}
+        </p>
+      )}
+    </div>
 
-                    {/* Requirement Type */}
-                    <div className="relative col-span-full">
-                        <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-1">
-                            This requirement is for a{" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                            {[
-                                "Business",
-                                "Startup",
-                                "Side Project",
-                                "Personal Need",
-                                "Other",
-                            ].map((type) => (
-                                <label key={type} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="requirementType"
-                                        value={type}
-                                        checked={
-                                            formData.requirementType === type
-                                        }
-                                        onChange={handleChange}
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <span className="ml-2 text-sm sm:text-base text-gray-700">
-                                        {type}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.requirementType && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.requirementType}
-                            </p>
-                        )}
-                        {formData.requirementType === "Other" && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="otherRequirementType"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Specify Requirement Type{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <input
-                                        id="otherRequirementType"
-                                        name="otherRequirementType"
-                                        value={formData.otherRequirementType}
-                                        onChange={handleChange}
-                                        type="text"
-                                        placeholder="Specify requirement type"
-                                        className={`w-full sm:w-[50%] px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                                            errors.otherRequirementType
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                </div>
-                                {errors.otherRequirementType && (
-                                    <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                        {errors.otherRequirementType}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                        {["Startup", "Business"].includes(
-                            formData.requirementType
-                        ) && (
-                                <div className="mt-4">
-                                    <label
-                                        htmlFor="startUpName"
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Business/Startup Name{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex flex-col sm:flex-row items-center gap-2">
-                                        <input
-                                            id="startUpName"
-                                            name="startUpName"
-                                            value={formData.startUpName}
-                                            onChange={handleChange}
-                                            type="text"
-                                            placeholder="Enter business/startup name"
-                                            className={`w-full sm:w-[50%] px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                                                errors.startUpName
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                    </div>
-                                    {errors.startUpName && (
-                                        <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                            {errors.startUpName}
-                                        </p>
-                                    )}
-                                </div>
-                            )}
-                    </div>
+    <div className="relative md:col-span-1 lg:col-span-2">
+      <label
+        htmlFor="email"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Email <span className="text-red-500">*</span>
+      </label>
+      <input
+        id="email"
+        name="email"
+        value={formData.email}
+        disabled
+        type="text"
+        className="w-full h-10 px-3 sm:px-4 border rounded-lg cursor-not-allowed border-purple-300 text-sm sm:text-base box-border"
+      />
+      {errors.email && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.email}
+        </p>
+      )}
+    </div>
 
-                    {/* About Entity */}
-                    {formData.requirementType && (
-                        <div className="relative col-span-full lg:col-span-2">
-                            <label
-                                htmlFor="aboutEntity"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                About your requirement
-                            </label>
-                            <div className="relative">
-                                <textarea
-                                    id="aboutEntity"
-                                    name="aboutEntity"
-                                    value={formData.aboutEntity}
-                                    onChange={handleChange}
-                                    maxLength={300}
-                                    placeholder="Briefly describe your business/project/startup"
-                                    rows={4}
-                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base resize-none"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        enhanceField(
-                                            "aboutEntity",
-                                            formData.aboutEntity
-                                        )
-                                    }
-                                    disabled={enhanceLoading.aboutEntity}
-                                    className={`absolute right-2 sm:right-3 top-2 sm:top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                        enhanceLoading.aboutEntity
-                                            ? "animate-pulse"
-                                            : ""
-                                    }`}
-                                    title={
-                                        enhanceLoading.aboutEntity
-                                            ? "Enhancing..."
-                                            : "Enhance"
-                                    }
-                                >
-                                    <FaMagic className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
+    {/* Personal Website */}
+    <div className="relative col-span-full">
+      <label
+        htmlFor="websiteOfStartupLink"
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        Personal website
+      </label>
+      <div className="flex items-center gap-2">
+        <input
+          id="websiteOfStartupLink"
+          name="websiteOfStartupLink"
+          value={formData.websiteOfStartupLink}
+          onChange={handleChange}
+          type="url"
+          placeholder="Enter website URL (https://)"
+          className={`w-full h-10 px-3 sm:px-4 border rounded-lg focus:ring-2 focus:ring-purple-200  transition-all duration-200 hover:border-purple-400 text-sm sm:text-base box-border ${
+            errors.websiteOfStartupLink ? "border-red-500" : "border-purple-300"
+          }`}
+        />
+      </div>
+      {errors.websiteOfStartupLink && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.websiteOfStartupLink}
+        </p>
+      )}
+    </div>
 
-                    {/* Contact Methods */}
-                    <div className="relative col-span-full">
-                        <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-1">
-                            How people can reach out to you (select at least
-                            two) <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                            {[
-                                "call",
-                                "whatsapp",
-                                "instagram",
-                                "linkedin",
-                                "facebook",
-                                "other",
-                            ].map((method) => (
-                                <div key={method} className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={method}
-                                        checked={
-                                            formData.contact_methods[method]
-                                                .selected
-                                        }
-                                        onChange={() =>
-                                            handleContactMethodChange(method)
-                                        }
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <label
-                                        htmlFor={method}
-                                        className="ml-2 text-sm sm:text-base text-gray-700"
-                                    >
-                                        {method.charAt(0).toUpperCase() +
-                                            method.slice(1)}
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                        {errors.contact_methods && (
-                            <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                {errors.contact_methods}
-                            </p>
-                        )}
+    {/* User Type */}
+    <div className="relative col-span-full">
+      <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-1">
+        You are a <span className="text-red-500">*</span>
+      </label>
+      <div className="flex flex-wrap gap-4">
+  {[
+    "Business Owner",
+    "Startup Founder",
+    "Working Professional",
+    "Freelancer",
+    "Student",
+    "Other",
+  ].map((type) => (
+    <label
+      key={type}
+      className="flex items-center space-x-2 cursor-pointer w-full sm:w-1/3"
+    >
+      <input
+        type="radio"
+        name="userType"
+        value={type}
+        checked={formData.userType === type}
+        onChange={handleChange}
+        className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+      />
+      <span className="text-sm sm:text-base text-gray-700">
+        {type}
+      </span>
+    </label>
+  ))}
+</div>
+      {errors.userType && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.userType}
+        </p>
+      )}
+      {formData.userType === "Other" && (
+        <div className="mt-4">
+          <label
+            htmlFor="otherUserType"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Specify User Type <span className="text-red-500">*</span>
+          </label>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              id="otherUserType"
+              name="otherUserType"
+              value={formData.otherUserType}
+              onChange={handleChange}
+              type="text"
+              placeholder="Specify your user type"
+              className={`w-full h-10 px-3 sm:px-4 border rounded-lg focus:ring-2 focus:ring-purple-200  transition-all duration-200 hover:border-purple-400 text-sm sm:text-base box-border ${
+                errors.otherUserType ? "border-red-500" : "border-purple-300"
+              }`}
+            />
+          </div>
+          {errors.otherUserType && (
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {errors.otherUserType}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
 
-                        {/* Contact Method Values */}
-                        <div className="mt-4 space-y-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
-                            {Object.entries(formData.contact_methods).map(
-                                ([method, { selected, value }]) =>
-                                    selected && (
-                                        <div key={method} className="relative">
-                                            <label
-                                                htmlFor={`${method}Value`}
-                                                className="block font-medium mb-1 text-black opacity-[73%] text-sm"
-                                            >
-                                                {method
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    method.slice(1)}{" "}
-                                                {method === "whatsapp" ||
-                                                method === "call"
-                                                    ? "Number"
-                                                    : "URL"}{" "}
-                                                <span className="text-red-500">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="gap-2">
-                                                {method === "call" ||
-                                                method === "whatsapp" ? (
-                                                    <div className="text-left">
-                                                        <PhoneInput
-                                                            country="in"
-                                                            value={value}
-                                                            onChange={(phone) =>
-                                                                handleContactValueChange(
-                                                                    method,
-                                                                    phone
-                                                                )
-                                                            }
-                                                            containerClass="w-full"
-                                                            inputClass={`w-full h-10 sm:h-12 px-3 sm:px-4 text-gray-900 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 text-sm sm:text-base ${
-                                                                errors[
-                                                                    `${method}Value`
-                                                                ]
-                                                                    ? "border-red-500"
-                                                                    : ""
-                                                            } `}
-                                                            buttonClass="border-gray-300 h-10 sm:h-14 w-12 sm:w-16"
-                                                            dropdownClass="h-28"
-                                                            containerStyle={{
-                                                                height:
-                                                                    window.innerWidth <
-                                                                    640
-                                                                        ? "40px"
-                                                                        : "56px",
-                                                                width: "100%",
-                                                            }}
-                                                            inputStyle={{
-                                                                height:
-                                                                    window.innerWidth <
-                                                                    640
-                                                                        ? "38px"
-                                                                        : "43px",
-                                                                width: "100%",
-                                                            }}
-                                                            buttonStyle={{
-                                                                position:
-                                                                    "absolute",
-                                                                left: "5px",
-                                                                top: "1px",
-                                                                height:
-                                                                    window.innerWidth <
-                                                                    640
-                                                                        ? "36px"
-                                                                        : "40px",
-                                                                width:
-                                                                    window.innerWidth <
-                                                                    640
-                                                                        ? "32px"
-                                                                        : "40px",
-                                                                backgroundColor:
-                                                                    "transparent",
-                                                                border: "none",
-                                                                outline: "none",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <input
-                                                        id={`${method}Value`}
-                                                        type="url"
-                                                        value={value}
-                                                        onChange={(e) =>
-                                                            handleContactValueChange(
-                                                                method,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder={`Enter your ${method} URL (https://)`}
-                                                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                                                            errors[
-                                                                `${method}Value`
-                                                            ]
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                        }`}
-                                                    />
-                                                )}
-                                            </div>
-                                            {errors[`${method}Value`] && (
-                                                <p className="text-red-500 text-xs sm:text-sm mt-1">
-                                                    {errors[`${method}Value`]}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )
-                            )}
-                        </div>
-                    </div>
+    {/* Requirement Type */}
+    <div className="relative col-span-full">
+      <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-1">
+        This requirement is for a <span className="text-red-500">*</span>
+      </label>
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
+        {["Business", "Startup", "Side Project", "Personal Need", "Other"].map(
+          (type) => (
+            <label key={type} className="flex items-center">
+              <input
+                type="radio"
+                name="requirementType"
+                value={type}
+                checked={formData.requirementType === type}
+                onChange={handleChange}
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+              />
+              <span className="ml-2 text-sm sm:text-base text-gray-700">
+                {type}
+              </span>
+            </label>
+          )
+        )}
+      </div>
+      {errors.requirementType && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.requirementType}
+        </p>
+      )}
+      {formData.requirementType === "Other" && (
+        <div className="mt-4">
+          <label
+            htmlFor="otherRequirementType"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Specify Requirement Type <span className="text-red-500">*</span>
+          </label>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              id="otherRequirementType"
+              name="otherRequirementType"
+              value={formData.otherRequirementType}
+              onChange={handleChange}
+              type="text"
+              placeholder="Specify requirement type"
+              className={`w-full sm:w-[50%] h-11 px-3 sm:px-4 border rounded-lg focus:ring-2 focus:ring-purple-200  transition-all duration-200 hover:border-purple-400 text-sm sm:text-base box-border ${
+                errors.otherRequirementType ? "border-red-500" : "border-purple-300"
+              }`}
+            />
+          </div>
+          {errors.otherRequirementType && (
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {errors.otherRequirementType}
+            </p>
+          )}
+        </div>
+      )}
+      {["Startup", "Business"].includes(formData.requirementType) && (
+        <div className="mt-4">
+          <label
+            htmlFor="startUpName"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Business/Startup Name <span className="text-red-500">*</span>
+          </label>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              id="startUpName"
+              name="startUpName"
+              value={formData.startUpName}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter business/startup name"
+              className={`w-full sm:w-[50%] h-11 px-3 sm:px-4 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base box-border ${
+                errors.startUpName ? "border-red-500" : "border-purple-300"
+              }`}
+            />
+          </div>
+          {errors.startUpName && (
+            <p className="text-red-500 text-xs sm:text-sm mt-1">
+              {errors.startUpName}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
 
-                    {/* Action Buttons */}
-                    <div className="col-span-full flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-6">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-                        >
-                            Next Step
-                        </button>
-                    </div>
-                </form>
-            )}
+    {/* About Entity */}
+    {formData.requirementType && (
+      <div className="relative col-span-full lg:col-span-3">
+        <label
+          htmlFor="aboutEntity"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          About your requirement
+        </label>
+        <div className="relative">
+          <textarea
+            id="aboutEntity"
+            name="aboutEntity"
+            value={formData.aboutEntity}
+            onChange={handleChange}
+            maxLength={300}
+            placeholder="Briefly describe your business/project/startup"
+            rows={4}
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-200  transition-all duration-200 hover:border-purple-400 text-sm sm:text-base resize-none box-border"
+          />
+          <button
+            type="button"
+            onClick={() => enhanceField("aboutEntity", formData.aboutEntity)}
+            disabled={enhanceLoading.aboutEntity}
+            className={`absolute right-2 sm:right-3 top-2 sm:top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
+              enhanceLoading.aboutEntity ? "animate-pulse" : ""
+            }`}
+            title={enhanceLoading.aboutEntity ? "Enhancing..." : "Enhance"}
+          >
+            <FaMagic className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* Contact Methods */}
+    <div className="relative col-span-full">
+      <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-1">
+        How people can reach out to you (select at least two){" "}
+        <span className="text-red-500">*</span>
+      </label>
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
+        {["call", "whatsapp", "instagram", "linkedin", "facebook", "other"].map(
+          (method) => (
+            <div key={method} className="flex items-center">
+              <input
+                type="checkbox"
+                id={method}
+                checked={formData.contact_methods[method].selected}
+                onChange={() => handleContactMethodChange(method)}
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
+              />
+              <label
+                htmlFor={method}
+                className="ml-2 text-sm sm:text-base text-gray-700"
+              >
+                {method.charAt(0).toUpperCase() + method.slice(1)}
+              </label>
+            </div>
+          )
+        )}
+      </div>
+      {errors.contact_methods && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.contact_methods}
+        </p>
+      )}
+
+      {/* Contact Method Values */}
+      <div className="mt-4 space-y-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-4 lg:gap-6">
+        {Object.entries(formData.contact_methods).map(([method, { selected, value }]) =>
+          selected && (
+            <div key={method} className="relative">
+              <label
+                htmlFor={`${method}Value`}
+                className="block font-medium mb-1 text-black opacity-[73%] text-sm"
+              >
+                {method.charAt(0).toUpperCase() + method.slice(1)}{" "}
+                {method === "whatsapp" || method === "call" ? "Number" : "URL"}{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="gap-2">
+                {method === "call" || method === "whatsapp" ? (
+                  <div className="text-left">
+                    <PhoneInput
+                      country="in"
+                      value={value}
+                      onChange={(phone) => handleContactValueChange(method, phone)}
+                      containerClass="w-full"
+                      inputClass={`w-full h-11 px-3 sm:px-4 text-gray-900 border border-purple-200 rounded-lg  focus:outline-none focus:ring-1 focus:ring-purple-200 text-sm sm:text-base box-border ${
+                        errors[`${method}Value`] ? "border-red-500" : ""
+                      }`}
+                      buttonClass="border-purple-300 h-11 w-12 sm:w-14"
+                      dropdownClass="h-28"
+                      containerStyle={{
+                        height: "44px",
+                        width: "100%",
+                      }}
+                      inputStyle={{
+                        height: "44px",
+                        width: "100%",
+                      }}
+                      buttonStyle={{
+                        position: "absolute",
+                        left: "5px",
+                        top: "1px",
+                        height: "40px",
+                        width: "40px",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    id={`${method}Value`}
+                    type="url"
+                    value={value}
+                    onChange={(e) => handleContactValueChange(method, e.target.value)}
+                    placeholder={`${method} URL (https://)`}
+                    className={`w-full h-11 px-3 sm:px-4 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base box-border ${
+                      errors[`${method}Value`] ? "border-red-500" : "border-purple-300"
+                    }`}
+                  />
+                )}
+              </div>
+              {errors[`${method}Value`] && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">
+                  {errors[`${method}Value`]}
+                </p>
+              )}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+
+    {/* Action Buttons */}
+    <div className="col-span-full flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-6">
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base box-border"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={handleNext}
+        className="w-full h-11 sm:w-auto bg-purple-600 text-white px-4 sm:px-6 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base box-border"
+      >
+        Next Step
+      </button>
+    </div>
+  </form>
+)}
 
             {step === 2 && (
   <form className="grid grid-cols-1 gap-6">
-    <h3 className="text-xl font-semibold text-[#7900BF] mb-4">
+    {/* <h3 className="text-xl font-semibold text-[#7900BF] mb-4">
       Your dream teammate, freelancer, or hire — describe them here.
-    </h3>
+    </h3> */}
 
     <div className="relative">
       <button
@@ -2125,8 +1990,8 @@ function FounderPostForm({ onClose }) {
           onChange={handleChange}
           maxLength={80}
           placeholder="Enter a catchy headline"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-            errors.headline ? "border-red-500" : "border-gray-300"
+          className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            errors.headline ? "border-red-500" : "border-purple-300"
           }`}
         />
         <button
@@ -2245,16 +2110,16 @@ function FounderPostForm({ onClose }) {
       <label className="block text-sm font-medium text-gray-700 mb-1">
         Work Basis <span className="text-red-500">*</span>
       </label>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
         {[
           "Partnership",
           "Collaboration",
           "EquityBasis",
           "ProjectBasis",
           "PercentageBasis",
+          "Freelance",
           "Job",
           "Internship",
-          "Freelance",
           "Other",
         ].map((basis) => (
           <div key={basis} className="flex items-center">
@@ -2296,8 +2161,8 @@ function FounderPostForm({ onClose }) {
                 value={formData.partnershipCriteria}
                 onChange={handleChange}
                 placeholder="Describe the partnership criteria"
-                className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
-                  errors.partnershipCriteria ? "border-red-500" : "border-gray-300"
+                className={`w-full h-13 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y  text-sm sm:text-base ${
+                  errors.partnershipCriteria ? "border-red-500" : "border-purple-300"
                 }`}
               />
               <button
@@ -2403,10 +2268,10 @@ function FounderPostForm({ onClose }) {
                   type="number"
                   min="1"
                   placeholder="Duration"
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                  className={`w-full  h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                     errors.internshipDuration?.value
                       ? "border-red-500"
-                      : "border-gray-300"
+                      : "border-purple-300"
                   }`}
                 />
                 <select
@@ -2420,10 +2285,10 @@ function FounderPostForm({ onClose }) {
                       e.target.value
                     )
                   }
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                  className={`w-full h-11 text-gray-500 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                     errors.internshipDuration?.unit
                       ? "border-red-500"
-                      : "border-gray-300"
+                      : "border-purple-300"
                   }`}
                 >
                   <option value="">Select Unit</option>
@@ -2466,10 +2331,10 @@ function FounderPostForm({ onClose }) {
                     type="number"
                     min="0"
                     placeholder="Min stipend"
-                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                       errors.internshipStipendRange?.min
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-purple-300"
                     }`}
                   />
                   <input
@@ -2486,10 +2351,10 @@ function FounderPostForm({ onClose }) {
                     type="number"
                     min="0"
                     placeholder="Max stipend"
-                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                       errors.internshipStipendRange?.max
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-purple-300"
                     }`}
                   />
                 </div>
@@ -2521,10 +2386,10 @@ function FounderPostForm({ onClose }) {
                     value={formData.internshipPerformanceCriteria}
                     onChange={handleChange}
                     placeholder="Describe performance criteria"
-                    className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+                    className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
                       errors.internshipPerformanceCriteria
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-purple-300"
                     }`}
                   />
                   <button
@@ -2575,10 +2440,10 @@ function FounderPostForm({ onClose }) {
                 value={formData.collaborationDescription}
                 onChange={handleChange}
                 placeholder="Describe the collaboration"
-                className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+                className={`w-full h-13 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y  text-sm sm:text-base ${
                   errors.collaborationDescription
                     ? "border-red-500"
-                    : "border-gray-300"
+                    : "border-purple-300"
                 }`}
               />
               <button
@@ -2659,8 +2524,8 @@ function FounderPostForm({ onClose }) {
                   type="number"
                   min="0"
                   placeholder="Min amount"
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                    errors.jobAmountRange?.min ? "border-red-500" : "border-gray-300"
+                  className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                    errors.jobAmountRange?.min ? "border-red-500" : "border-purple-300"
                   }`}
                 />
                 <input
@@ -2673,8 +2538,8 @@ function FounderPostForm({ onClose }) {
                   type="number"
                   min="0"
                   placeholder="Max amount"
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                    errors.jobAmountRange?.max ? "border-red-500" : "border-gray-300"
+                  className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                    errors.jobAmountRange?.max ? "border-red-500" : "border-purple-300"
                   }`}
                 />
               </div>
@@ -2715,10 +2580,10 @@ function FounderPostForm({ onClose }) {
                 type="number"
                 min="0"
                 placeholder="Min payment"
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                   errors.freelancePaymentRange?.min
                     ? "border-red-500"
-                    : "border-gray-300"
+                    : "border-purple-300"
                 }`}
               />
               <input
@@ -2735,10 +2600,10 @@ function FounderPostForm({ onClose }) {
                 type="number"
                 min="0"
                 placeholder="Max payment"
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                   errors.freelancePaymentRange?.max
                     ? "border-red-500"
-                    : "border-gray-300"
+                    : "border-purple-300"
                 }`}
               />
             </div>
@@ -2770,8 +2635,8 @@ function FounderPostForm({ onClose }) {
                 value={formData.projectDescription}
                 onChange={handleChange}
                 placeholder="Describe the project"
-                className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
-                  errors.projectDescription ? "border-red-500" : "border-gray-300"
+                className={`w-full h-13 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y  text-sm sm:text-base ${
+                  errors.projectDescription ? "border-red-500" : "border-purple-300"
                 }`}
               />
               <button
@@ -2813,8 +2678,8 @@ function FounderPostForm({ onClose }) {
               onChange={handleChange}
               type="text"
               placeholder="Enter percentage value"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                errors.percentageBasisValue ? "border-red-500" : "border-gray-300"
+              className={`w-full h-13 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                errors.percentageBasisValue ? "border-red-500" : "border-purple-300"
               }`}
             />
             {errors.percentageBasisValue && (
@@ -2840,8 +2705,8 @@ function FounderPostForm({ onClose }) {
               onChange={handleChange}
               type="text"
               placeholder="Enter equity value"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-                errors.equityBasisValue ? "border-red-500" : "border-gray-300"
+              className={`w-full h-13 px-3 sm:px-4 py-0 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                errors.equityBasisValue ? "border-red-500" : "border-purple-300"
               }`}
             />
             {errors.equityBasisValue && (
@@ -2866,8 +2731,8 @@ function FounderPostForm({ onClose }) {
               value={formData.otherWorkBasis}
               onChange={handleChange}
               placeholder="Describe other work basis"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
-                errors.otherWorkBasis ? "border-red-500" : "border-gray-300"
+              className={`w-full h-12 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y text-sm sm:text-base ${
+                errors.otherWorkBasis ? "border-red-500" : "border-purple-300"
               }`}
             />
             {errors.otherWorkBasis && (
@@ -2880,51 +2745,97 @@ function FounderPostForm({ onClose }) {
       </div>
     </div>
 
-    <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Time Commitment
-      </label>
-      <div className="flex flex-col sm:flex-row gap-2">
-        <input
-          id="timeCommitmentValue"
-          name="timeCommitment.value"
-          value={formData.timeCommitment.value}
-          onChange={(e) =>
-            handleNestedChange("timeCommitment", "value", e.target.value)
-          }
-          type="number"
-          min="1"
-          placeholder="Enter value"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-            errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
-          }`}
-        />
-        <select
-          id="timeCommitmentUnit"
-          name="timeCommitment.unit"
-          value={formData.timeCommitment.unit}
-          onChange={(e) =>
-            handleNestedChange("timeCommitment", "unit", e.target.value)
-          }
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-            errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
-          }`}
-        >
-          <option value="">Select Unit</option>
-          <option value="hours/day">Hours/Day</option>
-          <option value="hours/week">Hours/Week</option>
-          <option value="hours/month">Hours/Month</option>
-        </select>
-      </div>
-      {errors.timeCommitment && (
-        <div className="text-red-500 text-xs sm:text-sm mt-1">
-          {errors.timeCommitment.value && (
-            <p>{errors.timeCommitment.value}</p>
-          )}
-          {errors.timeCommitment.unit && <p>{errors.timeCommitment.unit}</p>}
-        </div>
-      )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div className="relative">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Time Commitment
+    </label>
+    <div className="flex flex-col sm:flex-row gap-2">
+      <input
+        id="timeCommitmentValue"
+        name="timeCommitment.value"
+        value={formData.timeCommitment.value}
+        onChange={(e) =>
+          handleNestedChange("timeCommitment", "value", e.target.value)
+        }
+        type="number"
+        min="1"
+        placeholder="Enter value"
+        className={`w-1/3 h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          errors.timeCommitment?.value ? "border-red-500" : "border-purple-300"
+        }`}
+      />
+      <select
+        id="timeCommitmentUnit"
+        name="timeCommitment.unit"
+        value={formData.timeCommitment.unit}
+        onChange={(e) =>
+          handleNestedChange("timeCommitment", "unit", e.target.value)
+        }
+        className={`w-1/2  h-11 px-3 text-gray-500 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          errors.timeCommitment?.unit ? "border-red-500" : "border-purple-300"
+        }`}
+      >
+        <option value="">Select Unit</option>
+        <option value="hours/day">Hours/Day</option>
+        <option value="hours/week">Hours/Week</option>
+        <option value="hours/month">Hours/Month</option>
+      </select>
     </div>
+    {errors.timeCommitment && (
+      <div className="text-red-500 text-xs sm:text-sm mt-1">
+        {errors.timeCommitment.value && (
+          <p>{errors.timeCommitment.value}</p>
+        )}
+        {errors.timeCommitment.unit && <p>{errors.timeCommitment.unit}</p>}
+      </div>
+    )}
+  </div>
+
+  <div className="relative">
+    <label
+      className="block text-sm font-medium text-gray-700 mb-1"
+    >
+      Experience (Years) <span className="text-red-500">*</span>
+    </label>
+    <div className="flex flex-col sm:flex-row gap-2">
+      <input
+        id="experienceRangeMin"
+        name="experienceRange.min"
+        value={formData.experienceRange.min}
+        onChange={(e) =>
+          handleNestedChange("experienceRange", "min", e.target.value)
+        }
+        type="number"
+        min="0"
+        placeholder="Min exp"
+        className={`w-1/3 h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          errors.experienceRange?.min ? "border-red-500" : "border-purple-300"
+        }`}
+      />
+      <input
+        id="experienceRangeMax"
+        name="experienceRange.max"
+        value={formData.experienceRange.max}
+        onChange={(e) =>
+          handleNestedChange("experienceRange", "max", e.target.value)
+        }
+        type="number"
+        min="0"
+        placeholder="Max exp"
+        className={`w-1/3 h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          errors.experienceRange?.max ? "border-red-500" : "border-purple-300"
+        }`}
+      />
+    </div>
+    {errors.experienceRange && (
+      <div className="text-red-500 text-xs sm:text-sm mt-1">
+        {errors.experienceRange.min && <p>{errors.experienceRange.min}</p>}
+        {errors.experienceRange.max && <p>{errors.experienceRange.max}</p>}
+      </div>
+    )}
+  </div>
+</div>
 
     <div className="relative">
       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2972,8 +2883,8 @@ function FounderPostForm({ onClose }) {
             onChange={(e) =>
               handleNestedChange("workLocation", "country", e.target.value)
             }
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-              errors.workLocation?.country ? "border-red-500" : "border-gray-300"
+            className={`w-full h-11 px-3 text-gray-500 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              errors.workLocation?.country ? "border-red-500" : "border-purple-300"
             }`}
           >
             <option value="">Select Country</option>
@@ -3003,8 +2914,8 @@ function FounderPostForm({ onClose }) {
             onChange={(e) =>
               handleNestedChange("workLocation", "state", e.target.value)
             }
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-              errors.workLocation?.state ? "border-red-500" : "border-gray-300"
+            className={`w-full h-11 px-3 text-gray-500 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              errors.workLocation?.state ? "border-red-500" : "border-purple-300"
             }`}
           >
             <option value="">Select State</option>
@@ -3034,8 +2945,8 @@ function FounderPostForm({ onClose }) {
             onChange={(e) =>
               handleNestedChange("workLocation", "district", e.target.value)
             }
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-              errors.workLocation?.district ? "border-red-500" : "border-gray-300"
+            className={`w-full px-3 text-gray-500 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              errors.workLocation?.district ? "border-red-500" : "border-purple-300"
             }`}
           >
             <option value="">Select District</option>
@@ -3054,7 +2965,7 @@ function FounderPostForm({ onClose }) {
       </div>
     )}
 
-    <div className="relative">
+    {/* <div className="relative">
       <label
         className="block text-sm font-medium text-gray-700 mb-1"
       >
@@ -3071,8 +2982,8 @@ function FounderPostForm({ onClose }) {
           type="number"
           min="0"
           placeholder="Min experience"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-            errors.experienceRange?.min ? "border-red-500" : "border-gray-300"
+          className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            errors.experienceRange?.min ? "border-red-500" : "border-purple-300"
           }`}
         />
         <input
@@ -3085,8 +2996,8 @@ function FounderPostForm({ onClose }) {
           type="number"
           min="0"
           placeholder="Max experience"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
-            errors.experienceRange?.max ? "border-red-500" : "border-gray-300"
+          className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            errors.experienceRange?.max ? "border-red-500" : "border-purple-300"
           }`}
         />
       </div>
@@ -3096,13 +3007,13 @@ function FounderPostForm({ onClose }) {
           {errors.experienceRange.max && <p>{errors.experienceRange.max}</p>}
         </div>
       )}
-    </div>
+    </div> */}
 
     <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
       <button
         type="button"
         onClick={handleBack}
-        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
+        className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
       >
         Back
       </button>
@@ -3110,14 +3021,14 @@ function FounderPostForm({ onClose }) {
         <button
           type="button"
           onClick={handleCancel}
-          className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+          className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleNext}
-          className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+          className="w-full h-11 sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
         >
           Next Step
         </button>
@@ -3143,8 +3054,8 @@ function FounderPostForm({ onClose }) {
           onChange={handleChange}
           maxLength={400}
           placeholder="List key responsibilities"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
-            errors.responsibilities ? "border-red-500" : "border-gray-300"
+          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+            errors.responsibilities ? "border-red-500" : "border-purple-300"
           }`}
         />
         <button
@@ -3183,8 +3094,8 @@ function FounderPostForm({ onClose }) {
           onChange={handleChange}
           maxLength={300}
           placeholder="What makes this opportunity exciting?"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
-            errors.whyShouldJoin ? "border-red-500" : "border-gray-300"
+          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+            errors.whyShouldJoin ? "border-red-500" : "border-purple-300"
           }`}
         />
         <button
@@ -3221,8 +3132,8 @@ function FounderPostForm({ onClose }) {
           onChange={handleChange}
           maxLength={200}
           placeholder="Additional details (optional)"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
-            errors.anyOtherInfo ? "border-red-500" : "border-gray-300"
+          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+            errors.anyOtherInfo ? "border-red-500" : "border-purple-300"
           }`}
         />
         <button
@@ -3252,7 +3163,7 @@ function FounderPostForm({ onClose }) {
       <button
         type="button"
         onClick={handleBack}
-        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
+        className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
       >
         Back
       </button>
@@ -3260,13 +3171,13 @@ function FounderPostForm({ onClose }) {
         <button
           type="button"
           onClick={handleCancel}
-          className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+          className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+          className="w-full h-11 sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
         >
           Submit
         </button>

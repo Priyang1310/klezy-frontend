@@ -143,17 +143,17 @@ const NewCard = ({ post }) => {
 
   return (
     <>
-      <div className="text-gray-800 flex shadow-[1px_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[1px_1px_13px_rgba(0,0,0,0.2)] transition-all duration-300 flex-col h-fit w-full max-w-[650px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
+      <div className="relative  text-gray-800 flex shadow-[1px_1px_1px_rgba(0,0,0,0.1)] transition-all duration-300 flex-col h-fit w-full max-w-[700px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
         
         {/* Role, Domain, Status */}
         <div className="flex w-full items-start justify-between" onClick={() => setIsModalOpen(true)}>
           <div className="flex items-start gap-2 sm:gap-5">
-            <div className="flex flex-col border-r border-gray-300 pr-2 sm:pr-4">
+            <div className="flex flex-col  border-gray-300 pr-2 sm:pr-4">
               <p className="text-sm sm:text-md font-semibold">{roleUnderDomain}</p>
               <p className="text-xs sm:text-sm font-medium">{domainName}</p>
             </div>
           </div>
-          <div className={`w-3.5 h-3.5 rounded-full ${statusColor[status] || "bg-gray-200"}`}></div>
+          <div className={`w-3.5 h-3.5 absolute right-3 rounded-full ${statusColor[status] || "bg-gray-200"}`}></div>
         </div>
         
         <hr className="mt-2 text-gray-200 w-full" />
@@ -267,14 +267,14 @@ const NewCard = ({ post }) => {
     </div>
     
     {/* Text Buttons */}
-    <div className="flex gap-1 sm:gap-3 w-full sm:w-auto">
-      <button className="text-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-2 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-50 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
-        Start Searching
-      </button>
-      <button className="text-white bg-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-1 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-700 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
-        View Applications
-      </button>
-    </div>
+    <div className="flex gap-1 sm:gap-3 sm:w-auto">
+  <button className="text-[#A100FF] w-24 sm:w-32 h-9 border-[2px] border-[#A100FF] text-[0.65rem] sm:text-sm font-medium px-1 sm:px-2 py-1 sm:py-1 rounded-full hover:bg-purple-50 transition-colors duration-200">
+  Start Searching
+</button>
+<button className="text-white h-9 w-27 sm:w-36 bg-[#A100FF] border-[2px] border-[#A100FF] text-[0.65rem] sm:text-sm font-medium px-2 sm:px-2 py-2 sm:py-1 rounded-full hover:bg-purple-700 transition-colors duration-200">
+  View Applications
+</button>
+</div>
   </div>
 </div>
       </div>
@@ -323,12 +323,13 @@ const NewCard = ({ post }) => {
       {/* Update Modal */}
       {isUpdateModalOpen && (
         <div
-          className="fixed inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+          className="fixed  inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
           onClick={() => setIsUpdateModalOpen(false)}
         >
           <div
-            className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-4xl m-4 relative max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+        className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-3xl m-4 relative max-h-[90vh] overflow-y-auto"
+
+        onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
@@ -341,7 +342,7 @@ const NewCard = ({ post }) => {
             </button>
 
             {/* Header */}
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#7900BF] mb-6 text-center">
+            <h2 className="text-xl  sm:text-2xl font-semibold text-[#7900BF] mb-6 text-center">
               Update Founder Post
             </h2>
 

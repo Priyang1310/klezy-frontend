@@ -121,7 +121,8 @@ const NewCard = ({ post }) => {
 
   return (
     <>
-      <div className="text-gray-800 flex shadow-[1px_1px_3px_rgba(0,0,0,0.2)] hover:shadow-[1px_1px_13px_rgba(0,0,0,0.2)] transition-all duration-300 flex-col h-fit w-full max-w-[650px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
+      <div className="text-gray-800 flex shadow-md transition-all duration-300 flex-col h-fit w-full max-w-[650px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
+
         {/* Role, Domain, Status */}
         <div className="flex w-full items-start justify-between" onClick={() => setIsModalOpen(true)}>
           <div className="flex items-start gap-2 sm:gap-5">
@@ -244,12 +245,12 @@ const NewCard = ({ post }) => {
             
             {/* Text Buttons */}
             <div className="flex gap-1 sm:gap-3 w-full sm:w-auto">
-              <button className="text-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-2 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-50 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
-                Start Searching
-              </button>
-              <button className="text-white bg-[#A100FF] border-[2px] border-[#A100FF] w-full sm:w-auto text-[0.65rem] sm:text-sm font-medium px-1 sm:px-6 py-2 sm:py-2.5 rounded-2xl hover:bg-purple-700 transition-colors duration-200 sm:min-w-[140px] sm:whitespace-nowrap">
-                View Applications
-              </button>
+            <button className="text-[#A100FF] w-24 sm:w-32 h-9 border-[2px] border-[#A100FF] text-[0.65rem] sm:text-sm font-medium px-1 sm:px-2 py-1 sm:py-1 rounded-full hover:bg-purple-50 transition-colors duration-200">
+  Start Searching
+</button>
+<button className="text-white h-9 w-27 sm:w-36 bg-[#A100FF] border-[2px] border-[#A100FF] text-[0.65rem] sm:text-sm font-medium px-2 sm:px-2 py-2 sm:py-1 rounded-full hover:bg-purple-700 transition-colors duration-200">
+  View Applications
+</button>
             </div>
           </div>
         </div>

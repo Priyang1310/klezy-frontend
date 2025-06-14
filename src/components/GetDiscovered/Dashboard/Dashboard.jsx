@@ -122,7 +122,7 @@ const Dashboard = () => {
 	const postsFiltered = filter === "All" ? posts : posts.filter((post) => post.status === filter);
 
 	return (
-		<div className="flex flex-col bg-gray-50 min-h-screen poppins-medium">
+		<div className="flex flex-col bg-gray-100 min-h-screen poppins-medium">
 			{/* Navbar */}
 			<nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -146,7 +146,7 @@ const Dashboard = () => {
 							</div>
 							<button
 								onClick={openModal}
-								className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-200"
+								className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-[#a100ff] hover:bg-violet-700 rounded-lg transition-colors duration-200"
 							>
 								<MdOutlineAddToPhotos className="w-5 h-5 mr-2" />
 								Add Post
@@ -250,7 +250,7 @@ const Dashboard = () => {
 
 									{/* Marketplace Button */}
 									<div>
-										<button className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-200">
+										<button className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-[#a100ff] hover:bg-violet-700 rounded-lg transition-colors duration-200">
 											<AiOutlineShop className="w-5 h-5 mr-3" />
 											Market Place
 										</button>
@@ -260,7 +260,7 @@ const Dashboard = () => {
 
 									{/* Filter Buttons */}
 									<div className="space-y-2 ">
-										<h3 className="text-sm font-medium text-gray-900 mb-3">Filter Posts</h3>
+									
 										{[
 											{ key: "All", label: "All Posts", icon: <LuGalleryVerticalEnd className="w-5 h-5" /> },
 											{ key: "Pending", label: "Pending Posts", icon: <div className="w-3.5 h-3.5 bg-yellow-400 rounded-full" /> },
@@ -289,7 +289,6 @@ const Dashboard = () => {
 
 									{/* Additional Menu Items */}
 									<div className="space-y-2">
-										<h3 className="text-sm font-medium text-gray-900 mb-3">Your Activity</h3>
 										{[
 											{ icon: <BsBookmarkStar className="w-5 h-5" />, label: "Favourite Posts" },
 											{ icon: <IoIdCard className="w-5 h-5" />, label: "Purchased Posts" },

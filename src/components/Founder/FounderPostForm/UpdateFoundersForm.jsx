@@ -65,6 +65,7 @@ function UpdateFounderPostForm({ listingId,onClose }) {
         responsibilities: "",
         whyShouldJoin: "",
         anyOtherInfo: "",
+        profile_pic:"",
     });
 
     const [errors, setErrors] = useState({});
@@ -1819,82 +1820,30 @@ const handleSubmit = async (e) => {
 
      return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
-           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 rounded-t-2xl mb-6 border-b border-gray-200 w-full sm:w-[90%] lg:w-[70%] mx-auto py-4 sm:py-6">
-  <div className="flex flex-col items-center">
-    <p className="flex items-center gap-2 text-sm sm:text-base">
-      01{" "}
-      <span className="text-xs sm:text-sm text-violet-600">
-        About Founder
-      </span>
-    </p>
-    <div className="flex items-center gap-1">
-      <div
-        className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600"
-      >
-        ✓
-      </div>
-      <div
-        className={`w-20 sm:w-24 md:w-32 h-1 ${step > 1 ? "bg-violet-600" : "bg-gray-200"}`}
-      ></div>
-    </div>
+          
+<div className=" sm:mb-4">
+  {/* Progress Bar Container */}
+  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+    <div 
+      className="bg-[#7900BF] h-2 rounded-full transition-all duration-500 ease-out"
+      style={{ width: `${(step / 3) * 100}%` }}
+    ></div>
   </div>
-  <div className="flex flex-col items-center">
-    <p className="flex items-center gap-2 text-sm sm:text-base">
-      02{" "}
-      <span
-        className={`text-xs sm:text-sm ${step > 1 ? "text-violet-600" : "text-black"}`}
-      >
-        Skills and Strength
-      </span>
-    </p>
-    <div className="flex items-center gap-1">
-      <div
-        className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 1 ? "bg-violet-600" : "bg-white"}`}
-      >
-        ✓
-      </div>
-      <div
-        className={`w-20 sm:w-24 md:w-32 h-1 ${step > 2 ? "bg-violet-600" : "bg-gray-200"}`}
-      ></div>
-    </div>
-  </div>
-  <div className="flex flex-col items-center">
-    <p className="flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto">
-      03{" "}
-      <span
-        className={`text-xs sm:text-sm ${step > 2 ? "text-violet-600" : "text-black"}`}
-      >
-        Looking for
-      </span>
-    </p>
-    <div className="flex items-center gap-1">
-      <div
-        className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${step > 2 ? "bg-violet-600" : "bg-white"}`}
-      >
-        ✓
-      </div>
-    </div>
-  </div>
+  
+  {/* Step Title */}
+  <h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
+    {step === 1 ? "Let's introduce you to the world." : 
+     step === 2 ? "Tell us about your preferences." : 
+     "Almost done! Final details."}
+  </h3>
+  
+  {/* Step indicator */}
+  <p className="text-sm text-gray-500">
+    Step {step} of 3
+  </p>
 </div>
 
-{step === 1 && (
-  <div className="flex flex-col sm:flex-row items-center justify-between w-full bg-violet-100 px-4 sm:px-6 py-4 sm:py-6 rounded-2xl mb-5 gap-4">
-    <div className="flex flex-col max-w-full sm:max-w-[60%]">
-      <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-        Stay It Your Way
-      </p>
-      <p className="text-violet-400 text-sm sm:text-base">
-        This isn't your typical hiring form. In a few short questions, you'll paint a picture of your world and who you're looking for — no corporate lingo required.
-      </p>
-    </div>
-    <img
-      src="./FormImage1.svg"
-      alt="Step 1 illustration"
-      className="w-32 sm:w-40 md:w-48 object-contain"
-    />
-  </div>
-)}
-
+{/*           
 {step === 2 && (
   <div className="flex flex-col sm:flex-row items-center justify-between w-full bg-violet-100 px-4 sm:px-6 py-4 sm:py-6 rounded-2xl mb-5 gap-4">
     <div className="flex flex-col max-w-full sm:max-w-[60%]">
@@ -1929,13 +1878,11 @@ const handleSubmit = async (e) => {
       className="w-32 sm:w-40 md:w-48 object-contain"
     />
   </div>
-)}
+)} */}
 
             {step === 1 && (
   <form className="grid grid-cols-1 gap-6">
-    <h3 className="text-xl font-semibold text-[#7900BF] mb-4">
-      Let's introduce you to the world.
-    </h3>
+  
 
     {/* Personal Website */}
     <div className="relative">
@@ -1953,10 +1900,10 @@ const handleSubmit = async (e) => {
           onChange={handleChange}
           type="url"
           placeholder="Enter website URL (https://)"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2  focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.websiteOfStartupLink ? "border-red-500" : "border-gray-300"
           }`}
-        />
+        />  
       </div>
       {errors.websiteOfStartupLink && (
         <p className="text-red-500 text-xs sm:text-sm mt-1">
@@ -1969,7 +1916,7 @@ const handleSubmit = async (e) => {
       <label className="block text-sm font-medium text-gray-700 mb-1">
         You are a <span className="text-red-500">*</span>
       </label>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 gap-3">
         {[
           "Business Owner",
           "Startup Founder",
@@ -2012,7 +1959,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               type="text"
               placeholder="Specify your user type"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                 errors.otherUserType ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -2030,7 +1977,7 @@ const handleSubmit = async (e) => {
       <label className="block text-sm font-medium text-gray-700 mb-1">
         This requirement is for a <span className="text-red-500">*</span>
       </label>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1   sm:grid-cols-3 gap-2 ">
         {["Business", "Startup", "Side Project", "Personal Need", "Other"].map(
           (type) => (
             <label key={type} className="flex items-center">
@@ -2068,7 +2015,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               type="text"
               placeholder="Specify requirement type"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                 errors.otherRequirementType ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -2096,7 +2043,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               type="text"
               placeholder="Enter business/startup name"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                 errors.startUpName ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -2126,7 +2073,7 @@ const handleSubmit = async (e) => {
             onChange={handleChange}
             maxLength={300}
             placeholder="Briefly describe your business/project/startup"
-            className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+            className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
               errors.aboutEntity ? "border-red-500" : "border-gray-300"
             }`}
           />
@@ -2238,7 +2185,7 @@ const handleSubmit = async (e) => {
                         handleContactValueChange(method, e.target.value)
                       }
                       placeholder={`Enter your ${method} URL (https://)`}
-                      className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                      className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                         errors[`${method}Value`] ? "border-red-500" : "border-gray-300"
                       }`}
                     />
@@ -2276,9 +2223,7 @@ const handleSubmit = async (e) => {
 
             {step === 2 && (
   <form className="grid grid-cols-1 gap-6">
-    <h3 className="text-xl font-semibold text-[#7900BF] mb-4">
-      Your dream teammate, freelancer, or hire — describe them here.
-    </h3>
+   
 
     <div className="relative">
       <label
@@ -2295,7 +2240,7 @@ const handleSubmit = async (e) => {
           onChange={handleChange}
           maxLength={80}
           placeholder="Enter a catchy headline"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.headline ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -2460,7 +2405,7 @@ const handleSubmit = async (e) => {
                 value={formData.partnershipCriteria}
                 onChange={handleChange}
                 placeholder="Describe the partnership criteria"
-                className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+                className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
                   errors.partnershipCriteria ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -2558,7 +2503,7 @@ const handleSubmit = async (e) => {
                   type="number"
                   min="1"
                   placeholder="Duration"
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                  className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                     errors.internshipDuration?.value ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -2582,7 +2527,7 @@ const handleSubmit = async (e) => {
                   onChange={(e) =>
                     handleNestedChange("internshipDuration", "unit", e.target.value)
                   }
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                  className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                     errors.internshipDuration?.unit ? "border-red-500" : "border-gray-300"
                   }`}
                 >
@@ -2618,7 +2563,7 @@ const handleSubmit = async (e) => {
                     type="number"
                     min="0"
                     placeholder="Min stipend"
-                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                    className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                       errors.internshipStipendRange?.min ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -2645,7 +2590,7 @@ const handleSubmit = async (e) => {
                     type="number"
                     min="0"
                     placeholder="Max stipend"
-                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                    className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                       errors.internshipStipendRange?.max ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -2673,7 +2618,7 @@ const handleSubmit = async (e) => {
                     value={formData.internshipPerformanceCriteria}
                     onChange={handleChange}
                     placeholder="Describe performance criteria"
-                    className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+                    className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
                       errors.internshipPerformanceCriteria ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -2718,7 +2663,7 @@ const handleSubmit = async (e) => {
                 value={formData.collaborationDescription}
                 onChange={handleChange}
                 placeholder="Describe the collaboration"
-                className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+                className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
                   errors.collaborationDescription ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -2791,7 +2736,7 @@ const handleSubmit = async (e) => {
                   type="number"
                   min="0"
                   placeholder="Min amount"
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                  className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                     errors.jobAmountRange?.min ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -2818,7 +2763,7 @@ const handleSubmit = async (e) => {
                   type="number"
                   min="0"
                   placeholder="Max amount"
-                  className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                  className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                     errors.jobAmountRange?.max ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -2851,7 +2796,7 @@ const handleSubmit = async (e) => {
                 type="number"
                 min="0"
                 placeholder="Min payment"
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                   errors.freelancePaymentRange?.min ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -2878,7 +2823,7 @@ const handleSubmit = async (e) => {
                 type="number"
                 min="0"
                 placeholder="Max payment"
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+                className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                   errors.freelancePaymentRange?.max ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -2906,7 +2851,7 @@ const handleSubmit = async (e) => {
                 value={formData.projectDescription}
                 onChange={handleChange}
                 placeholder="Describe the project"
-                className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+                className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
                   errors.projectDescription ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -2943,7 +2888,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               type="text"
               placeholder="Enter percentage value"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                 errors.percentageBasisValue ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -2970,7 +2915,7 @@ const handleSubmit = async (e) => {
               onChange={handleChange}
               type="text"
               placeholder="Enter equity value"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+              className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
                 errors.equityBasisValue ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -2994,7 +2939,7 @@ const handleSubmit = async (e) => {
               value={formData.otherWorkBasis}
               onChange={handleChange}
               placeholder="Describe other work basis"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+              className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
                 errors.otherWorkBasis ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -3024,7 +2969,7 @@ const handleSubmit = async (e) => {
           type="number"
           min="1"
           placeholder="Enter value"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -3046,7 +2991,7 @@ const handleSubmit = async (e) => {
           onChange={(e) =>
             handleNestedChange("timeCommitment", "unit", e.target.value)
           }
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
           }`}
         >
@@ -3102,7 +3047,7 @@ const handleSubmit = async (e) => {
             onChange={(e) =>
               handleNestedChange("workLocation", "country", e.target.value)
             }
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
               errors.workLocation?.country ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -3131,7 +3076,7 @@ const handleSubmit = async (e) => {
             onChange={(e) =>
               handleNestedChange("workLocation", "state", e.target.value)
             }
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
               errors.workLocation?.state ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -3160,7 +3105,7 @@ const handleSubmit = async (e) => {
             onChange={(e) =>
               handleNestedChange("workLocation", "district", e.target.value)
             }
-            className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
               errors.workLocation?.district ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -3196,7 +3141,7 @@ const handleSubmit = async (e) => {
           type="number"
           min="0"
           placeholder="Min experience"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.experienceRange?.min ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -3221,7 +3166,7 @@ const handleSubmit = async (e) => {
           type="number"
           min="0"
           placeholder="Max experience"
-          className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.experienceRange?.max ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -3276,7 +3221,7 @@ const handleSubmit = async (e) => {
           onChange={handleChange}
           maxLength={400}
           placeholder="List key responsibilities"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+          className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
             errors.responsibilities ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -3312,7 +3257,7 @@ const handleSubmit = async (e) => {
           onChange={handleChange}
           maxLength={300}
           placeholder="What makes this opportunity exciting?"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+          className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
             errors.whyShouldJoin ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -3348,7 +3293,7 @@ const handleSubmit = async (e) => {
           onChange={handleChange}
           maxLength={200}
           placeholder="Additional details (optional)"
-          className={`w-full pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
+          className={`w-full h-10 pr-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] text-sm sm:text-base ${
             errors.anyOtherInfo ? "border-red-500" : "border-gray-300"
           }`}
         />

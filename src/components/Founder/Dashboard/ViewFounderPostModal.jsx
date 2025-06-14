@@ -58,8 +58,9 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
     whyShouldJoin,
     anyOtherInfo,
     userId: userDetails,
+    profile_pic,
   } = post;
-
+  // console.log(profile_pic)
   const {
     firstName,
     middleName,
@@ -158,10 +159,37 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
           ?.trim() || "",
       }
     : { min: "", max: "" };
+const handleProfilePhotoChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formDataToUpload = new FormData();
+  formDataToUpload.append("media", file);
+
+  try {
+    const response = await fetch("http://localhost:3333/api/media/upload", {
+      method: "POST",
+      body: formDataToUpload,
+      credentials: "include", // if you use cookies/session
+    });
+
+    if (!response.ok) throw new Error("Failed to upload image");
+
+    const result = await response.json();
+    console.log(result)
+
+    // Set the returned URL as profilePhoto
+    setFormData((prev) => ({ ...prev, profile_pic: result.url }));
+  } catch (error) {
+    console.error("Error uploading profile photo:", error);
+    alert("Failed to upload profile photo. Please try again.");
+  }
+};
 
   return (
-    <div className="bg-white rounded-3xl px-4 sm:px-6 py-4 w-full max-w-4xl max-h-[95vh] overflow-y-auto border border-violet-200 shadow-2xl mx-auto">
+    <div className="bg-white rounded-3xl px-4 sm:px-6 py-4 w-full max-w-3xl max-h-[95vh]  border border-violet-200 shadow-2xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 sm:px-4 gap-4 sm:gap-0">
+        
         <h2 className="text-xl sm:text-2xl font-bold text-violet-900 tracking-tight">
           View Post Details
         </h2>
@@ -176,7 +204,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
             Update
           </button>
           <button
-            className="text-gray-600 text-xl p-1.5 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 transition-all duration-200"
+            className="text-gray-600 text-xl p-1.5 rounded-full bg-white border border-gray-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 transition-all duration-200"
             onClick={(e) => {
               e.stopPropagation();
               onClose();
@@ -187,29 +215,46 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
         </div>
       </div>
       <div className="h-[2px] bg-gray-300 w-full my-4"></div>
-      <div className="bg-white px-4 sm:px-6 py-4 rounded-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div className="bg-white px-4 sm:px-6 py-4  rounded-2xl w-full max-h-[80vh] overflow-y-auto">
         {/* Banner Section */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-violet-100 px-4 sm:px-6 py-4 rounded-2xl mb-6 gap-4">
-          <div className="flex-1">
-            <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-              Say It Your Way
-            </p>
-            <p className="text-violet-400 text-sm sm:text-base mt-1">
-              This isn't your typical hiring form. In a few short questions,
-              you'll paint a picture of your world and who you're looking for — no
-              corporate lingo required.
-            </p>
-          </div>
-          <img
-            src="./FormImage1.svg"
-            alt="Form illustration"
-            className="w-24 sm:w-32 h-auto"
-          />
-        </div>
+  <div className="col-span-full flex flex-col mb-6 items-center gap-3 sm:gap-4">
+  <div className="relative">
+    <img
+      src={profile_pic}
+      alt="Profile"
+      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-purple-300 shadow-md"
+    />
+    {/* Optional overlay edit icon */}
+    <label htmlFor="profilePhotoUpload" className="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow cursor-pointer hover:bg-gray-100">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 text-purple-600"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+      >
+        <path d="M17.414 2.586a2 2 0 010 2.828l-9.95 9.95a2 2 0 01-.878.516l-3.535 1.01a1 1 0 01-1.213-1.213l1.01-3.535a2 2 0 01.516-.878l9.95-9.95a2 2 0 012.828 0z" />
+      </svg>
+      <input
+        type="file"
+        id="profilePhotoUpload"
+        accept="image/*"
+        onChange={handleProfilePhotoChange}
+        className="hidden"
+      />
+    </label>
+  </div>
+  <button
+    type="button"
+    onClick={() => document.getElementById('profilePhotoUpload')?.click()}
+    className="text-sm font-medium text-purple-700 hover:underline"
+  >
+    Update Photo
+  </button>
+</div>
 
         {/* Step 1: About Founder */}
         <div className="grid grid-cols-1 gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 First Name
@@ -218,7 +263,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={firstName || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -230,7 +275,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={middleName || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -242,7 +287,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={lastName || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -254,7 +299,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={userEmail || email || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -266,7 +311,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={country || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -278,7 +323,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={state || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -290,7 +335,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={city || ""}
                 disabled
                 type="text"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -302,7 +347,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={websiteOfStartupLink || ""}
                 disabled
                 type="url"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
           </div>
@@ -342,7 +387,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   value={otherUserType || ""}
                   disabled
                   type="text"
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                  className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                 />
               </div>
             )}
@@ -378,7 +423,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   value={otherRequirementType || ""}
                   disabled
                   type="text"
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                  className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                 />
               </div>
             )}
@@ -391,7 +436,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   value={startUpName || ""}
                   disabled
                   type="text"
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                  className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                 />
               </div>
             )}
@@ -404,7 +449,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
             <textarea
               value={aboutEntity || ""}
               disabled
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
+              className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border border-purple-300 rounded-lg bg-white cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
             />
           </div>
 
@@ -448,9 +493,9 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         value={value}
                         disabled
                         containerClass="w-full"
-                        inputClass="w-full h-12 px-3 sm:px-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-sm sm:text-base"
-                        buttonClass="border-gray-300 h-12 bg-gray-100 cursor-not-allowed"
-                        dropdownClass="border-gray-300"
+                        inputClass="w-full h-12 px-3 sm:px-4 text-gray-900 border border-purple-300 rounded-lg bg-white cursor-not-allowed text-sm sm:text-base"
+                        buttonClass="border-purple-300 h-12 bg-white cursor-not-allowed"
+                        dropdownClass="border-purple-300"
                         containerStyle={{
                           height: "48px",
                           width: "100%",
@@ -475,7 +520,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         type="url"
                         value={value}
                         disabled
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                        className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                       />
                     )}
                   </div>
@@ -486,22 +531,8 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
         </div>
 
         {/* Step 2: Skills and Strength */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-violet-100 px-4 sm:px-6 py-4 rounded-2xl my-6 gap-4">
-          <div className="flex-1">
-            <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-              You're almost there!
-            </p>
-            <p className="text-violet-400 text-sm sm:text-base mt-1">
-              This fun little form helps you describe your vibe and your need —
-              quick, casual, and human. No resumes, no HR jargon. Just say it like
-              it is.
-            </p>
-          </div>
-          <img
-            src="./FormImage2.svg"
-            alt="Form illustration"
-            className="w-24 sm:w-32 h-auto"
-          />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between  px-4 sm:px-6  rounded-2xl my-6 gap-4">
+          
         </div>
 
         <div className="grid grid-cols-1 gap-6">
@@ -512,7 +543,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
             <input
               value={headline || ""}
               disabled
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+              className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
             />
           </div>
 
@@ -524,7 +555,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
               <input
                 value={roleUnderDomain || ""}
                 disabled
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
 
@@ -535,7 +566,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
               <input
                 value={domainName || ""}
                 disabled
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
           </div>
@@ -594,7 +625,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   <textarea
                     value={partnershipCriteria || ""}
                     disabled
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px] text-sm sm:text-base"
+                    className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 min-h-[100px] text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -630,7 +661,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         value={jobAmountRangeObj.min || ""}
                         disabled
                         type="number"
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                        className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                       />
                     </div>
                     <div>
@@ -641,7 +672,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         value={jobAmountRangeObj.max || ""}
                         disabled
                         type="number"
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                        className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                       />
                     </div>
                   </div>
@@ -699,7 +730,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                       value={internshipDuration || ""}
                       disabled
                       type="text"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                      className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                     />
                   </div>
                   {internshipType === "Paid" && (
@@ -712,7 +743,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                           value={internshipStipendRangeObj.min || ""}
                           disabled
                           type="number"
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                          className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                         />
                       </div>
                       <div>
@@ -723,7 +754,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                           value={internshipStipendRangeObj.max || ""}
                           disabled
                           type="number"
-                          className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                          className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                         />
                       </div>
                     </div>
@@ -736,7 +767,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                       <textarea
                         value={internshipPerformanceCriteria || ""}
                         disabled
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px] text-sm sm:text-base"
+                        className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 min-h-[100px] text-sm sm:text-base"
                       />
                     </div>
                   )}
@@ -750,7 +781,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   <textarea
                     value={collaborationDescription || ""}
                     disabled
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px] text-sm sm:text-base"
+                    className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 min-h-[100px] text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -764,7 +795,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                       value={freelancePaymentRangeObj.min || ""}
                       disabled
                       type="number"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                      className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                     />
                   </div>
                   <div>
@@ -775,7 +806,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                       value={freelancePaymentRangeObj.max || ""}
                       disabled
                       type="number"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                      className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                     />
                   </div>
                 </div>
@@ -788,7 +819,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   <textarea
                     value={projectDescription || ""}
                     disabled
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px] text-sm sm:text-base"
+                    className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 min-h-[100px] text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -801,7 +832,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                     value={percentageBasisValue || ""}
                     disabled
                     type="text"
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                    className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -814,7 +845,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                     value={equityBasisValue || ""}
                     disabled
                     type="number"
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                    className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -826,7 +857,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   <textarea
                     value={otherWorkBasis || ""}
                     disabled
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 min-h-[100px] text-sm sm:text-base"
+                    className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 min-h-[100px] text-sm sm:text-base"
                   />
                 </div>
               )}
@@ -841,7 +872,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
               value={timeCommitment || ""}
               disabled
               type="text"
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+              className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
             />
           </div>
 
@@ -874,7 +905,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   value={getCountryName(workLocation.country) || ""}
                   disabled
                   type="text"
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                  className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                 />
               </div>
               <div>
@@ -885,7 +916,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   value={getStateName(workLocation.country, workLocation.state) || ""}
                   disabled
                   type="text"
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                  className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                 />
               </div>
               <div>
@@ -902,7 +933,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                   }
                   disabled
                   type="text"
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                  className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -917,7 +948,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={experienceRangeObj.min || ""}
                 disabled
                 type="number"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
             <div>
@@ -928,29 +959,15 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 value={experienceRangeObj.max || ""}
                 disabled
                 type="number"
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-gray-100 cursor-not-allowed border-gray-300 text-sm sm:text-base"
+                className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg bg-white cursor-not-allowed border-purple-300 text-sm sm:text-base"
               />
             </div>
           </div>
         </div>
 
         {/* Step 3: Looking for */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-violet-100 px-4 sm:px-6 py-4 rounded-2xl my-6 gap-4">
-          <div className="flex-1">
-            <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-              You’ve made it to the final step!
-            </p>
-            <p className="text-violet-400 text-sm sm:text-base mt-1">
-              This short form captures who you are, what you need, and how your
-              team works — no fluff, no lengthy job descriptions. Just clear,
-              honest details. Done in minutes.
-            </p>
-          </div>
-          <img
-            src="./FormImage3.svg"
-            alt="Form illustration"
-            className="w-24 sm:w-32 h-auto"
-          />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between  px-4 sm:px-6 rounded-2xl my-6 gap-1">
+           
         </div>
 
         <div className="space-y-6">
@@ -961,7 +978,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
             <textarea
               value={responsibilities || ""}
               disabled
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
+              className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border border-purple-300 rounded-lg bg-white cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
             />
           </div>
 
@@ -972,7 +989,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
             <textarea
               value={whyShouldJoin || ""}
               disabled
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
+              className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border border-purple-300 rounded-lg bg-white cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
             />
           </div>
 
@@ -983,7 +1000,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
             <textarea
               value={anyOtherInfo || ""}
               disabled
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
+              className="w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border border-purple-300 rounded-lg bg-white cursor-not-allowed resize-y min-h-[100px] text-sm sm:text-base"
             />
           </div>
         </div>

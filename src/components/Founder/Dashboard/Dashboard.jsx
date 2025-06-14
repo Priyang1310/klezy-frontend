@@ -139,7 +139,7 @@ const Dashboard = () => {
 	console.log("postFiltered: ", postsFiltered);
 
 	return (
-		<div className="flex flex-col bg-gray-50 min-h-screen poppins-medium">
+		<div className="flex flex-col bg-gray-100 min-h-screen poppins-medium">
 			{/* Navbar */}
 			<nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -217,7 +217,7 @@ const Dashboard = () => {
 
 			{/* Main Layout Container */}
 			<div className="flex-1 pt-20 sm:pt-20 lg:pt-16 flex">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex w-full">
+				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex w-full">
 					<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
 						{/* Left Sidebar */}
 						<aside
@@ -281,7 +281,6 @@ const Dashboard = () => {
 
 									{/* Filter Buttons */}
 									<div className="space-y-2">
-										<h3 className="text-sm font-medium text-gray-900 mb-3">Filter Posts</h3>
 										{[
 											{ key: "All", label: "All Post", icon: <LuGalleryVerticalEnd className="w-5 h-5" /> },
 											{ key: "Pending", label: "Pending Post", icon: <div className="w-3.5 h-3.5 bg-[#FFE167] rounded-full" /> },
@@ -310,7 +309,7 @@ const Dashboard = () => {
 
 									{/* Additional Menu Items */}
 									<div className="space-y-2">
-										<h3 className="text-sm font-medium text-gray-900 mb-3">Your Activity</h3>
+										
 										{[
 											{ icon: <BsBookmarkStar className="w-5 h-5" />, label: "Favourite Post" },
 											{ icon: <IoIdCard className="w-5 h-5" />, label: "Purchased Post" },
@@ -452,11 +451,11 @@ const Dashboard = () => {
 
 			{/* Modals */}
 			{isModalOpen && (
-				<div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50">
-					<div className="bg-white rounded-3xl p-5 w-full max-w-[95%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto border border-violet-200 shadow-2xl">
+				<div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+					<div className="bg-white rounded-3xl p-4 w-full max-w-[95%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto border border-violet-200 shadow-2xl">
 						<div className="flex justify-between items-center mb-6">
 							<h2 className="text-2xl font-bold text-violet-900 tracking-tight">
-								Founder Post
+								 
 							</h2>
 							<button
 								className="text-gray-600 text-sm font-medium px-4 py-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"

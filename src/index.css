@@ -6,3 +6,201 @@ body {
 button{
   cursor: pointer;
 }
+/* Base radio button styling */
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none; /* Ensure cross-browser compatibility */
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: #FFFFFF; /* White background for clean look */
+  border: 2px solid #bfb7ee; /* Tailwind's purple-300 for a softer, professional border */
+  border-radius: 50%; /* Perfect circle */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out; /* Smooth transition for all changes */
+  outline: none; /* Remove default outline for custom focus */
+}
+
+/* Hover state for better interactivity */
+input[type="radio"]:hover {
+  border-color: #7C3AED; /* Tailwind's purple-600 for hover */
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); /* Subtle purple glow */
+}
+
+/* Checked state */
+input[type="radio"]:checked {
+  background-color: #7C3AED; /* Tailwind's purple-600 */
+  border-color: #7C3AED; /* Consistent border color */
+}
+
+/* Inner dot for checked state */
+input[type="radio"]:checked::before {
+  content: "";
+  display: block;
+  width: 8px; /* Slightly smaller for better proportion */
+  height: 8px;
+  background-color: #FFFFFF; /* White dot for high contrast */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1); /* Scale for animation */
+  transition: transform 0.2s ease-in-out; /* Smooth scaling effect */
+}
+
+/* Focus state for accessibility */
+input[type="radio"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3); /* Tailwind purple-600 with opacity */
+  border-color: #6D28D9; /* Slightly darker purple-700 for focus */
+}
+
+/* Disabled state for better UX */
+input[type="radio"]:disabled {
+  background-color: #F3F4F6; /* Tailwind gray-100 */
+  border-color: #D1D5DB; /* Tailwind gray-300 */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+input[type="radio"]:disabled:checked::before {
+  background-color: #D1D5DB; /* Gray dot for disabled checked state */
+}
+/* Base radio button styling */
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none; /* Ensure cross-browser compatibility */
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  background-color: #FFFFFF; /* White background for clean look */
+  border: 2px solid #D8B4FE; /* Tailwind's purple-300 */
+  border-radius: 50%; /* Perfect circle */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out; /* Smooth transition for all changes */
+  outline: none; /* Remove default outline for custom focus */
+}
+
+/* Hover state for better interactivity */
+input[type="radio"]:hover {
+  border-color: #7C3AED; /* Tailwind's purple-600 for hover */
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); /* Subtle purple glow */
+}
+
+/* Checked state */
+input[type="radio"]:checked {
+  background-color: #7C3AED; /* Tailwind's purple-600 */
+  border-color: #7C3AED; /* Consistent border color */
+}
+
+/* Inner dot for checked state */
+input[type="radio"]:checked::before {
+  content: "";
+  display: block;
+  width: 8px; /* Slightly smaller for better proportion */
+  height: 8px;
+  background-color: #FFFFFF; /* White dot for high contrast */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1); /* Scale for animation */
+  transition: transform 0.2s ease-in-out; /* Smooth scaling effect */
+}
+
+/* Focus state for accessibility */
+input[type="radio"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3); /* Tailwind purple-600 with opacity */
+  border-color: #6D28D9; /* Slightly darker purple-700 for focus */
+}
+
+/* Disabled state for better UX */
+input[type="radio"]:disabled {
+  background-color: #F3F4F6; /* Tailwind gray-100 */
+  border-color: #D1D5DB; /* Tailwind gray-300 */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+input[type="radio"]:disabled:checked::before {
+  background-color: #D1D5DB; /* Gray dot for disabled checked state */
+}
+/* Base checkbox styling */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none; /* Ensure cross-browser compatibility */
+  -moz-appearance: none;
+  width: 16px; /* Matches h-4 w-4 in Tailwind */
+  height: 16px;
+  background-color: #FFFFFF; /* White background for clean look */
+  border: 2px solid #D8B4FE; /* Tailwind's purple-300 */
+  border-radius: 4px; /* Slightly rounded square for checkboxes */
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out; /* Smooth transition for all changes */
+  outline: none; /* Remove default outline for custom focus */
+}
+
+/* Hover state for interactivity */
+input[type="checkbox"]:hover {
+  border-color: #7C3AED; /* Tailwind's purple-600 */
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); /* Subtle purple glow */
+}
+
+/* Checked state */
+input[type="checkbox"]:checked {
+  background-color: #7C3AED; /* Tailwind's purple-600 */
+  border-color: #7C3AED; /* Consistent border color */
+}
+
+/* Checkmark for checked state */
+input[type="checkbox"]:checked::before {
+  content: "\2713"; /* Unicode checkmark */
+  display: block;
+  width: 16px;
+  height: 16px;
+  color: #FFFFFF; /* White checkmark */
+  font-size: 12px; /* Size for proper checkmark fit */
+  font-weight: bold;
+  text-align: center;
+  line-height: 16px; /* Center checkmark vertically */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease-in-out; /* Smooth appearance */
+}
+
+/* Focus state for accessibility */
+input[type="checkbox"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3); /* Tailwind purple-600 with opacity */
+  border-color: #6D28D9; /* Tailwind purple-700 for focus */
+}
+
+/* Disabled state for better UX */
+input[type="checkbox"]:disabled {
+  background-color: #F3F4F6; /* Tailwind gray-100 */
+  border-color: #D1D5DB; /* Tailwind gray-300 */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+input[type="checkbox"]:disabled:checked::before {
+  color: #D1D5DB; /* Gray checkmark for disabled checked state */
+}
+input:focus {
+  outline: none;
+}
+textarea:focus{
+  outline: none;
+}
+select:focus{
+  outline: none;
+}
+input:focus{
+outline: none;
+}
+#expectations, #anyOtherInfo{
+  border: 1px solid gray;
+}

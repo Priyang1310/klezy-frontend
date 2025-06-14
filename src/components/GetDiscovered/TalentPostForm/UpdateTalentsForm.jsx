@@ -1664,202 +1664,9 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
 
     return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
-            <div className="hidden md:flex h-20 items-center justify-center gap-5 rounded-t-2xl mb-6 border-b border-gray-200 w-full max-w-4xl mx-auto text-xl">
-                <div className="flex flex-col">
-                    <p className="flex items-center gap-2">
-                        01{" "}
-                        <span className="text-sm text-violet-600">
-                            About You
-                        </span>
-                    </p>
-                    <div className="flex items-center gap-1">
-                        <div className="flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600">
-                            ✓
-                        </div>
-                        <div
-                            className={`w-[100px] lg:w-[150px] h-1 ${
-                                step > 1 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
-                        ></div>
-                    </div>
-                </div>
-                <div className="flex flex-col">
-                    <p className="flex items-center gap-2">
-                        02{" "}
-                        <span
-                            className={`text-sm ${
-                                step > 1 ? "text-violet-600" : "text-black"
-                            }`}
-                        >
-                            Skills and Strength
-                        </span>
-                    </p>
-                    <div className="flex items-center gap-1">
-                        <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 1 ? "bg-violet-600" : "bg-white"
-                            }`}
-                        >
-                            ✓
-                        </div>
-                        <div
-                            className={`w-[100px] lg:w-[150px] h-1 ${
-                                step > 2 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
-                        ></div>
-                    </div>
-                </div>
-                <div className="flex flex-col">
-                    <p className="flex items-center gap-2 w-[100px] lg:w-[150px]">
-                        03{" "}
-                        <span
-                            className={`text-sm ${
-                                step > 2 ? "text-violet-600" : "text-black"
-                            }`}
-                        >
-                            Portfolio
-                        </span>
-                    </p>
-                    <div className="flex items-center gap-1">
-                        <div
-                            className={`flex items-center justify-center h-5 w-5 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 2 ? "bg-violet-600" : "bg-white"
-                            }`}
-                        >
-                            ✓
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
-            {/* Mobile Layout */}
-            <div className="md:hidden rounded-t-2xl mb-6 border-b border-gray-200 w-full mx-auto py-4">
-                {/* Progress Bar */}
-                <div className="flex items-center justify-center mb-4 px-4">
-                    <div className="flex items-center w-full max-w-sm">
-                        <div className="flex items-center justify-center h-6 w-6 rounded-full text-white text-xs font-semibold border border-violet-600 bg-violet-600">
-                            ✓
-                        </div>
-                        <div
-                            className={`flex-1 h-1 mx-2 ${
-                                step > 1 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
-                        ></div>
-                        <div
-                            className={`flex items-center justify-center h-6 w-6 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 1 ? "bg-violet-600" : "bg-white"
-                            }`}
-                        >
-                            ✓
-                        </div>
-                        <div
-                            className={`flex-1 h-1 mx-2 ${
-                                step > 2 ? "bg-violet-600" : "bg-gray-200"
-                            }`}
-                        ></div>
-                        <div
-                            className={`flex items-center justify-center h-6 w-6 rounded-full text-white text-xs font-semibold border border-violet-600 ${
-                                step > 2 ? "bg-violet-600" : "bg-white"
-                            }`}
-                        >
-                            ✓
-                        </div>
-                    </div>
-                </div>
-
-                {/* Step Labels */}
-                <div className="flex justify-between items-center px-4 text-sm">
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs font-medium mb-1">01</span>
-                        <span className="text-violet-600 text-center leading-tight">
-                            About You
-                        </span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs font-medium mb-1">02</span>
-                        <span
-                            className={`text-center leading-tight ${
-                                step > 1 ? "text-violet-600" : "text-black"
-                            }`}
-                        >
-                            Skills & Strength
-                        </span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs font-medium mb-1">03</span>
-                        <span
-                            className={`text-center leading-tight ${
-                                step > 2 ? "text-violet-600" : "text-black"
-                            }`}
-                        >
-                            Portfolio
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            {step === 1 && (
-                <div className="flex flex-col md:flex-row items-center w-full bg-violet-100 px-4 md:px-5 py-4 md:py-0 rounded-2xl mb-5 min-h-[120px] md:min-h-0">
-                    <div className="flex flex-col text-center md:text-left mb-4 md:mb-0 md:flex-1">
-                        <p className="text-violet-700 text-lg md:text-xl font-medium mb-2">
-                            Update Your Story
-                        </p>
-                        <p className="text-violet-400 text-sm md:text-base leading-relaxed">
-                            Revise how you present yourself and how to be
-                            reached — keep it authentic.
-                        </p>
-                    </div>
-                    <div className="flex-shrink-0 w-24 h-24 md:w-auto md:h-auto">
-                        <img
-                            src="./FormImage1.svg"
-                            alt=""
-                            className="w-full h-full object-contain md:scale-150"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {step === 2 && (
-                <div className="flex flex-col md:flex-row items-center w-full bg-violet-100 px-4 md:px-5 py-4 md:py-0 rounded-2xl mb-5 min-h-[120px] md:min-h-0">
-                    <div className="flex flex-col text-center md:text-left mb-4 md:mb-0 md:flex-1">
-                        <p className="text-violet-700 text-lg md:text-xl font-medium mb-2">
-                            Update Your Strengths
-                        </p>
-                        <p className="text-violet-400 text-sm md:text-base leading-relaxed">
-                            Refine your skills and work preferences — show what
-                            you're capable of.
-                        </p>
-                    </div>
-                    <div className="flex-shrink-0 w-24 h-24 md:w-auto md:h-auto">
-                        <img
-                            src="./FormImage2.svg"
-                            alt=""
-                            className="w-full h-full object-contain"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {step === 3 && (
-                <div className="flex flex-col md:flex-row items-center w-full bg-violet-100 px-4 md:px-5 py-4 md:py-0 rounded-2xl mb-5 min-h-[120px] md:min-h-0">
-                    <div className="flex flex-col text-center md:text-left mb-4 md:mb-0 md:flex-1">
-                        <p className="text-violet-700 text-lg md:text-xl font-medium mb-2">
-                            Update Your Portfolio
-                        </p>
-                        <p className="text-violet-400 text-sm md:text-base leading-relaxed">
-                            Refresh your work and experience — make your profile
-                            stand out.
-                        </p>
-                    </div>
-                    <div className="flex-shrink-0 w-24 h-24 md:w-auto md:h-auto">
-                        <img
-                            src="./FormImage3.svg"
-                            alt=""
-                            className="w-full h-full object-contain"
-                        />
-                    </div>
-                </div>
-            )}
+            
 
             {/* Step 1 Form */}
             {step === 1 && (
@@ -1881,7 +1688,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             name="gender"
                             value={formData.gender}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
+                            className="w-1/5 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
                         >
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
@@ -1897,7 +1704,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             You are a <span className="text-red-500">*</span>
                         </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2">
                             {[
                                 "Working Professional",
                                 "Freelancer",
@@ -2004,7 +1811,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             How people can reach out to you (select at least
                             two) <span className="text-red-500">*</span>
                         </label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-2  sm:grid-cols-3 lg:grid-cols-6 gap-4">
                             {[
                                 "call",
                                 "whatsapp",
