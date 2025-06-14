@@ -1667,6 +1667,27 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
             
+        <div className=" sm:mb-4">
+  {/* Progress Bar Container */}
+  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+    <div 
+      className="bg-[#7900BF] h-2 rounded-full transition-all duration-500 ease-out"
+      style={{ width: `${(step / 3) * 100}%` }}
+    ></div>
+  </div>
+  
+  {/* Step Title */}
+  <h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
+    {step === 1 ? "Let's introduce you to the world." : 
+     step === 2 ? "Tell us about your preferences." : 
+     "Almost done! Final details."}
+  </h3>
+  
+  {/* Step indicator */}
+  <p className="text-sm text-gray-500">
+    Step {step} of 3
+  </p>
+</div>
 
             
 
@@ -1674,9 +1695,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
 
 {step === 1 && (
   <form className="max-w-4xl mx-auto grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-0">
-    <h3 className="text-xl sm:text-2xl font-semibold text-[#7900BF] mb-4">
-      Update your introduction.
-    </h3>
+   
 
     {/* Gender Select */}
     <div className="relative">

@@ -295,9 +295,7 @@ const NewCard = ({ post }) => {
             </button>
 
             {/* Header */}
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#A100FF] mb-6 text-center">
-              Update Talent Profile
-            </h2>
+            
 
             {/* Render UpdateTalentPostForm */}
             <UpdateTalentPostForm

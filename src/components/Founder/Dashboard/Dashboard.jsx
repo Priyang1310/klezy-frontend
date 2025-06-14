@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Modal from "react-modal";
+	import { FaTimes } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { MdOutlineAddToPhotos } from "react-icons/md";
 import { BiCoinStack } from "react-icons/bi";
@@ -457,12 +458,27 @@ const Dashboard = () => {
 							<h2 className="text-2xl font-bold text-violet-900 tracking-tight">
 								 
 							</h2>
-							<button
-								className="text-gray-600 text-sm font-medium px-4 py-2 rounded-full bg-gray-100 border border-gray-200 hover:bg-gray-200 transition-colors"
-								onClick={closeModal}
-							>
-								Close
-							</button>
+						
+
+<button
+        onClick={() => closeModal()}
+        className=" text-gray-500 hover:text-gray-700"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
+        </svg>
+      </button>
 						</div>
 						<FounderPostForm onClose={closeModal} />
 					</div>
