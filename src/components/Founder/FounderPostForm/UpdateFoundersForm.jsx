@@ -2215,7 +2215,7 @@ const handleSubmit = async (e) => {
         onClick={handleNext}
         className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2"
       >
-        Next Step
+        Next
       </button>
     </div>
   </form>
@@ -3197,7 +3197,7 @@ const handleSubmit = async (e) => {
           onClick={handleNext}
           className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
         >
-          Next Step
+          Next
         </button>
       </div>
     </div>

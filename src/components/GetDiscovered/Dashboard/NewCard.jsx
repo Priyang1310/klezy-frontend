@@ -281,7 +281,7 @@ const NewCard = ({ post }) => {
           onClick={() => setIsUpdateModalOpen(false)} // Close on overlay click
         >
           <div
-            className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-4xl m-4 relative max-h-[90vh] overflow-y-auto"
+            className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-3xl m-4 relative max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
             {/* Close Button */}
@@ -295,7 +295,7 @@ const NewCard = ({ post }) => {
             </button>
 
             {/* Header */}
-            <h2 className="text-xl sm:text-2xl font-semibold text-[#7900BF] mb-6 text-center">
+            <h2 className="text-xl sm:text-2xl font-semibold text-[#A100FF] mb-6 text-center">
               Update Talent Profile
             </h2>
 

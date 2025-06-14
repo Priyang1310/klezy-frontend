@@ -1230,25 +1230,8 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 
 				{/* Step 3: Portfolio */}
 				<div>
-					<div className="flex flex-col sm:flex-row items-center w-full bg-violet-100 px-3 sm:px-5 py-4 rounded-2xl mb-4 sm:mb-5">
-						<div className="flex flex-col mb-3 sm:mb-0 sm:mr-4">
-							<p className="text-violet-700 text-lg sm:text-xl">
-								Build Your Portfolio
-							</p>
-							<p className="text-violet-400 text-sm sm:text-base">
-								Showcase your work, experience, and what others
-								can expect from you — make it shine.
-							</p>
-						</div>
-						<img
-							src="./FormImage3.svg"
-							alt=""
-							className="w-16 sm:w-20"
-						/>
-					</div>
-					<h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-3 sm:mb-4">
-						Build your portfolio to stand out.
-					</h3>
+					
+					
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 						<div className="col-span-1 sm:col-span-2">
 							<label className="block text-sm font-medium text-gray-700 mb-1">

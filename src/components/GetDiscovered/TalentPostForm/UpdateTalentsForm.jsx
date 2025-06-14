@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
+import 'react-phone-input-2/lib/style.css'; 
 import { FaMagic, FaPlus, FaTimes } from "react-icons/fa";
 import PhoneInput from "react-phone-input-2";
 import Select from "react-select";
@@ -8,7 +9,8 @@ import chroma from "chroma-js";
 import makeAnimated from "react-select/animated";
 import "react-phone-input-2/lib/style.css";
 // import { useParams } from "react-router-dom";
-
+//   import { FaPlus, FaTimes } from "react-icons/fa"; // Using FaPlus and FaTimes as equivalents to Plus
+import { FiUploadCloud } from "react-icons/fi"; // Equivalent to UploadCloud
 function UpdateGetDiscoveredForm({ listingId, onClose }) {
     // const { id } = useParams();
     const animatedComponents = makeAnimated();
@@ -1669,293 +1671,232 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             
 
             {/* Step 1 Form */}
-            {step === 1 && (
-                <form className="grid grid-cols-1 gap-6 px-4 md:px-0">
-                    <h3 className="text-xl font-semibold text-[#7900BF] mb-4">
-                        Update your introduction.
-                    </h3>
 
-                    {/* Gender Select */}
-                    <div className="relative">
-                        <label
-                            htmlFor="gender"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Gender <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="gender"
-                            name="gender"
-                            value={formData.gender}
-                            onChange={handleChange}
-                            className="w-1/5 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 border-gray-300"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Prefer not to specify">
-                                Prefer not to specify
-                            </option>
-                        </select>
-                    </div>
+{step === 1 && (
+  <form className="max-w-4xl mx-auto grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-0">
+    <h3 className="text-xl sm:text-2xl font-semibold text-[#7900BF] mb-4">
+      Update your introduction.
+    </h3>
 
-                    {/* User Type Radio Buttons */}
-                    <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            You are a <span className="text-red-500">*</span>
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2">
-                            {[
-                                "Working Professional",
-                                "Freelancer",
-                                "Student",
-                                "Other",
-                            ].map((type) => (
-                                <label key={type} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="userType"
-                                        value={type}
-                                        checked={formData.userType === type}
-                                        onChange={handleChange}
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <span className="ml-2 text-gray-700">
-                                        {type}
-                                    </span>
-                                </label>
-                            ))}
-                        </div>
-                        {errors.userType && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.userType}
-                            </p>
-                        )}
-                        {formData.userType === "Other" && (
-                            <div className="mt-4">
-                                <label
-                                    htmlFor="otherUserType"
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
-                                    Specify User Type{" "}
-                                    <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    id="otherUserType"
-                                    name="otherUserType"
-                                    value={formData.otherUserType}
-                                    onChange={handleChange}
-                                    type="text"
-                                    placeholder="Specify your user type"
-                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                        errors.otherUserType
-                                            ? "border-red-500"
-                                            : "border-gray-300"
-                                    }`}
-                                />
-                                {errors.otherUserType && (
-                                    <p className="text-red-500 text-sm mt-1">
-                                        {errors.otherUserType}
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    </div>
+    {/* Gender Select */}
+    <div className="relative">
+      <label
+        htmlFor="gender"
+        className="block text-sm sm:text-base font-medium text-gray-800 mb-1"
+      >
+        Gender <span className="text-red-500">*</span>
+      </label>
+      <select
+        id="gender"
+        name="gender"
+        value={formData.gender}
+        onChange={handleChange}
+        className="w-full sm:w-1/2 lg:w-1/3 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 border-gray-300 hover:border-violet-500"
+      >
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Prefer not to specify">Prefer not to specify</option>
+      </select>
+    </div>
 
-                    {/* About Self Textarea */}
-                    <div className="relative">
-                        <label
-                            htmlFor="aboutSelf"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            About Yourself
-                        </label>
-                        <div className="relative">
-                            <textarea
-                                id="aboutSelf"
-                                name="aboutSelf"
-                                value={formData.aboutSelf}
-                                onChange={handleChange}
-                                maxLength={300}
-                                placeholder="Briefly describe yourself"
-                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "aboutSelf",
-                                        formData.aboutSelf
-                                    )
-                                }
-                                disabled={enhanceLoading.aboutSelf}
-                                className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
-                                    enhanceLoading.aboutSelf
-                                        ? "animate-pulse"
-                                        : ""
-                                }`}
-                                title={
-                                    enhanceLoading.aboutSelf
-                                        ? "Enhancing..."
-                                        : "Enhance"
-                                }
-                            >
-                                <FaMagic className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
+    {/* User Type Radio Buttons */}
+    <div className="relative">
+      <label className="block text-sm sm:text-base font-medium text-gray-800 mb-1">
+        You are a <span className="text-red-500">*</span>
+      </label>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {["Working Professional", "Freelancer", "Student", "Other"].map((type) => (
+          <label key={type} className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="userType"
+              value={type}
+              checked={formData.userType === type}
+              onChange={handleChange}
+              className="appearance-none h-5 w-5 border-2 border-gray-300 rounded-full checked:bg-violet-600 checked:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+            />
+            <span className="text-gray-700 text-sm sm:text-base">{type}</span>
+          </label>
+        ))}
+      </div>
+      {errors.userType && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.userType}</p>
+      )}
+      {formData.userType === "Other" && (
+        <div className="mt-4">
+          <label
+            htmlFor="otherUserType"
+            className="block text-sm sm:text-base font-medium text-gray-800 mb-1"
+          >
+            Specify User Type <span className="text-red-500">*</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              id="otherUserType"
+              name="otherUserType"
+              value={formData.otherUserType}
+              onChange={handleChange}
+              type="text"
+              placeholder="Specify your user type"
+              className={`w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
+                errors.otherUserType ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+              }`}
+            />
+          </div>
+          {errors.otherUserType && (
+            <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.otherUserType}</p>
+          )}
+        </div>
+      )}
+    </div>
 
-                    {/* Contact Methods */}
-                    <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            How people can reach out to you (select at least
-                            two) <span className="text-red-500">*</span>
-                        </label>
-                        <div className="grid grid-cols-2  sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                            {[
-                                "call",
-                                "whatsapp",
-                                "instagram",
-                                "linkedin",
-                                "facebook",
-                                "other",
-                            ].map((method) => (
-                                <div key={method} className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={method}
-                                        checked={
-                                            formData.contact_methods[method]
-                                                .selected
-                                        }
-                                        onChange={() =>
-                                            handleContactMethodChange(method)
-                                        }
-                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
-                                    />
-                                    <label
-                                        htmlFor={method}
-                                        className="ml-2 text-gray-700 text-sm"
-                                    >
-                                        {method.charAt(0).toUpperCase() +
-                                            method.slice(1)}
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                        {errors.contact_methods && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {errors.contact_methods}
-                            </p>
-                        )}
+    {/* About Self Textarea */}
+    <div className="relative">
+      <label
+        htmlFor="aboutSelf"
+        className="block text-sm sm:text-base font-medium text-gray-800 mb-1"
+      >
+        About Yourself
+      </label>
+      <div className="relative">
+        <textarea
+          id="aboutSelf"
+          name="aboutSelf"
+          value={formData.aboutSelf}
+          onChange={handleChange}
+          maxLength={300}
+          placeholder="Briefly describe yourself"
+          className="w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 resize-y min-h-[100px] border-gray-300 hover:border-violet-500 transition-all duration-200"
+        />
+        <button
+          type="button"
+          onClick={() => enhanceField("aboutSelf", formData.aboutSelf)}
+          disabled={enhanceLoading.aboutSelf}
+          className={`absolute bg-white right-3 top-3 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+            enhanceLoading.aboutSelf ? "animate-pulse" : ""
+          }`}
+          title={enhanceLoading.aboutSelf ? "Enhancing..." : "Enhance"}
+        >
+          <FaMagic className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
 
-                        {/* Contact Method Inputs */}
-                        <div className="mt-4 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {Object.entries(formData.contact_methods).map(
-                                    ([method, { selected, value }]) =>
-                                        selected && (
-                                            <div
-                                                key={method}
-                                                className="relative"
-                                            >
-                                                <label
-                                                    htmlFor={`${method}Value`}
-                                                    className="block font-medium mb-1 text-black opacity-[73%] text-sm"
-                                                >
-                                                    {method
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        method.slice(1)}{" "}
-                                                    {method === "whatsapp" ||
-                                                    method === "call"
-                                                        ? "Number"
-                                                        : "URL"}{" "}
-                                                    <span className="text-red-500">
-                                                        *
-                                                    </span>
-                                                </label>
-                                                {method === "call" ||
-                                                method === "whatsapp" ? (
-                                                    <input
-                                                        id={`${method}Value`}
-                                                        type="tel"
-                                                        value={value}
-                                                        onChange={(e) =>
-                                                            handleContactValueChange(
-                                                                method,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder={`Enter your ${method} number`}
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors[
-                                                                `${method}Value`
-                                                            ]
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                        }`}
-                                                    />
-                                                ) : (
-                                                    <input
-                                                        id={`${method}Value`}
-                                                        type="url"
-                                                        value={value}
-                                                        onChange={(e) =>
-                                                            handleContactValueChange(
-                                                                method,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder={`Enter your ${method} URL (https://)`}
-                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
-                                                            errors[
-                                                                `${method}Value`
-                                                            ]
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                        }`}
-                                                    />
-                                                )}
-                                                {errors[`${method}Value`] && (
-                                                    <p className="text-red-500 text-sm mt-1">
-                                                        {
-                                                            errors[
-                                                                `${method}Value`
-                                                            ]
-                                                        }
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )
-                                )}
-                            </div>
-                        </div>
-                    </div>
+    {/* Contact Methods */}
+    <div className="relative">
+      <label className="block text-sm sm:text-base font-medium text-gray-800 mb-1">
+        How people can reach out to you (select at least two) <span className="text-red-500">*</span>
+      </label>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {["call", "whatsapp", "instagram", "linkedin", "facebook", "other"].map((method) => (
+          <div key={method} className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id={method}
+              checked={formData.contact_methods[method].selected}
+              onChange={() => handleContactMethodChange(method)}
+              className="appearance-none h-5 w-5 border-2 border-gray-300 rounded-md checked:bg-violet-600 checked:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+            />
+            <label htmlFor={method} className="text-gray-700 text-sm sm:text-base">
+              {method.charAt(0).toUpperCase() + method.slice(1)}
+            </label>
+          </div>
+        ))}
+      </div>
+      {errors.contact_methods && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.contact_methods}</p>
+      )}
 
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Next Step
-                        </button>
-                    </div>
-                </form>
-            )}
+      {/* Contact Method Inputs */}
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Object.entries(formData.contact_methods).map(([method, { selected, value }]) =>
+          selected && (
+            <div key={method} className="relative">
+              <label
+                htmlFor={`${method}Value`}
+                className="block text-sm sm:text-base font-medium text-gray-800 mb-1"
+              >
+                {method.charAt(0).toUpperCase() + method.slice(1)}{" "}
+                {method === "whatsapp" || method === "call" ? "Number" : "URL"}{" "}
+                <span className="text-red-500">*</span>
+              </label>
+              {method === "call" || method === "whatsapp" ? (
+                <div className="text-left">
+                  <PhoneInput
+                    country="in"
+                    value={value}
+                    onChange={(phone) => handleContactValueChange(method, phone)}
+                    containerClass="w-full"
+                    inputClass={`w-full px-3 sm:px-4 py-2 sm:py-3 text-gray-900 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
+                      errors[`${method}Value`] ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+                    }`}
+                    buttonClass="border-gray-300 h-12 w-12"
+                    dropdownClass="h-28"
+                    containerStyle={{
+                      height: "auto",
+                      width: "100%",
+                    }}
+                    inputStyle={{
+                      height: "100%",
+                      width: "100%",
+                    }}
+                    buttonStyle={{
+                      position: "absolute",
+                      left: "5px",
+                      top: "1px",
+                      height: "100%",
+                      width: "40px",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+              ) : (
+                <input
+                  id={`${method}Value`}
+                  type="url"
+                  value={value}
+                  onChange={(e) => handleContactValueChange(method, e.target.value)}
+                  placeholder={`${method} URL (https://)`}
+                  className={`w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
+                    errors[`${method}Value`] ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+                  }`}
+                />
+              )}
+              {errors[`${method}Value`] && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1">{errors[`${method}Value`]}</p>
+              )}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+
+    {/* Action Buttons */}
+    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
+      <button
+        type="button"
+        onClick={handleCancel}
+        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        onClick={handleNext}
+        className="w-full sm:w-auto bg-violet-600 text-white px-6 py-3 rounded-md font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2"
+      >
+        Next
+      </button>
+    </div>
+  </form>
+)}
 
             {step === 2 && (
                 <form className="grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-0">
-                    <h3 className="col-span-1 text-xl font-semibold text-blue-600 mb-4">
+                    <h3 className="col-span-1 text-xl font-semibold text-[#A100FF] mb-4">
                         Update your skills and preferences.
                     </h3>
                     <div className="relative col-span-1">
@@ -1974,7 +1915,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                 onChange={handleChange}
                                 maxLength={80}
                                 placeholder="Enter a catchy headline"
-                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2text-purple-600 hover:text-purple-800 disabled:text-purple-300 transition-all duration-200 hover:border-blue-400 ${
                                     errors.headline
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -1986,7 +1927,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                     enhanceField("headline", formData.headline)
                                 }
                                 disabled={enhanceLoading.headline}
-                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
+                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
                                     enhanceLoading.headline
                                         ? "animate-pulse"
                                         : ""
@@ -2188,7 +2129,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             disabled={
                                                 enhanceLoading.partnershipCriteria
                                             }
-                                            className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-gray-300 ${
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
                                                 enhanceLoading.partnershipCriteria
                                                     ? "animate-pulse"
                                                     : ""
@@ -3285,833 +3226,565 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         <button
                             type="button"
                             onClick={handleNext}
-                            className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+                            className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
                         >
-                            Next Step
+                            Next
                         </button>
                     </div>
                 </form>
             )}
 
-            {step === 3 && (
-                <form
-                    onSubmit={handleSubmit}
-                    className="grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-0"
-                >
-                    <h3 className="col-span-1 text-xl font-semibold text-blue-600 mb-4">
-                        Update your portfolio and experience.
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="relative">
-                            <label
-                                htmlFor="portfolioLink"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Portfolio Link
-                            </label>
-                            <input
-                                id="portfolioLink"
-                                name="portfolioLink"
-                                value={formData.portfolioLink}
-                                onChange={handleChange}
-                                type="url"
-                                placeholder="https://yourportfolio.com"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                    errors.portfolioLink
-                                        ? "border-red-500"
-                                        : "border-gray-300"
-                                }`}
-                            />
-                            {errors.portfolioLink && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.portfolioLink}
-                                </p>
-                            )}
-                        </div>
-                        <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Resume Link
-                            </label>
-                            {/* Display the current resume link if it exists and no new file is selected */}
-                            {formData.resumeLink && !formData.resumeFile && (
-                                <div className="mb-2">
-                                    <a
-                                        href={formData.resumeLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 hover:underline break-all"
-                                    >
-                                        {formData.resumeLink}
-                                    </a>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                resumeLink: "",
-                                            }));
-                                            setUploadSuccess("");
-                                        }}
-                                        className="ml-2 text-red-600 hover:text-red-800"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            )}
-                            {/* Display the new file name if a file is selected but not yet uploaded */}
-                            {formData.resumeFile && !formData.resumeLink && (
-                                <div className="mb-2 flex items-center">
-                                    <span className="text-gray-700">
-                                        {formData.resumeFile.name}
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                resumeFile: null,
-                                            }));
-                                            setUploadSuccess("");
-                                        }}
-                                        className="ml-2 text-red-600 hover:text-red-800"
-                                    >
-                                        Remove
-                                    </button>
-                                </div>
-                            )}
-                            {/* Show success message if upload is successful */}
-                            {uploadSuccess && (
-                                <p className="text-green-600 text-sm mb-2">
-                                    {uploadSuccess}
-                                </p>
-                            )}
-                            {/* Show file input if no file is selected or after removing the link */}
-                            {(!formData.resumeLink || formData.resumeFile) && (
-                                <input
-                                    id="resumeFile"
-                                    type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={async (e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                resumeFile: file,
-                                            }));
-                                            try {
-                                                const formDataToUpload =
-                                                    new FormData();
-                                                formDataToUpload.append(
-                                                    "media",
-                                                    file
-                                                );
+         
+{step === 3 && (
+  <form
+    onSubmit={handleSubmit}
+    className="max-w-4xl mx-auto grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-0"
+  >
+    <h3 className="col-span-1 text-xl font-semibold text-purple-600 mb-4">
+      Update your portfolio and experience.
+    </h3>
 
-                                                const uploadResponse =
-                                                    await fetch(
-                                                        "http://localhost:3333/api/media/upload",
-                                                        {
-                                                            method: "POST",
-                                                            body: formDataToUpload,
-                                                            credentials:
-                                                                "include",
-                                                        }
-                                                    );
+    {/* Portfolio Link */}
+    <div className="relative col-span-1 lg:col-span-2">
+      <label
+        htmlFor="portfolioLink"
+        className="block text-sm font-medium text-gray-800 mb-1"
+      >
+        Portfolio Link
+      </label>
+      <input
+        id="portfolioLink"
+        name="portfolioLink"
+        value={formData.portfolioLink}
+        onChange={handleChange}
+        type="url"
+        placeholder="https://yourportfolio.com"
+        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
+          errors.portfolioLink ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+        }`}
+      />
+      {errors.portfolioLink && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.portfolioLink}</p>
+      )}
+    </div>
 
-                                                if (!uploadResponse.ok) {
-                                                    throw new Error(
-                                                        "Failed to upload resume"
-                                                    );
-                                                }
+    {/* Resume Upload */}
+    <div className="relative col-span-1 lg:col-span-2 cursor-pointer">
+      <label
+        htmlFor="resumeFile"
+        className="block text-sm font-medium text-gray-800 mb-1"
+      >
+        Resume Link <span className="text-red-500">*</span>
+      </label>
 
-                                                const uploadData =
-                                                    await uploadResponse.json();
-                                                const newResumeLink =
-                                                    uploadData.url;
+      <div
+        className={`border-2 border-dashed rounded-lg p-6 text-center transition ${
+          errors.resumeFile || errors.resumeLink
+            ? "border-red-400"
+            : "border-gray-300 hover:border-violet-500"
+        }`}
+      >
+        <FiUploadCloud size={32} className="mx-auto text-gray-400 mb-2" />
 
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    resumeLink: newResumeLink,
-                                                    resumeFile: null,
-                                                }));
-                                                setUploadSuccess(
-                                                    "Resume uploaded successfully!"
-                                                );
-                                            } catch (error) {
-                                                console.error(
-                                                    "Upload error:",
-                                                    error
-                                                );
-                                                setErrors((prev) => ({
-                                                    ...prev,
-                                                    resumeFile:
-                                                        "Failed to upload resume. Please try again.",
-                                                }));
-                                                setFormData((prev) => ({
-                                                    ...prev,
-                                                    resumeFile: null,
-                                                }));
-                                            }
-                                        }
-                                    }}
-                                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 border-gray-300"
-                                />
-                            )}
-                            {errors.resumeFile && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.resumeFile}
-                                </p>
-                            )}
-                            {errors.resumeLink && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.resumeLink}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                    <div className="relative col-span-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Projects
-                        </label>
-                        {formData.projects.map((project, index) => (
-                            <div
-                                key={index}
-                                className="mb-4 p-4 border border-gray-300 rounded-lg"
-                            >
-                                <div className="flex justify-between items-center mb-2">
-                                    <h4 className="text-sm font-medium text-gray-700">
-                                        Project {index + 1}
-                                    </h4>
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleRemoveProject(index)
-                                        }
-                                        className="text-red-600 hover:text-red-800"
-                                    >
-                                        <FaTimes />
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="relative">
-                                        <label
-                                            htmlFor={`projectTitle${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Title{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <input
-                                            id={`projectTitle${index}`}
-                                            value={project.title}
-                                            onChange={(e) =>
-                                                handleProjectChange(
-                                                    index,
-                                                    "title",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="Project Title"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[`projectTitle${index}`]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors[`projectTitle${index}`] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors[`projectTitle${index}`]}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative">
-                                        <label
-                                            htmlFor={`projectLink${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Link
-                                        </label>
-                                        <input
-                                            id={`projectLink${index}`}
-                                            value={project.link}
-                                            onChange={(e) =>
-                                                handleProjectChange(
-                                                    index,
-                                                    "link",
-                                                    e.target.value
-                                                )
-                                            }
-                                            type="url"
-                                            placeholder="https://projectlink.com"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[`projectLink${index}`]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors[`projectLink${index}`] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {errors[`projectLink${index}`]}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative col-span-1 sm:col-span-2">
-                                        <label
-                                            htmlFor={`projectDescription${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Description{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="relative">
-                                            <textarea
-                                                id={`projectDescription${index}`}
-                                                value={project.description}
-                                                onChange={(e) =>
-                                                    handleProjectChange(
-                                                        index,
-                                                        "description",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Describe the project"
-                                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px] ${
-                                                    errors[
-                                                        `projectDescription${index}`
-                                                    ]
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    enhanceField(
-                                                        "projects",
-                                                        project.description,
-                                                        index,
-                                                        "description"
-                                                    )
-                                                }
-                                                disabled={
-                                                    enhanceLoading[
-                                                        `projects${index}`
-                                                    ]
-                                                }
-                                                className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
-                                                    enhanceLoading[
-                                                        `projects${index}`
-                                                    ]
-                                                        ? "animate-pulse"
-                                                        : ""
-                                                }`}
-                                                title={
-                                                    enhanceLoading[
-                                                        `projects${index}`
-                                                    ]
-                                                        ? "Enhancing..."
-                                                        : "Enhance"
-                                                }
-                                            >
-                                                <FaMagic className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                        {errors[
-                                            `projectDescription${index}`
-                                        ] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors[
-                                                        `projectDescription${index}`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={handleAddProject}
-                            className="flex items-center text-blue-600 hover:text-blue-800"
-                        >
-                            <FaPlus className="mr-2" /> Add Project
-                        </button>
-                    </div>
-                    <div className="relative col-span-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Work Experience
-                        </label>
-                        {formData.workExperience.map((exp, index) => (
-                            <div
-                                key={index}
-                                className="mb-4 p-4 border border-gray-300 rounded-lg"
-                            >
-                                <div className="flex justify-between items-center mb-2">
-                                    <h4 className="text-sm font-medium text-gray-700">
-                                        Experience {index + 1}
-                                    </h4>
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleRemoveWorkExperience(index)
-                                        }
-                                        className="text-red-600 hover:text-red-800"
-                                    >
-                                        <FaTimes />
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="relative">
-                                        <label
-                                            htmlFor={`workExperienceCompany${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Company Name{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <input
-                                            id={`workExperienceCompany${index}`}
-                                            value={exp.companyName}
-                                            onChange={(e) =>
-                                                handleWorkExperienceChange(
-                                                    index,
-                                                    "companyName",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="Company Name"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[
-                                                    `workExperienceCompany${index}`
-                                                ]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors[
-                                            `workExperienceCompany${index}`
-                                        ] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors[
-                                                        `workExperienceCompany${index}`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative">
-                                        <label
-                                            htmlFor={`workExperienceRole${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Role{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <input
-                                            id={`workExperienceRole${index}`}
-                                            value={exp.role}
-                                            onChange={(e) =>
-                                                handleWorkExperienceChange(
-                                                    index,
-                                                    "role",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="Role"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[
-                                                    `workExperienceRole${index}`
-                                                ]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors[
-                                            `workExperienceRole${index}`
-                                        ] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors[
-                                                        `workExperienceRole${index}`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative">
-                                        <label
-                                            htmlFor={`workExperienceStartDate${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Start Date{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <input
-                                            id={`workExperienceStartDate${index}`}
-                                            type="date"
-                                            value={exp.startDate}
-                                            onChange={(e) =>
-                                                handleWorkExperienceChange(
-                                                    index,
-                                                    "startDate",
-                                                    e.target.value
-                                                )
-                                            }
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[
-                                                    `workExperienceStartDate${index}`
-                                                ]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors[
-                                            `workExperienceStartDate${index}`
-                                        ] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors[
-                                                        `workExperienceStartDate${index}`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative">
-                                        <label
-                                            htmlFor={`workExperienceEndDate${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            End Date{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <input
-                                            id={`workExperienceEndDate${index}`}
-                                            type="date"
-                                            value={exp.endDate}
-                                            onChange={(e) =>
-                                                handleWorkExperienceChange(
-                                                    index,
-                                                    "endDate",
-                                                    e.target.value
-                                                )
-                                            }
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[
-                                                    `workExperienceEndDate${index}`
-                                                ]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        {errors[
-                                            `workExperienceEndDate${index}`
-                                        ] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors[
-                                                        `workExperienceEndDate${index}`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="relative col-span-1 sm:col-span-2">
-                                        <label
-                                            htmlFor={`workExperienceDescription${index}`}
-                                            className="block text-sm font-medium text-gray-700 mb-1"
-                                        >
-                                            Description{" "}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </label>
-                                        <div className="relative">
-                                            <textarea
-                                                id={`workExperienceDescription${index}`}
-                                                value={exp.description}
-                                                onChange={(e) =>
-                                                    handleWorkExperienceChange(
-                                                        index,
-                                                        "description",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Describe your role and responsibilities"
-                                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px] ${
-                                                    errors[
-                                                        `workExperienceDescription${index}`
-                                                    ]
-                                                        ? "border-red-500"
-                                                        : "border-gray-300"
-                                                }`}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    enhanceField(
-                                                        "workExperience",
-                                                        exp.description,
-                                                        index,
-                                                        "description"
-                                                    )
-                                                }
-                                                disabled={
-                                                    enhanceLoading[
-                                                        `workExperience${index}`
-                                                    ]
-                                                }
-                                                className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
-                                                    enhanceLoading[
-                                                        `workExperience${index}`
-                                                    ]
-                                                        ? "animate-pulse"
-                                                        : ""
-                                                }`}
-                                                title={
-                                                    enhanceLoading[
-                                                        `workExperience${index}`
-                                                    ]
-                                                        ? "Enhancing..."
-                                                        : "Enhance"
-                                                }
-                                            >
-                                                <FaMagic className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                        {errors[
-                                            `workExperienceDescription${index}`
-                                        ] && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {
-                                                    errors[
-                                                        `workExperienceDescription${index}`
-                                                    ]
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={handleAddWorkExperience}
-                            className="flex items-center text-blue-600 hover:text-blue-800"
-                        >
-                            <FaPlus className="mr-2" /> Add Work Experience
-                        </button>
-                    </div>
-                    <div className="relative col-span-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Other Links
-                        </label>
-                        {formData.otherLinks.map((link, index) => (
-                            <div
-                                key={index}
-                                className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 items-end"
-                            >
-                                <div className="relative">
-                                    <label
-                                        htmlFor={`otherLinkUrl${index}`}
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        URL{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        id={`otherLinkUrl${index}`}
-                                        value={link.url}
-                                        onChange={(e) =>
-                                            handleOtherLinkChange(
-                                                index,
-                                                "url",
-                                                e.target.value
-                                            )
-                                        }
-                                        type="url"
-                                        placeholder="https://otherlink.com"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                            errors[`otherLink${index}`]
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                        }`}
-                                    />
-                                    {errors[`otherLink${index}`] && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors[`otherLink${index}`]}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="relative">
-                                    <label
-                                        htmlFor={`otherLinkTitle${index}`}
-                                        className="block text-sm font-medium text-gray-700 mb-1"
-                                    >
-                                        Title{" "}
-                                        <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            id={`otherLinkTitle${index}`}
-                                            value={link.title}
-                                            onChange={(e) =>
-                                                handleOtherLinkChange(
-                                                    index,
-                                                    "title",
-                                                    e.target.value
-                                                )
-                                            }
-                                            type="text"
-                                            placeholder="Link Title"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
-                                                errors[`otherLinkTitle${index}`]
-                                                    ? "border-red-500"
-                                                    : "border-gray-300"
-                                            }`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveOtherLink(index)
-                                            }
-                                            className="text-red-600 hover:text-red-800"
-                                        >
-                                            <FaTimes />
-                                        </button>
-                                    </div>
-                                    {errors[`otherLinkTitle${index}`] && (
-                                        <p className="text-red-500 text-sm mt-1">
-                                            {errors[`otherLinkTitle${index}`]}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={handleAddOtherLink}
-                            className="flex items-center text-blue-600 hover:text-blue-800"
-                        >
-                            <FaPlus className="mr-2" /> Add Link
-                        </button>
-                    </div>
-                    <div className="relative col-span-1">
-                        <label
-                            htmlFor="expectations"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Expectations
-                        </label>
-                        <div className="relative">
-                            <textarea
-                                id="expectations"
-                                name="expectations"
-                                value={formData.expectations}
-                                onChange={handleChange}
-                                placeholder="Describe your expectations"
-                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "expectations",
-                                        formData.expectations
-                                    )
-                                }
-                                disabled={enhanceLoading.expectations}
-                                className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
-                                    enhanceLoading.expectations
-                                        ? "animate-pulse"
-                                        : ""
-                                }`}
-                                title={
-                                    enhanceLoading.expectations
-                                        ? "Enhancing..."
-                                        : "Enhance"
-                                }
-                            >
-                                <FaMagic className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="relative col-span-1">
-                        <label
-                            htmlFor="anyOtherInfo"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Any Other Information
-                        </label>
-                        <div className="relative">
-                            <textarea
-                                id="anyOtherInfo"
-                                name="anyOtherInfo"
-                                value={formData.anyOtherInfo}
-                                onChange={handleChange}
-                                placeholder="Additional information"
-                                className="w-full pr-10 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px]"
-                            />
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    enhanceField(
-                                        "anyOtherInfo",
-                                        formData.anyOtherInfo
-                                    )
-                                }
-                                disabled={enhanceLoading.anyOtherInfo}
-                                className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
-                                    enhanceLoading.anyOtherInfo
-                                        ? "animate-pulse"
-                                        : ""
-                                }`}
-                                title={
-                                    enhanceLoading.anyOtherInfo
-                                        ? "Enhancing..."
-                                        : "Enhance"
-                                }
-                            >
-                                <FaMagic className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </div>
-                    {errors.submit && (
-                        <p className="col-span-1 text-red-500 text-sm mt-1">
-                            {errors.submit}
-                        </p>
-                    )}
-                    <div className="col-span-1 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="submit"
-                            className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Update Profile
-                        </button>
-                    </div>
-                </form>
+        <label className="relative inline-block cursor-pointer text-violet-600 font-semibold hover:underline">
+          Choose File
+          <input
+            id="resumeFile"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={async (e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setFormData((prev) => ({
+                  ...prev,
+                  resumeFile: file,
+                }));
+                try {
+                  const formDataToUpload = new FormData();
+                  formDataToUpload.append("media", file);
+
+                  const uploadResponse = await fetch(
+                    "http://localhost:3333/api/media/upload",
+                    {
+                      method: "POST",
+                      body: formDataToUpload,
+                      credentials: "include",
+                    }
+                  );
+
+                  if (!uploadResponse.ok) {
+                    throw new Error("Failed to upload resume");
+                  }
+
+                  const uploadData = await uploadResponse.json();
+                  const newResumeLink = uploadData.url;
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    resumeLink: newResumeLink,
+                    resumeFile: null,
+                  }));
+                  setUploadSuccess("Resume uploaded successfully!");
+                } catch (error) {
+                  console.error("Upload error:", error);
+                  setErrors((prev) => ({
+                    ...prev,
+                    resumeFile: "Failed to upload resume. Please try again.",
+                  }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    resumeFile: null,
+                  }));
+                }
+              }
+            }}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+          />
+        </label>
+
+        <p className="mt-2 text-sm text-gray-600">
+          {formData.resumeFile ? formData.resumeFile.name : "No file chosen"}
+        </p>
+      </div>
+
+      {/* Display Uploaded Resume Link */}
+      {formData.resumeLink && !formData.resumeFile && (
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <a
+            href={formData.resumeLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-violet-600 hover:underline break-all text-sm"
+          >
+            {formData.resumeLink}
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              setFormData((prev) => ({
+                ...prev,
+                resumeLink: "",
+              }));
+              setUploadSuccess("");
+            }}
+            className="text-red-500 hover:text-red-700 p-1"
+          >
+            <FaTimes className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Feedback messages */}
+      {uploadSuccess && !formData.resumeFile && (
+        <p className="text-green-600 text-xs sm:text-sm mt-1 text-center">
+          {uploadSuccess}
+        </p>
+      )}
+      {errors.resumeFile && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1 text-center">
+          {errors.resumeFile}
+        </p>
+      )}
+      {errors.resumeLink && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1 text-center">
+          {errors.resumeLink}
+        </p>
+      )}
+    </div>
+
+    {/* Projects Section */}
+    <div className="relative col-span-1 lg:col-span-2 mb-[-15px]">
+      <div className="flex justify-between items-center mb-2">
+        <label className="block text-sm font-medium text-gray-800">Projects</label>
+        <button
+          type="button"
+          onClick={handleAddProject}
+          className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+        >
+          <FaPlus className="w-4 h-4 mr-1" />
+          Add Project
+        </button>
+      </div>
+
+      {formData.projects.map((project, index) => (
+        <div key={index} className="mb-4 p-3 border rounded-lg bg-gray-50">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="text-sm font-semibold text-gray-800">
+              Project {index + 1}
+            </h4>
+            <button
+              type="button"
+              onClick={() => handleRemoveProject(index)}
+              className="text-red-500 hover:text-red-700 p-1"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <input
+              type="text"
+              value={project.title}
+              onChange={(e) => handleProjectChange(index, "title", e.target.value)}
+              placeholder="Project Title"
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                errors[`projectTitle${index}`] ? "border-red-400" : "border-gray-300"
+              }`}
+            />
+            <div className="relative">
+              <textarea
+                value={project.description}
+                onChange={(e) =>
+                  handleProjectChange(index, "description", e.target.value)
+                }
+                placeholder="Describe the project"
+                className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[80px] ${
+                  errors[`projectDescription${index}`]
+                    ? "border-red-400"
+                    : "border-gray-300"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  enhanceField("projects", project.description, index, "description")
+                }
+                disabled={enhanceLoading[`projects${index}`]}
+                className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+                  enhanceLoading[`projects${index}`] ? "animate-pulse" : ""
+                }`}
+                title={
+                  enhanceLoading[`projects${index}`] ? "Enhancing..." : "Enhance"
+                }
+              >
+                <FaMagic className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="url"
+              value={project.link}
+              onChange={(e) => handleProjectChange(index, "link", e.target.value)}
+              placeholder="https://projectlink.com"
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                errors[`projectLink${index}`] ? "border-red-400" : "border-gray-300"
+              }`}
+            />
+
+            {errors[`projectTitle${index}`] && (
+              <p className="text-red-500 text-xs">{errors[`projectTitle${index}`]}</p>
             )}
+            {errors[`projectDescription${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`projectDescription${index}`]}
+              </p>
+            )}
+            {errors[`projectLink${index}`] && (
+              <p className="text-red-500 text-xs">{errors[`projectLink${index}`]}</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Work Experience Section */}
+    <div className="relative col-span-1 lg:col-span-2 mb-[-15px]">
+      <div className="flex justify-between items-center mb-2">
+        <label className="block text-sm font-medium text-gray-800">
+          Work Experience
+        </label>
+        <button
+          type="button"
+          onClick={handleAddWorkExperience}
+          className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+        >
+          <FaPlus className="w-4 h-4 mr-1" />
+          Add Work
+        </button>
+      </div>
+
+      {formData.workExperience.map((exp, index) => (
+        <div key={index} className="mb-4 p-3 border rounded-lg bg-gray-50">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="text-sm font-semibold text-gray-800">
+              Experience {index + 1}
+            </h4>
+            <button
+              type="button"
+              onClick={() => handleRemoveWorkExperience(index)}
+              className="text-red-500 hover:text-red-700 p-1"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input
+                type="text"
+                value={exp.role}
+                onChange={(e) =>
+                  handleWorkExperienceChange(index, "role", e.target.value)
+                }
+                placeholder="Role"
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                  errors[`workExperienceRole${index}`]
+                    ? "border-red-400"
+                    : "border-gray-300"
+                }`}
+              />
+              <input
+                type="text"
+                value={exp.companyName}
+                onChange={(e) =>
+                  handleWorkExperienceChange(index, "companyName", e.target.value)
+                }
+                placeholder="Company Name"
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                  errors[`workExperienceCompany${index}`]
+                    ? "border-red-400"
+                    : "border-gray-300"
+                }`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <input
+                type="date"
+                value={exp.startDate}
+                onChange={(e) =>
+                  handleWorkExperienceChange(index, "startDate", e.target.value)
+                }
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                  errors[`workExperienceStartDate${index}`]
+                    ? "border-red-400"
+                    : "border-gray-300"
+                }`}
+              />
+              <input
+                type="date"
+                value={exp.endDate}
+                onChange={(e) =>
+                  handleWorkExperienceChange(index, "endDate", e.target.value)
+                }
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                  errors[`workExperienceEndDate${index}`]
+                    ? "border-red-400"
+                    : "border-gray-300"
+                }`}
+              />
+            </div>
+
+            <div className="relative">
+              <textarea
+                value={exp.description}
+                onChange={(e) =>
+                  handleWorkExperienceChange(index, "description", e.target.value)
+                }
+                placeholder="Describe your role and responsibilities"
+                className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[80px] ${
+                  errors[`workExperienceDescription${index}`]
+                    ? "border-red-400"
+                    : "border-gray-300"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  enhanceField("workExperience", exp.description, index, "description")
+                }
+                disabled={enhanceLoading[`workExperience${index}`]}
+                className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+                  enhanceLoading[`workExperience${index}`] ? "animate-pulse" : ""
+                }`}
+                title={
+                  enhanceLoading[`workExperience${index}`] ? "Enhancing..." : "Enhance"
+                }
+              >
+                <FaMagic className="w-5 h-5" />
+              </button>
+            </div>
+
+            {errors[`workExperienceCompany${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`workExperienceCompany${index}`]}
+              </p>
+            )}
+            {errors[`workExperienceRole${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`workExperienceRole${index}`]}
+              </p>
+            )}
+            {errors[`workExperienceStartDate${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`workExperienceStartDate${index}`]}
+              </p>
+            )}
+            {errors[`workExperienceEndDate${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`workExperienceEndDate${index}`]}
+              </p>
+            )}
+            {errors[`workExperienceDescription${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`workExperienceDescription${index}`]}
+              </p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Other Links Section */}
+    <div className="relative col-span-1 lg:col-span-2 mb-[-15px]">
+      <div className="flex justify-between items-center mb-2">
+        <label className="block text-sm font-medium text-gray-800">Other Links</label>
+        <button
+          type="button"
+          onClick={handleAddOtherLink}
+          className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+        >
+          <FaPlus className="w-4 h-4 mr-1" />
+          Add Link
+        </button>
+      </div>
+
+      {formData.otherLinks.map((link, index) => (
+        <div key={index} className="mb-4 p-3 border rounded-lg bg-gray-50">
+          <div className="flex justify-between items-center mb-2">
+            <p className="text-sm font-medium text-gray-800">Link {index + 1}</p>
+            <button
+              type="button"
+              onClick={() => handleRemoveOtherLink(index)}
+              className="text-red-500 hover:text-red-700 p-1"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <input
+              type="text"
+              value={link.title}
+              onChange={(e) => handleOtherLinkChange(index, "title", e.target.value)}
+              placeholder="Link Title"
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                errors[`otherLinkTitle${index}`] ? "border-red-400" : "border-gray-300"
+              }`}
+            />
+            <input
+              type="url"
+              value={link.url}
+              onChange={(e) => handleOtherLinkChange(index, "url", e.target.value)}
+              placeholder="https://otherlink.com"
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                errors[`otherLink${index}`] ? "border-red-400" : "border-gray-300"
+              }`}
+            />
+          </div>
+
+          <div className="mt-1 space-y-1">
+            {errors[`otherLink${index}`] && (
+              <p className="text-red-500 text-xs">{errors[`otherLink${index}`]}</p>
+            )}
+            {errors[`otherLinkTitle${index}`] && (
+              <p className="text-red-500 text-xs">
+                {errors[`otherLinkTitle${index}`]}
+              </p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Expectations */}
+    <div className="relative col-span-1 lg:col-span-2">
+      <label
+        htmlFor="expectations"
+        className="block text-sm font-medium text-gray-800 mb-1"
+      >
+        Expectations
+      </label>
+      <div className="relative">
+        <textarea
+          id="expectations"
+          name="expectations"
+          value={formData.expectations}
+          onChange={handleChange}
+          placeholder="Describe your expectations"
+          className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[100px] ${
+            errors.expectations ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+          }`}
+        />
+        <button
+          type="button"
+          onClick={() => enhanceField("expectations", formData.expectations)}
+          disabled={enhanceLoading.expectations}
+          className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+            enhanceLoading.expectations ? "animate-pulse" : ""
+          }`}
+          title={enhanceLoading.expectations ? "Enhancing..." : "Enhance"}
+        >
+          <FaMagic className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+
+    {/* Any Other Information */}
+    <div className="relative col-span-1 lg:col-span-2">
+      <label
+        htmlFor="anyOtherInfo"
+        className="block text-sm font-medium text-gray-800 mb-1"
+      >
+        Any Other Information
+      </label>
+      <div className="relative">
+        <textarea
+          id="anyOtherInfo"
+          name="anyOtherInfo"
+          value={formData.anyOtherInfo}
+          onChange={handleChange}
+          placeholder="Additional information"
+          className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[100px] ${
+            errors.anyOtherInfo ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+          }`}
+        />
+        <button
+          type="button"
+          onClick={() => enhanceField("anyOtherInfo", formData.anyOtherInfo)}
+          disabled={enhanceLoading.anyOtherInfo}
+          className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+            enhanceLoading.anyOtherInfo ? "animate-pulse" : ""
+          }`}
+          title={enhanceLoading.anyOtherInfo ? "Enhancing..." : "Enhance"}
+        >
+          <FaMagic className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+
+    {errors.submit && (
+      <p className="col-span-1 lg:col-span-2 text-red-500 text-sm mt-1">
+        {errors.submit}
+      </p>
+    )}
+
+    <div className="col-span-1 lg:col-span-2 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
+      <button
+        type="button"
+        onClick={handleBack}
+        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md text-sm font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+      >
+        Back
+      </button>
+      <button
+        type="submit"
+        className="w-full sm:w-auto bg-violet-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+      >
+        Update Profile
+      </button>
+    </div>
+  </form>
+)}
         </div>
     );
 }

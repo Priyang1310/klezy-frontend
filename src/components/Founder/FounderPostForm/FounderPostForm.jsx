@@ -1373,8 +1373,10 @@ const handleProfilePhotoChange = async (e) => {
 
     return (
         <div className="bg-white p-4 sm:pt-3 rounded-2xl w-full">
+          
           {/* Simple Progress Bar Line */}
 <div className=" sm:mb-4">
+  
   {/* Progress Bar Container */}
   <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
     <div 
@@ -1955,7 +1957,7 @@ const handleProfilePhotoChange = async (e) => {
         onClick={handleNext}
         className="w-full h-11 sm:w-auto bg-purple-600 text-white px-4 sm:px-6 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base box-border"
       >
-        Next Step
+        Next
       </button>
     </div>
   </form>
@@ -3030,7 +3032,7 @@ const handleProfilePhotoChange = async (e) => {
           onClick={handleNext}
           className="w-full h-11 sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
         >
-          Next Step
+          Next
         </button>
       </div>
     </div>
