@@ -88,10 +88,17 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 					<FaTimes className="w-5 h-5 sm:w-6 sm:h-6" />
 				</button>
 
-				{/* Header */}
-				<h2 className="text-xl sm:text-2xl font-semibold text-[#7900BF] mb-4 sm:mb-6 text-center">
-					View Profile Details
-				</h2>
+				{/* Rejection Comment Section */}
+{post.comment && (
+	<div className="mb-4 sm:mb-6 mt-5 p-3 sm:p-4 border border-red-300 rounded-lg bg-red-50">
+		<h3 className="text-base sm:text-lg font-semibold text-red-700 mb-1">
+			Reason for Rejection
+		</h3>
+		<p className="text-sm sm:text-base text-red-800 whitespace-pre-line">
+			{post.comment}
+		</p>
+	</div>
+)}
 
 				{/* Step 1: About You */}
 				<div className="mb-6 sm:mb-8">
@@ -104,39 +111,8 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 								alt="Profile"
 								className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-purple-300 shadow-md"
 							/>
-							{/* Optional overlay edit icon */}
-							<label
-								htmlFor="profilePhotoUpload"
-								className="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow cursor-pointer hover:"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									className="h-5 w-5 text-purple-600"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-								>
-									<path d="M17.414 2.586a2 2 0 010 2.828l-9.95 9.95a2 2 0 01-.878.516l-3.535 1.01a1 1 0 01-1.213-1.213l1.01-3.535a2 2 0 01.516-.878l9.95-9.95a2 2 0 012.828 0z" />
-								</svg>
-								<input
-									type="file"
-									id="profilePhotoUpload"
-									accept="image/*"
-									onChange={handleProfilePhotoChange}
-									className="hidden"
-								/>
-							</label>
+							
 						</div>
-						<button
-							type="button"
-							onClick={() =>
-								document
-									.getElementById("profilePhotoUpload")
-									?.click()
-							}
-							className="text-sm font-medium text-purple-700 hover:underline"
-						>
-							Update Photo
-						</button>
 					</div>
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
 						<div>
