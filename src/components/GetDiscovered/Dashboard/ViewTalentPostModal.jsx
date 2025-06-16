@@ -13,12 +13,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
         // Placeholder: In practice, fetch domain name from domains array or API
         return domainId || "N/A";
     };
-    const getExperienceDisplay = (experience) => {
-        if (experience.years) return experience.years;
-        if (experience.months) return experience.months;
-        if (experience.days) return experience.days;
-        return "N/A";
-    };
+   
 
     // Helper to get display value for role
     const getRoleName = (roleId) => {
@@ -73,12 +68,12 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 
     return (
         <div
-            className="fixed inset-0 bg-opacity-75 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+            className="fixed inset-0  bg-black/50   flex items-center justify-center z-50 overflow-y-auto"
             onClick={handleOverlayClick}
         >
             <div
                 ref={modalContentRef}
-                className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-[90vw] sm:max-w-3xl md:max-w-4xl m-2 sm:m-4 relative max-h-[90vh] overflow-y-auto"
+                className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-[90vw] sm:max-w-2xl md:max-w-3xl m-2 sm:m-4 relative max-h-[90vh] overflow-y-auto"
             >
                 {/* Close Button */}
                 <button
@@ -248,7 +243,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 You are a{" "}
                                 <span className="text-red-500">*</span>
                             </label>
-                            <div className="flex flex-wrap gap-3 sm:gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {[
                                     "Working Professional",
                                     "Freelancer",
@@ -312,7 +307,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 How people can reach out to you (select at least
                                 two) <span className="text-red-500">*</span>
                             </label>
-                            <div className="flex flex-wrap gap-3 sm:gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {[
                                     "call",
                                     "whatsapp",
@@ -502,7 +497,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 Work Basis{" "}
                                 <span className="text-red-500">*</span>
                             </label>
-                            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 gap-3 lg:gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {[
                                     "Partnership",
                                     "Collaboration",
@@ -804,7 +799,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 {post.workBasis.Collaboration && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Collaboration Description{" "}
+                                            Collaboration Criteria {" "}
                                             <span className="text-red-500">
                                                 *
                                             </span>
@@ -1180,22 +1175,21 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Experience{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                value={getExperienceDisplay(post.experience)}
-                                disabled
-                                type="text"
-                                className="w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg  cursor-not-allowed border-purple-300"
-                            />
-                            {errors.experience && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.experience}
-                                </p>
-                            )}
-                        </div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+        Experience <span className="text-red-500">*</span>
+    </label>
+    <input
+        value={post.experience || "N/A"}
+        disabled
+        type="text"
+        className="w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg cursor-not-allowed border-purple-300"
+    />
+    {errors.experience && (
+        <p className="text-red-500 text-sm mt-1">
+            {errors.experience}
+        </p>
+    )}
+</div>
                     </div>
                 </div>
 

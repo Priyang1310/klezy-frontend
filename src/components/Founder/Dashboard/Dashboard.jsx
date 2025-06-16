@@ -451,39 +451,39 @@ const Dashboard = () => {
 			</div>
 
 			{/* Modals */}
-			{isModalOpen && (
-				<div className="fixed inset-0 bg-violet-300/30 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-					<div className="bg-white rounded-3xl p-4 w-full max-w-[95%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto border border-violet-200 shadow-2xl">
-						<div className="flex justify-between items-center mb-6">
-							<h2 className="text-2xl font-bold text-violet-900 tracking-tight">
-								 
-							</h2>
-						
-
-<button
-        onClick={() => closeModal()}
-        className=" text-gray-500 hover:text-gray-700"
-      >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+		{isModalOpen && (
+  <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
+    <div className="bg-white rounded-3xl w-full max-w-[95%] sm:max-w-[800px] h-[90vh] flex flex-col border border-violet-200 shadow-2xl">
+      <div className="flex justify-between items-center p-4 border-b border-gray-200">
+        <h2 className="text-2xl font-bold text-purple-600 tracking-tight">
+          Create New Listing
+        </h2>
+        <button
+          onClick={() => closeModal()}
+          className="text-gray-500 hover:text-gray-700"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M6 18L18 6M6 6l12 12"
-          ></path>
-        </svg>
-      </button>
-						</div>
-						<FounderPostForm onClose={closeModal} />
-					</div>
-				</div>
-			)}
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <FounderPostForm onClose={closeModal} />
+      </div>
+    </div>
+  </div>
+)}
 
 			<Modal
 				isOpen={isAccountSettingsModalOpen}

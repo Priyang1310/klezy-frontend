@@ -1296,7 +1296,7 @@ useEffect(() => {
             !formData.collaborationDescription.trim()
         )
             newErrors.collaborationDescription =
-                "Collaboration description is required";
+                "Collaboration Criteria  is required";
         if (formData.workBasis.Job) {
             if (!formData.jobTimeType)
                 newErrors.jobTimeType = "Please specify job time type";
@@ -1819,66 +1819,31 @@ const handleSubmit = async (e) => {
     }
 
      return (
-        <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
-          
-<div className=" sm:mb-4">
-  {/* Progress Bar Container */}
-  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-    <div 
-      className="bg-[#7900BF] h-2 rounded-full transition-all duration-500 ease-out"
-      style={{ width: `${(step / 3) * 100}%` }}
-    ></div>
-  </div>
-  
-  {/* Step Title */}
-  <h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
-    {step === 1 ? "Let's introduce you to the world." : 
-     step === 2 ? "Tell us about your preferences." : 
-     "Almost done! Final details."}
-  </h3>
-  
-  {/* Step indicator */}
-  <p className="text-sm text-gray-500">
-    Step {step} of 3
-  </p>
-</div>
+       <div className="bg-white rounded-2xl w-full  flex flex-col h-full max-h-[80vh]">
+    {/* Scrollable Content Area */}
+    <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+      <div className="mb-4">
+        {/* Progress Bar Container */}
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+          <div
+            className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${(step / 3) * 100}%` }}
+          ></div>
+        </div>
 
-{/*           
-{step === 2 && (
-  <div className="flex flex-col sm:flex-row items-center justify-between w-full bg-violet-100 px-4 sm:px-6 py-4 sm:py-6 rounded-2xl mb-5 gap-4">
-    <div className="flex flex-col max-w-full sm:max-w-[60%]">
-      <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-        You're almost there!
-      </p>
-      <p className="text-violet-400 text-sm sm:text-base">
-        This fun little form helps you describe your vibe and your need — quick, casual, and human. No resumes, no HR jargon. Just say it like it is.
-      </p>
-    </div>
-    <img
-      src="./FormImage2.svg"
-      alt="Step 2 illustration"
-      className="w-32 sm:w-40 md:w-48 object-contain"
-    />
-  </div>
-)}
+        {/* Step Title */}
+        <h3 className="text-lg sm:text-xl font-semibold text-[#a100ff] mb-2 sm:mb-4">
+          <span className="mr-2">✦</span>
+          {step === 1
+            ? "Let's introduce you to the world."
+            : step === 2
+            ? "Tell us about your preferences."
+            : "Almost done! Final details."}
+        </h3>
 
-{step === 3 && (
-  <div className="flex flex-col sm:flex-row items-center justify-between w-full bg-violet-100 px-4 sm:px-6 py-4 sm:py-6 rounded-2xl mb-5 gap-4">
-    <div className="flex flex-col max-w-full sm:max-w-[60%]">
-      <p className="text-violet-700 text-lg sm:text-xl font-semibold">
-        You've made it to the final step!
-      </p>
-      <p className="text-violet-400 text-sm sm:text-base">
-        This short form captures who you are, what you need, and how your team works — no fluff, no lengthy job descriptions. Just clear, honest details. Done in minutes.
-      </p>
-    </div>
-    <img
-      src="./FormImage3.svg"
-      alt="Step 3 illustration"
-      className="w-32 sm:w-40 md:w-48 object-contain"
-    />
-  </div>
-)} */}
+        {/* Step indicator */}
+        <p className="text-sm text-gray-500">Step {step} of 3</p>
+      </div>
 
             {step === 1 && (
   <form className="grid grid-cols-1 gap-6">
@@ -2202,22 +2167,7 @@ const handleSubmit = async (e) => {
       </div>
     </div>
 
-    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
-      <button
-        type="button"
-        onClick={handleCancel}
-        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        onClick={handleNext}
-        className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2"
-      >
-        Next
-      </button>
-    </div>
+   
   </form>
 )}
 
@@ -2654,7 +2604,7 @@ const handleSubmit = async (e) => {
               htmlFor="collaborationDescription"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Collaboration Description <span className="text-red-500">*</span>
+              Collaboration Criteria  <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <textarea
@@ -2969,7 +2919,7 @@ const handleSubmit = async (e) => {
           type="number"
           min="1"
           placeholder="Enter value"
-          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.timeCommitment?.value ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -2991,7 +2941,7 @@ const handleSubmit = async (e) => {
           onChange={(e) =>
             handleNestedChange("timeCommitment", "unit", e.target.value)
           }
-          className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+          className={`w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
             errors.timeCommitment?.unit ? "border-red-500" : "border-gray-300"
           }`}
         >
@@ -3047,7 +2997,7 @@ const handleSubmit = async (e) => {
             onChange={(e) =>
               handleNestedChange("workLocation", "country", e.target.value)
             }
-            className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            className={`w-full h-12 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
               errors.workLocation?.country ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -3076,7 +3026,7 @@ const handleSubmit = async (e) => {
             onChange={(e) =>
               handleNestedChange("workLocation", "state", e.target.value)
             }
-            className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            className={`w-full h-12 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
               errors.workLocation?.state ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -3105,7 +3055,7 @@ const handleSubmit = async (e) => {
             onChange={(e) =>
               handleNestedChange("workLocation", "district", e.target.value)
             }
-            className={`w-full h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
+            className={`w-full h-12 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
               errors.workLocation?.district ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -3176,31 +3126,34 @@ const handleSubmit = async (e) => {
       </div>
     </div>
 
-    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
+
+  {/* Right Side: Cancel and Next/Submit Buttons */}
+  {/* <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3 sm:gap-4">
+    <button
+      type="button"
+      onClick={handleCancel}
+      className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+    >
+      Cancel
+    </button>
+    {step < 3 ? (
       <button
         type="button"
-        onClick={handleBack}
-        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
+        onClick={handleNext}
+        className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
       >
-        Back
+        Next
       </button>
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 order-1 sm:order-2">
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    ) : (
+      <button
+        type="submit"
+        className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+      >
+        Submit
+      </button>
+    )}
+  </div> */}
+
   </form>
 )}
 
@@ -3318,7 +3271,7 @@ const handleSubmit = async (e) => {
       <p className="text-red-500 text-xs sm:text-sm mt-4">{errors.submit}</p>
     )}
 
-    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
+    {/* <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
       <button
         type="button"
         onClick={handleBack}
@@ -3341,10 +3294,53 @@ const handleSubmit = async (e) => {
           Submit
         </button>
       </div>
-    </div>
+    </div> */}
   </form>
 )}
+</div>
+<div className="sticky bottom-0 bg-white z-20 p-4 sm:p-6 border-t rounded-b-3xl border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <button
+        type="button"
+        onClick={handleBack}
+        className={`w-full sm:w-auto px-6 py-3 rounded-lg text-sm sm:text-base font-medium transition-all duration-200 transform hover:scale-105 ${
+          step === 1
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        }`}
+        disabled={step === 1}
+      >
+        Back
+      </button>
+      <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3 sm:gap-4">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="w-full sm:w-auto px-6 py-3 rounded-lg text-sm sm:text-base font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 transform hover:scale-105"
+        >
+          Cancel
+        </button>
+        {step < 3 ? (
+          <button
+            type="button"
+            onClick={handleNext}
+            className="w-full sm:w-auto px-6 py-3 rounded-lg text-sm sm:text-base font-medium bg-[#a100ff] text-white hover:bg-[#8b00d6] transition-all duration-200 transform hover:scale-105"
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="w-full sm:w-auto px-6 py-3 rounded-lg text-sm sm:text-base font-medium bg-[#a100ff] text-white hover:bg-[#8b00d6] transition-all duration-200 transform hover:scale-105"
+          >
+            Submit
+          </button>
+        )}
+      </div>
+    </div>
+
         </div>
+        
     );
 }
 

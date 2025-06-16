@@ -12,7 +12,7 @@ import "react-phone-input-2/lib/style.css";
 
 function GetDiscoveredForm({ onClose }) {
     const animatedComponents = makeAnimated();
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(0);
     const [formData, setFormData] = useState({
         first_name: "",
         middle_name: "",
@@ -97,6 +97,8 @@ function GetDiscoveredForm({ onClose }) {
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [profileError, setProfileError] = useState("");
     const [enhanceLoading, setEnhanceLoading] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
 
     // Fetch profile data
     useEffect(() => {
@@ -990,7 +992,7 @@ function GetDiscoveredForm({ onClose }) {
             !formData.collaborationDescription.trim()
         )
             newErrors.collaborationDescription =
-                "Collaboration description is required";
+                "Collaboration Criteria  is required";
         if (formData.workBasis.Job) {
             if (!formData.jobTimeType)
                 newErrors.jobTimeType = "Please specify job time type";
@@ -1314,6 +1316,7 @@ function GetDiscoveredForm({ onClose }) {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (validateStep3()) {
             try {
                 const domain = domains.find(
@@ -1457,7 +1460,7 @@ function GetDiscoveredForm({ onClose }) {
 
                 if (response.ok) {
                     console.log("Form submitted:", submitData);
-                    onClose();
+                    setStep(4);
                 } else {
                     const errorData = await response.json();
                     setErrors({
@@ -1472,6 +1475,8 @@ function GetDiscoveredForm({ onClose }) {
             }
         }
     };
+
+
     const handleCancel = () => {
         setFormData({
             first_name: formData.first_name,
@@ -1582,7 +1587,7 @@ function GetDiscoveredForm({ onClose }) {
         }
     };
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
+        <div className="bg-white p-10 sm:pt-14 rounded-2xl w-full">
             <button
                 onClick={handleCancel}
                 className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -1601,30 +1606,80 @@ function GetDiscoveredForm({ onClose }) {
                         d="M6 18L18 6M6 6l12 12"
                     ></path>
                 </svg>
-            </button>
+            </button>   
 
-            <div className=" sm:m-4">
+            <div className="sm:m-4">
                 {/* Progress Bar Container */}
-                <div className="w-full  bg-gray-200 rounded-full h-2 mb-4">
-                    <div
-                        className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
-                        style={{ width: `${(step / 3) * 100}%` }}
-                    ></div>
-                </div>
+                {step > 0 && step < 4 && (
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                        <div
+                            className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
+                            style={{ width: `${((step - 1) / 3) * 100}%` }}
+                        ></div>
+                    </div>
+                )}
 
                 {/* Step Title */}
                 <h3 className="text-lg sm:text-xl font-semibold text-[#a100ff] mb-2 sm:mb-4">
                     <span className="mr-2">✦</span>
-                    {step === 1
+                    {step === 0
+                        ? "Important Instructions Before You Begin"
+                        : step === 1
                         ? "Let's introduce you to the world."
                         : step === 2
                         ? "Tell us about your preferences."
-                        : "Almost done! Final details."}
+                        : step === 3
+                        ? "Almost done! Final details."
+                        : "🎉 Submission Successful!"}
                 </h3>
 
-                {/* Step indicator */}
-                <p className="text-sm text-gray-500">Step {step} of 3</p>
+                {/* Step Indicator */}
+                <p className="text-sm text-gray-500">
+                    {step === 0
+                        ? "Instructions"
+                        : step === 4
+                        ? "You're all set!"
+                        : `Step ${step} of 3`}
+                </p>
             </div>
+    {step === 0 && (
+                <div className="flex flex-col items-center justify-center text-center space-y-6 p-6 sm:p-10 bg-gradient-to-br from-white via-purple-50 to-purple-100 border border-purple-300 rounded-2xl shadow-xl transition-all duration-500 animate-fade-in">
+                    {/* Heading */}
+                    <h2 className="text-2xl sm:text-3xl font-bold text-[#a100ff] tracking-tight">
+                        ⚠️ Read This Before You Begin
+                    </h2>
+
+                    {/* Primary Instruction */}
+                    <p className="text-gray-800 text-base sm:text-lg max-w-2xl leading-relaxed">
+                        <strong className="text-red-500">
+                            Do not enter personal details
+                        </strong>
+                        . Doing so may result in
+                        <span className="font-semibold text-red-600">
+                            {" "}
+                            disqualification or rejection
+                        </span>{" "}
+                        of your submission.
+                    </p>
+
+                    {/* Secondary Instruction */}
+                    <p className="text-gray-700 text-sm sm:text-base max-w-xl">
+                        Use fictional or placeholder data (e.g., initials,
+                        sample cities). This form is meant for demo or internal
+                        evaluation purposes only.
+                    </p>
+
+                    {/* Action Button */}
+                    <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="bg-[#a100ff] hover:bg-purple-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-md transition duration-200 transform hover:scale-105 text-sm sm:text-base"
+                    >
+                        I Understand, Proceed →
+                    </button>
+                </div>
+            )}
+
 
             {step === 1 && (
                 <form className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -4148,13 +4203,75 @@ function GetDiscoveredForm({ onClose }) {
                         </button>
                         <button
                             type="submit"
-                            className="w-full h-11 sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2"
+                            disabled={isSubmitting}
+                            className={`w-full h-11 sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium 
+        ${
+            isSubmitting
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-purple-700"
+        } 
+        focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2`}
                         >
-                            Submit
+                            {isSubmitting ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <svg
+                                        className="animate-spin h-5 w-5 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        ></path>
+                                    </svg>
+                                    Submitting...
+                                </div>
+                            ) : (
+                                "Submit"
+                            )}
                         </button>
                     </div>
+
+
+
+
                 </form>
             )}
+            {step === 4 && (
+                <div className="flex flex-col items-center justify-center text-center space-y-6 p-6 sm:p-10 bg-white border border-purple-300 rounded-xl shadow-md animate-fade-in">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-[#a100ff]">
+                        🎉 Submission Successful!
+                    </h2>
+                    <p className="text-gray-700 text-sm sm:text-base max-w-xl leading-relaxed">
+                        Your listing has been submitted successfully. It will
+                        take up to <strong>72 hours</strong> to verify your
+                        post. Once approved, you will be notified via email.
+                    </p>
+                    <p className="text-green-600 font-medium text-sm sm:text-base">
+                        Thank you for being part of our community 💜
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            onClose() // change this to your actual dashboard route
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg shadow transition duration-200 transform hover:scale-105 text-sm sm:text-base"
+                    >
+                        Go to Dashboard →
+                    </button>
+                </div>
+            )}
+
             {isRequestModalOpen && (
                 <RequestDomainRoleSkills
                     onClose={() => setIsRequestModalOpen(false)}

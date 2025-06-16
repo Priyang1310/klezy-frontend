@@ -318,19 +318,14 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         district: data.workLocation.district || "", // Use full name directly
                     },
                     experience: (() => {
-                        const exp =
-                            data.experience?.years ||
-                            data.experience?.months ||
-                            data.experience?.days ||
-                            "";
-                        if (!exp) return { range: "", unit: "" };
-                        const match = exp.match(
-                            /^(\d+-\d+)\s*(Years|Months|Days)$/
-                        );
-                        return match
-                            ? { range: match[1], unit: match[2] }
-                            : { range: "", unit: "" };
-                    })(),
+    const exp = data.experience || "";
+    if (!exp) return { range: "", unit: "" };
+    // Match format like "1-2 Years" or "3-5 Months"
+    const match = exp.match(/^(\d+-\d+)\s*(Years|Months|Days)$/);
+    return match
+        ? { range: match[1], unit: match[2] }
+        : { range: "", unit: "" };
+})(),
                     portfolioLink: data.portfolioLink || "",
                     resumeLink: data.resumeLink || "",
                     resumeFile: null,
@@ -1251,7 +1246,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             !formData.collaborationDescription.trim()
         )
             newErrors.collaborationDescription =
-                "Collaboration description is required";
+                "Collaboration Criteria  is required";
         if (formData.workBasis.Job) {
             if (!formData.jobTimeType)
                 newErrors.jobTimeType = "Please specify job time type";
@@ -1671,17 +1666,20 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
   {/* Progress Bar Container */}
   <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
     <div 
-      className="bg-[#7900BF] h-2 rounded-full transition-all duration-500 ease-out"
+      className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
       style={{ width: `${(step / 3) * 100}%` }}
     ></div>
   </div>
   
   {/* Step Title */}
-  <h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
-    {step === 1 ? "Let's introduce you to the world." : 
-     step === 2 ? "Tell us about your preferences." : 
-     "Almost done! Final details."}
-  </h3>
+   <h3 className="text-lg sm:text-xl font-semibold text-[#a100ff] mb-2 sm:mb-4">
+                    <span className="mr-2">✦</span>
+                    {step === 1
+                        ? "Let's introduce you to the world."
+                        : step === 2
+                        ? "Tell us about your preferences."
+                        : "Almost done! Final details."}
+                </h3>
   
   {/* Step indicator */}
   <p className="text-sm text-gray-500">
@@ -2527,7 +2525,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         htmlFor="collaborationDescription"
                                         className="block text-sm font-medium text-gray-700 mb-1"
                                     >
-                                        Collaboration Description{" "}
+                                        Collaboration Criteria {" "}
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">

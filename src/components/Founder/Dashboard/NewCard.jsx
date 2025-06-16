@@ -282,14 +282,14 @@ const NewCard = ({ post }) => {
       {/* View Modal */}
       {isModalOpen && (
   <div
-    className="fixed inset-0  bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+    className="fixed inset-0 bg-black/50  bg-opacity-50  flex items-center justify-center z-50 overflow-y-auto"
     onClick={() => handleViewModalClose()}
   >
  
       {/* Close Button */}
-      <button
+      {/* <button
         onClick={() => handleViewModalClose()}
-        className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        className=" text-gray-500 hover:text-gray-700"
       >
         <svg
           className="w-6 h-6"
@@ -305,7 +305,7 @@ const NewCard = ({ post }) => {
             d="M6 18L18 6M6 6l12 12"
           ></path>
         </svg>
-      </button>
+      </button> */}
 
       <ViewFounderPostModal
         post={post}
@@ -321,39 +321,50 @@ const NewCard = ({ post }) => {
 )}
 
       {/* Update Modal */}
-      {isUpdateModalOpen && (
-        <div
-          className="fixed  inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+  {isUpdateModalOpen && (
+  <div
+    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    onClick={() => setIsUpdateModalOpen(false)}
+  >
+    <div
+      className="bg-white rounded-2xl w-full max-w-3xl m-4 max-h-[90vh] flex flex-col relative"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Fixed Header */}
+      <div className="sticky top-0 bg-white rounded-3xl z-10 p-4 sm:p-6 border-b border-gray-200">
+        <button
           onClick={() => setIsUpdateModalOpen(false)}
+          className="absolute top-4 right-4 bg-white rounded-full p-2 text-gray-500 hover:text-gray-700 shadow-sm hover:shadow-md transition-all duration-200"
+          aria-label="Close modal"
         >
-          <div
-        className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-3xl m-4 relative max-h-[90vh] overflow-y-auto"
-
-        onClick={(e) => e.stopPropagation()}
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Close Button */}
-            <button
-              onClick={() => setIsUpdateModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+        <h2 className="text-xl sm:text-2xl font-semibold text-[#a100ff] text-center">
+          Update your post
+        </h2>
+      </div>
 
-            {/* Header */}
-            <h2 className="text-xl  sm:text-2xl font-semibold text-[#7900BF] mb-6 text-center">
-              Update Founder Post
-            </h2>
-
-            {/* Render UpdateFounderPostForm */}
-            <UpdateFounderPostForm
-              listingId={listingId}
-              onClose={() => setIsUpdateModalOpen(false)}
-            />
-          </div>
-        </div>
-      )}
+      {/* Form Content (Delegate Scrolling to Form) */}
+      <UpdateFounderPostForm
+        listingId={listingId}
+        onClose={() => setIsUpdateModalOpen(false)}
+      />
+    </div>
+  </div>
+)}
     </>
   );
 };

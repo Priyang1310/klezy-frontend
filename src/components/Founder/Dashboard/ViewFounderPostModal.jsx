@@ -200,7 +200,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
 
     return (
         <div className="bg-white rounded-3xl px-4 sm:px-6 py-4 w-full max-w-3xl max-h-[95vh]  border border-violet-200 shadow-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-2 sm:px-4 gap-4 sm:gap-0">
+            <div className="flex flex-col sm:flex-row justify-between justify-end sm:items-center px-2 sm:px-4 gap-4 sm:gap-0">
                 {/* Rejection Comment Section */}
                 {post.comment && (
                     <div className="mb-4 sm:mb-6 mt-5 p-3 sm:p-4 border border-red-300 rounded-lg bg-red-50">
@@ -212,8 +212,9 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         </p>
                     </div>
                 )}
-
-                <div className="flex items-center gap-3">
+               
+                <div className="flex  gap-3">
+                  
                     <button
                         className="bg-purple-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 transition-all duration-200"
                         onClick={(e) => {
@@ -233,6 +234,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         <IoMdClose className="w-5 h-5" />
                     </button>
                 </div>
+                
             </div>
             <div className="h-[2px] bg-gray-300 w-full my-4"></div>
             <div className="bg-white px-4 sm:px-6 py-4  rounded-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -839,7 +841,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                             {workBasisObj.Collaboration && (
                                 <div className="relative">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Collaboration Description
+                                        Collaboration Criteria 
                                     </label>
                                     <textarea
                                         value={collaborationDescription || ""}
