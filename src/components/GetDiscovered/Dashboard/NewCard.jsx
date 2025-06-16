@@ -121,17 +121,17 @@ const NewCard = ({ post }) => {
 
   return (
     <>
-      <div className="text-gray-800 flex shadow-md transition-all duration-300 flex-col h-fit w-full max-w-[650px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
+      <div className="relative text-gray-800 flex shadow-md transition-all duration-300 flex-col h-fit w-full max-w-[650px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
 
         {/* Role, Domain, Status */}
-        <div className="flex w-full items-start justify-between" onClick={() => setIsModalOpen(true)}>
+        <div className="flex  w-full items-start justify-between" onClick={() => setIsModalOpen(true)}>
           <div className="flex items-start gap-2 sm:gap-5">
             <div className="flex flex-col   pr-2 sm:pr-4">
               <p className="text-sm sm:text-md font-semibold">{roleUnderDomain}</p>
               <p className="text-xs sm:text-sm font-medium">{domainName}</p>
             </div>
           </div>
-          <div className={`w-3.5 h-3.5 rounded-full ${statusColor[status] || "bg-gray-200"}`}></div>
+          <div className={`w-3.5 h-3.5 absolute right-3 rounded-full ${statusColor[status] || "bg-gray-200"}`}></div>
         </div>
         <hr className="mt-2 text-gray-200 w-full" />
 
@@ -277,7 +277,7 @@ const NewCard = ({ post }) => {
       {/* Update Modal */}
       {isUpdateModalOpen && (
         <div
-          className="fixed inset-0 bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto"
           onClick={() => setIsUpdateModalOpen(false)} // Close on overlay click
         >
           <div

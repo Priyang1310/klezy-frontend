@@ -20,7 +20,7 @@ function FounderPostForm({ onClose }) {
         otherUserType: "",
         requirementType: "",
         otherRequirementType: "",
-        startUpName: "",
+        startUpName: "",    
         aboutEntity: "",
         email: "",
         country: "",
@@ -768,6 +768,7 @@ function FounderPostForm({ onClose }) {
 
     const validateStep1 = () => {
         const newErrors = {};
+        if(!formData.profile_pic)newErrors.profile_pic = "Profile Pic is required";
         if (!formData.first_name.trim())
             newErrors.first_name = "First Name is required";
         if (!formData.last_name.trim())
@@ -918,7 +919,7 @@ function FounderPostForm({ onClose }) {
             !formData.collaborationDescription.trim()
         )
             newErrors.collaborationDescription =
-                "Collaboration description is required";
+                "Collaboration Criteria  is required";
         if (formData.workBasis.Job) {
             if (!formData.jobTimeType)
                 newErrors.jobTimeType = "Please specify job time type";
@@ -1372,7 +1373,8 @@ const handleProfilePhotoChange = async (e) => {
 };
 
     return (
-        <div className="bg-white p-4 sm:pt-3 rounded-2xl w-full">
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto px-4 pt-4 pb-20">
           
           {/* Simple Progress Bar Line */}
 <div className=" sm:mb-4">
@@ -1380,17 +1382,20 @@ const handleProfilePhotoChange = async (e) => {
   {/* Progress Bar Container */}
   <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
     <div 
-      className="bg-[#7900BF] h-2 rounded-full transition-all duration-500 ease-out"
+      className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
       style={{ width: `${(step / 3) * 100}%` }}
     ></div>
   </div>
   
   {/* Step Title */}
-  <h3 className="text-lg sm:text-xl font-semibold text-[#7900BF] mb-2 sm:mb-4">
-    {step === 1 ? "Let's introduce you to the world." : 
-     step === 2 ? "Tell us about your preferences." : 
-     "Almost done! Final details."}
-  </h3>
+  <h3 className="text-lg sm:text-xl font-semibold text-[#a100ff] mb-2 sm:mb-4">
+                    <span className="mr-2">✦</span>
+                    {step === 1
+                        ? "Let's introduce you to the world."
+                        : step === 2
+                        ? "Tell us about your preferences."
+                        : "Almost done! Final details."}
+                </h3>
   
   {/* Step indicator */}
   <p className="text-sm text-gray-500">
@@ -1436,10 +1441,15 @@ const handleProfilePhotoChange = async (e) => {
   <button
     type="button"
     onClick={() => document.getElementById('profilePhotoUpload')?.click()}
-    className="text-sm font-medium text-purple-700 hover:underline"
+    className="text-sm font-medium text-[#a100ff] hover:underline"
   >
     Update Photo
   </button>
+  {errors.profile_pic && (
+        <p className="text-red-500 text-xs sm:text-sm mt-1">
+          {errors.profile_pic}
+        </p>
+      )}
 </div>
 
 
@@ -1944,7 +1954,7 @@ const handleProfilePhotoChange = async (e) => {
     </div>
 
     {/* Action Buttons */}
-    <div className="col-span-full flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-6">
+    {/* <div className="col-span-full flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-6">
       <button
         type="button"
         onClick={handleCancel}
@@ -1959,7 +1969,7 @@ const handleProfilePhotoChange = async (e) => {
       >
         Next
       </button>
-    </div>
+    </div> */}
   </form>
 )}
 
@@ -2433,7 +2443,7 @@ const handleProfilePhotoChange = async (e) => {
               htmlFor="collaborationDescription"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Collaboration Description <span className="text-red-500">*</span>
+              Collaboration Criteria  <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <textarea
@@ -2762,7 +2772,7 @@ const handleProfilePhotoChange = async (e) => {
         }
         type="number"
         min="1"
-        placeholder="Enter value"
+        placeholder="Value"
         className={`w-1/3 h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 text-sm sm:text-base ${
           errors.timeCommitment?.value ? "border-red-500" : "border-purple-300"
         }`}
@@ -3011,7 +3021,7 @@ const handleProfilePhotoChange = async (e) => {
       )}
     </div> */}
 
-    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
+    {/* <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
       <button
         type="button"
         onClick={handleBack}
@@ -3035,7 +3045,7 @@ const handleProfilePhotoChange = async (e) => {
           Next
         </button>
       </div>
-    </div>
+    </div> */}
   </form>
 )}
 
@@ -3161,7 +3171,7 @@ const handleProfilePhotoChange = async (e) => {
       <p className="text-red-500 text-xs sm:text-sm mt-4">{errors.submit}</p>
     )}
 
-    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
+    {/* <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
       <button
         type="button"
         onClick={handleBack}
@@ -3184,7 +3194,7 @@ const handleProfilePhotoChange = async (e) => {
           Submit
         </button>
       </div>
-    </div>
+    </div> */}
   </form>
 )}
             {isRequestModalOpen && (
@@ -3197,6 +3207,52 @@ const handleProfilePhotoChange = async (e) => {
                                     />
                                 )}
         </div>
+        <div className="sticky  bottom-0 bg-white rounded-b-3xl border-t  border-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center gap-4 z-10">
+  {/* Left Side: Back Button or Placeholder */}
+  <div className="w-full sm:w-auto">
+    {step > 1 ? (
+      <button
+        type="button"
+        onClick={handleBack}
+        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+      >
+        Back
+      </button>
+    ) : (
+      <div className="hidden sm:block"></div> // Placeholder to maintain layout
+    )}
+  </div>
+
+  {/* Right Side: Cancel and Next/Submit Buttons */}
+  <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-3 sm:gap-4">
+    <button
+      type="button"
+      onClick={handleCancel}
+      className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+    >
+      Cancel
+    </button>
+    {step < 3 && (
+      <button
+        type="button"
+        onClick={handleNext}
+        className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+      >
+        Next
+      </button>
+    )}
+    {step === 3 && (
+      <button
+        type="submit"
+        onClick={handleSubmit}
+        className="w-full sm:w-auto bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+      >
+        Submit
+      </button>
+    )}
+  </div>
+</div>
+</div>
     );
 }
 
