@@ -276,35 +276,32 @@ const NewCard = ({ post }) => {
 
       {/* Update Modal */}
       {isUpdateModalOpen && (
+    <div
+        className="fixed inset-0 h-full  bg-black/50 flex items-center justify-center z-50 overflow-y-auto"
+        onClick={() => setIsUpdateModalOpen(false)}
+    >
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto"
-          onClick={() => setIsUpdateModalOpen(false)} // Close on overlay click
+            className="rounded-2xl p-3 w-full max-w-3xl m-4 relative max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-3xl m-4 relative max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-          >
-            {/* Close Button */}
+            {/* Fixed Cross Button */}
             <button
-              onClick={() => setIsUpdateModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                onClick={() => setIsUpdateModalOpen(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+                <svg className="w-6 h-6 m-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
             </button>
-
-            {/* Header */}
-            
 
             {/* Render UpdateTalentPostForm */}
             <UpdateTalentPostForm
-              listingId={listingId}
-              onClose={() => setIsUpdateModalOpen(false)}
+                listingId={listingId}
+                onClose={() => setIsUpdateModalOpen(false)}
             />
-          </div>
         </div>
-      )}
+    </div>
+)}
     </>
   );
 };

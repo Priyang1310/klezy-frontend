@@ -68,21 +68,21 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
 
     return (
         <div
-            className="fixed inset-0  bg-black/50   flex items-center justify-center z-50 overflow-y-auto"
+            className="fixed inset-0 h-full  bg-black/50   flex items-center justify-center z-50 overflow-y-auto"
             onClick={handleOverlayClick}
         >
             <div
-                ref={modalContentRef}
-                className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl w-full max-w-[90vw] sm:max-w-2xl md:max-w-3xl m-2 sm:m-4 relative max-h-[90vh] overflow-y-auto"
-            >
+    ref={modalContentRef}
+    className="bg-white p-4 sm:p-6 md:p-10 rounded-2xl w-full max-w-[90vw] sm:max-w-2xl md:max-w-3xl m-2 sm:m-4 relative max-h-[90vh] flex flex-col"
+>
                 {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-500"
-                >
-                    <FaTimes className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-
+            <button
+    onClick={onClose}
+    className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 p-0 focus:outline-none"
+>
+    <FaTimes className="w-3 h-3 sm:w-5 sm:h-5" />
+</button>
+        <div className="flex-1 overflow-y-auto">
                 {/* Rejection Comment Section */}
                 {post.comment && (
                     <div className="mb-4 sm:mb-6 mt-5 p-3 sm:p-4 border border-red-300 rounded-lg bg-red-50">
@@ -1174,12 +1174,18 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                                 className="w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg  cursor-not-allowed border-purple-300"
                             />
                         </div>
-                        <div>
+                   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">
         Experience <span className="text-red-500">*</span>
     </label>
     <input
-        value={post.experience || "N/A"}
+        value={
+            post.experience
+                ? [post.experience.years, post.experience.months, post.experience.days]
+                      .filter(Boolean) // Remove empty strings
+                      .join(", ") || "N/A"
+                : "N/A"
+        }
         disabled
         type="text"
         className="w-full h-11 px-3 sm:px-4 py-2 sm:py-3 border rounded-lg cursor-not-allowed border-purple-300"
@@ -1403,27 +1409,26 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                         </div>
                     </div>
                 </div>
+                </div>
 
                 {/* Action Buttons */}
-                <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
-                    <button
-                        onClick={() =>
-                            onClose({ openUpdate: true, listingId: post._id })
-                        }
-                        className="w-full h-11 sm:w-auto bg-[#7900BF] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-[#5c0099] focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                    >
-                        Update
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                    >
-                        Close
-                    </button>
-                </div>
+                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+    <button
+        onClick={() => onClose({ openUpdate: true, listingId: post._id })}
+        className="w-full h-11 sm:w-auto bg-[#7900BF] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-[#5c0099] focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+    >
+        Update
+    </button>
+    <button
+        onClick={onClose}
+        className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+    >
+        Close
+    </button>
+</div>
             </div>
         </div>
-    );
+    );  
 }
 
 export default ViewGetDiscoveredModal;

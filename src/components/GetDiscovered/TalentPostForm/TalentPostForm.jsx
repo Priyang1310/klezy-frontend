@@ -1587,28 +1587,28 @@ function GetDiscoveredForm({ onClose }) {
         }
     };
     return (
-        <div className="bg-white p-10 sm:pt-14 rounded-2xl w-full">
+        <div className="bg-white p-5 sm:pt-10 rounded-2xl w-full flex flex-col h-[90vh] relative">
             <button
-                onClick={handleCancel}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-                <svg
-                    className="w-6 h-6 bg-gray-50 rounded-4xl"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                    ></path>
-                </svg>
-            </button>   
+    onClick={handleCancel}
+    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+>
+    <svg
+        className="w-6 h-6 bg-gray-50 rounded-4xl"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+        ></path>
+    </svg>
+</button>
 
-            <div className="sm:m-4">
+            <div className="flex-1 overflow-y-auto sm:m-4">
                 {/* Progress Bar Container */}
                 {step > 0 && step < 4 && (
                     <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
@@ -1639,9 +1639,9 @@ function GetDiscoveredForm({ onClose }) {
                         ? "Instructions"
                         : step === 4
                         ? "You're all set!"
-                        : `Step ${step} of 3`}
+                        : `Step ${step} of 4`}
                 </p>
-            </div>
+            
     {step === 0 && (
                 <div className="flex flex-col items-center justify-center text-center space-y-6 p-6 sm:p-10 bg-gradient-to-br from-white via-purple-50 to-purple-100 border border-purple-300 rounded-2xl shadow-xl transition-all duration-500 animate-fade-in">
                     {/* Heading */}
@@ -2189,23 +2189,7 @@ function GetDiscoveredForm({ onClose }) {
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="col-span-full flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-6">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full h-11 sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
-                        >
-                            Next
-                        </button>
-                    </div>
+                    
                 </form>
             )}
 
@@ -3556,22 +3540,7 @@ function GetDiscoveredForm({ onClose }) {
                             </div>
                         )}
                     </div>
-                    <div className="col-span-full flex flex-col sm:flex-row justify-between gap-4 lg:gap-6 mt-6 pt-4 border-t border-gray-200">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-2.5 lg:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm lg:text-base"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full sm:w-auto bg-purple-600 text-white px-6 py-2.5 lg:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm lg:text-base"
-                        >
-                            Next
-                        </button>
-                    </div>
+                    
                 </form>
             )}
 
@@ -4193,54 +4162,7 @@ function GetDiscoveredForm({ onClose }) {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="col-span-1 lg:col-span-2 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="w-full h-11 sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className={`w-full h-11 sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium 
-        ${
-            isSubmitting
-                ? "opacity-60 cursor-not-allowed"
-                : "hover:bg-purple-700"
-        } 
-        focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2`}
-                        >
-                            {isSubmitting ? (
-                                <div className="flex items-center justify-center gap-2">
-                                    <svg
-                                        className="animate-spin h-5 w-5 text-white"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                        ></path>
-                                    </svg>
-                                    Submitting...
-                                </div>
-                            ) : (
-                                "Submit"
-                            )}
-                        </button>
-                    </div>
+                   
 
 
 
@@ -4271,7 +4193,109 @@ function GetDiscoveredForm({ onClose }) {
                     </button>
                 </div>
             )}
+    </div>
+    <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex justify-between gap-4">
+    {step === 1 && (
+        <div className="flex justify-between w-full">
+            <button
+                type="button"
+                onClick={handleCancel}
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Cancel
+            </button>
+            <button
+                type="button"
+                onClick={handleNext}
+                className="w-full sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Next
+            </button>
+        </div>
+    )}
 
+    {step === 2 && (
+        <div className="flex justify-between w-full">
+            <button
+                type="button"
+                onClick={handleBack}
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-2.5 lg:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm lg:text-base"
+            >
+                Back
+            </button>
+            <button
+                type="button"
+                onClick={handleNext}
+                className="w-full sm:w-auto bg-purple-600 text-white px-6 py-2.5 lg:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm lg:text-base"
+            >
+                Next
+            </button>
+        </div>
+    )}
+
+    {step === 3 && (
+        <div className="flex justify-between w-full">
+            <button
+                type="button"
+                onClick={handleBack}
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
+            >
+                Back
+            </button>
+            <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium 
+                ${
+                    isSubmitting
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:bg-purple-700"
+                } 
+                focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2`}
+            >
+                {isSubmitting ? (
+                    <div className="flex items-center justify-center gap-2">
+                        <svg
+                            className="animate-spin h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                            ></circle>
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                            ></path>
+                        </svg>
+                        Submitting...
+                    </div>
+                ) : (
+                    "Submit"
+                )}
+            </button>
+        </div>
+    )}
+
+    {step === 4 && (
+        <button
+            type="button"
+            onClick={() => {
+                onClose();
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-lg shadow transition duration-200 transform hover:scale-105 text-sm sm:text-base"
+        >
+            Go to Dashboard →
+        </button>
+    )}
+</div>
             {isRequestModalOpen && (
                 <RequestDomainRoleSkills
                     onClose={() => setIsRequestModalOpen(false)}

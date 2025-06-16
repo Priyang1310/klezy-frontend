@@ -60,7 +60,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         otherWorkBasis: "",
         workMode: { Remote: false, Hybrid: false, Onsite: false },
         workLocation: { country: "", state: "", district: "" },
-        experience: { range: "", unit: "" },
+        experience: { years: "", months: "", days: "" },
         portfolioLink: "",
         resumeLink: "",
         resumeFile: null,
@@ -317,14 +317,21 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                         state: data.workLocation.state || "", // Use full name directly
                         district: data.workLocation.district || "", // Use full name directly
                     },
-                    experience: (() => {
-    const exp = data.experience || "";
-    if (!exp) return { range: "", unit: "" };
-    // Match format like "1-2 Years" or "3-5 Months"
-    const match = exp.match(/^(\d+-\d+)\s*(Years|Months|Days)$/);
-    return match
-        ? { range: match[1], unit: match[2] }
-        : { range: "", unit: "" };
+                   
+                   experience: (() => {
+    const exp = data.experience || { days: "", months: "", years: "" };
+    // Prioritize months, years, or days based on which is non-empty
+    if (exp.months) {
+        const match = exp.months.match(/^(\d+-\d+)\s*(Months)$/);
+        return match ? { range: match[1], unit: match[2] } : { range: "", unit: "" };
+    } else if (exp.years) {
+        const match = exp.years.match(/^(\d+-\d+)\s*(Years)$/);
+        return match ? { range: match[1], unit: match[2] } : { range: "", unit: "" };
+    } else if (exp.days) {
+        const match = exp.days.match(/^(\d+-\d+)\s*(Days)$/);
+        return match ? { range: match[1], unit: match[2] } : { range: "", unit: "" };
+    }
+    return { range: "", unit: "" };
 })(),
                     portfolioLink: data.portfolioLink || "",
                     resumeLink: data.resumeLink || "",
@@ -1660,37 +1667,37 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
     if (listingError) return <div className="text-red-500">{listingError}</div>;
 
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-2xl w-full">
+        <div className="bg-white p-6 sm:p-8 rounded-2xl w-full flex flex-col max-h-[90vh]">
             
-        <div className=" sm:mb-4">
-  {/* Progress Bar Container */}
-  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-    <div 
-      className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
-      style={{ width: `${(step / 3) * 100}%` }}
-    ></div>
-  </div>
-  
-  {/* Step Title */}
-   <h3 className="text-lg sm:text-xl font-semibold text-[#a100ff] mb-2 sm:mb-4">
-                    <span className="mr-2">✦</span>
-                    {step === 1
-                        ? "Let's introduce you to the world."
-                        : step === 2
-                        ? "Tell us about your preferences."
-                        : "Almost done! Final details."}
-                </h3>
-  
-  {/* Step indicator */}
-  <p className="text-sm text-gray-500">
-    Step {step} of 3
-  </p>
-</div>
-
+   
             
 
             {/* Step 1 Form */}
-
+<div className="flex-1 overflow-y-auto px-4 sm:px-0">
+     <div className="bg-white border-b border-gray-200 pb-4 mb-4">
+    {/* Progress Bar Container */}
+    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+        <div 
+            className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${(step / 3) * 100}%` }}
+        ></div>
+    </div>
+    
+    {/* Step Title */}
+    <h3 className="text-lg sm:text-xl font-semibold text-[#a100ff] mb-2 sm:mb-4">
+        <span className="mr-2">✦</span>
+        {step === 1
+            ? "Let's introduce you to the world."
+            : step === 2
+            ? "Tell us about your preferences."
+            : "Almost done! Final details."}
+    </h3>
+    
+    {/* Step indicator */}
+    <p className="text-sm text-gray-500">
+        Step {step} of 3
+    </p>
+</div>
 {step === 1 && (
   <form className="max-w-4xl mx-auto grid grid-cols-1 gap-6 px-4 sm:px-6 lg:px-0">
    
@@ -1891,23 +1898,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
       </div>
     </div>
 
-    {/* Action Buttons */}
-    <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 pt-4 border-t border-gray-200">
-      <button
-        type="button"
-        onClick={handleCancel}
-        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-2 sm:order-1"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        onClick={handleNext}
-        className="w-full sm:w-auto bg-violet-600 text-white px-6 py-3 rounded-md font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base order-1 sm:order-2"
-      >
-        Next
-      </button>
-    </div>
+    
   </form>
 )}
 
@@ -1932,7 +1923,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                 onChange={handleChange}
                                 maxLength={80}
                                 placeholder="Enter a catchy headline"
-                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2text-purple-600 hover:text-purple-800 disabled:text-purple-300 transition-all duration-200 hover:border-blue-400 ${
+                                className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2text-purple-600  disabled:text-purple-300 transition-all duration-200 hover:border-purple-400 ${
                                     errors.headline
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -2094,7 +2085,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         onChange={() =>
                                             handleWorkBasisChange(basis)
                                         }
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                        className="h-4 w-4 focus:ring-purple-500"
                                     />
                                     <label
                                         htmlFor={basis}
@@ -2129,7 +2120,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             value={formData.partnershipCriteria}
                                             onChange={handleChange}
                                             placeholder="Describe the partnership criteria"
-                                            className={`w-full pr-10 px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px] ${
+                                            className={`w-full pr-10 px-4 py-3 border rounded-md focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                 errors.partnershipCriteria
                                                     ? "border-red-500"
                                                     : "border-gray-300"
@@ -2196,7 +2187,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                                     type
                                                                 )
                                                             }
-                                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                                         />
                                                         <span className="ml-2 text-gray-700">
                                                             {type ===
@@ -2244,7 +2235,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                                 type
                                                             )
                                                         }
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                                     />
                                                     <span className="ml-2 text-gray-700">
                                                         {type
@@ -2289,7 +2280,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                     )
                                                 }
                                                 placeholder="Duration"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                     errors.internshipDuration
                                                         ?.value
                                                         ? "border-red-500"
@@ -2330,7 +2321,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                         e.target.value
                                                     )
                                                 }
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                     errors.internshipDuration
                                                         ?.unit
                                                         ? "border-red-500"
@@ -2390,7 +2381,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                         )
                                                     }
                                                     placeholder="Min Stipend"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                         errors
                                                             .internshipStipendRange
                                                             ?.min
@@ -2435,7 +2426,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                         )
                                                     }
                                                     placeholder="Max Stipend"
-                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                         errors
                                                             .internshipStipendRange
                                                             ?.max
@@ -2477,7 +2468,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                     }
                                                     onChange={handleChange}
                                                     placeholder="Describe performance criteria"
-                                                    className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px] ${
+                                                    className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                         errors.internshipPerformanceCriteria
                                                             ? "border-red-500"
                                                             : "border-gray-300"
@@ -2494,7 +2485,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                     disabled={
                                                         enhanceLoading.internshipPerformanceCriteria
                                                     }
-                                                    className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
+                                                    className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
                                                         enhanceLoading.internshipPerformanceCriteria
                                                             ? "animate-pulse"
                                                             : ""
@@ -2537,7 +2528,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             }
                                             onChange={handleChange}
                                             placeholder="Describe the collaboration"
-                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px] ${
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                 errors.collaborationDescription
                                                     ? "border-red-500"
                                                     : "border-gray-300"
@@ -2554,7 +2545,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             disabled={
                                                 enhanceLoading.collaborationDescription
                                             }
-                                            className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
                                                 enhanceLoading.collaborationDescription
                                                     ? "animate-pulse"
                                                     : ""
@@ -2604,7 +2595,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                                     type
                                                                 )
                                                             }
-                                                            className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                                            className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                                         />
                                                         <span className="ml-2 text-gray-700">
                                                             {type ===
@@ -2647,7 +2638,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                     )
                                                 }
                                                 placeholder="Min Amount"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                     errors.jobAmountRange?.min
                                                         ? "border-red-500"
                                                         : "border-gray-300"
@@ -2683,7 +2674,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                     )
                                                 }
                                                 placeholder="Max Amount"
-                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                     errors.jobAmountRange?.max
                                                         ? "border-red-500"
                                                         : "border-gray-300"
@@ -2725,7 +2716,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 )
                                             }
                                             placeholder="Min Payment"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                 errors.freelancePaymentRange
                                                     ?.min
                                                     ? "border-red-500"
@@ -2766,7 +2757,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 )
                                             }
                                             placeholder="Max Payment"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                                 errors.freelancePaymentRange
                                                     ?.max
                                                     ? "border-red-500"
@@ -2800,7 +2791,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             value={formData.projectDescription}
                                             onChange={handleChange}
                                             placeholder="Describe the project"
-                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 resize-y min-h-[100px] ${
+                                            className={`w-full pr-10 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 resize-y min-h-[100px] ${
                                                 errors.projectDescription
                                                     ? "border-red-500"
                                                     : "border-gray-300"
@@ -2817,7 +2808,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             disabled={
                                                 enhanceLoading.projectDescription
                                             }
-                                            className={`absolute right-3 top-3 text-blue-600 hover:text-blue-800 disabled:text-blue-300 ${
+                                            className={`absolute right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-purple-300 ${
                                                 enhanceLoading.projectDescription
                                                     ? "animate-pulse"
                                                     : ""
@@ -2853,7 +2844,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         value={formData.percentageBasisValue}
                                         onChange={handleChange}
                                         placeholder="Specify percentage value"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.percentageBasisValue
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -2881,7 +2872,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         value={formData.equityBasisValue}
                                         onChange={handleChange}
                                         placeholder="Specify equity value"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.equityBasisValue
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -2909,7 +2900,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         value={formData.otherWorkBasis}
                                         onChange={handleChange}
                                         placeholder="Specify other work basis"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.otherWorkBasis
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -2938,7 +2929,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         onChange={() =>
                                             handleWorkModeChange(mode)
                                         }
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                        className="h-4 w-4 text-purple-600 focus:ring-purple-500"
                                     />
                                     <label
                                         htmlFor={mode}
@@ -2975,7 +2966,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.workLocation?.country
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3015,7 +3006,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.workLocation?.state
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3059,7 +3050,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.workLocation?.district
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3108,7 +3099,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                 type="number"
                                 min="1"
                                 placeholder="Enter value"
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                     errors.timeCommitment?.value
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -3138,7 +3129,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                         e.target.value
                                     )
                                 }
-                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                     errors.timeCommitment?.unit
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -3183,7 +3174,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                             )
                                         }
                                         placeholder="e.g., 2-5"
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.experience?.range
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3212,7 +3203,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-blue-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.experience?.unit
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3232,22 +3223,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                             </div>
                         </div>
                     </div>
-                    <div className="col-span-1 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
-                        <button
-                            type="button"
-                            onClick={handleBack}
-                            className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-                        >
-                            Next
-                        </button>
-                    </div>
+                    
                 </form>
             )}
 
@@ -3785,23 +3761,66 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
       </p>
     )}
 
-    <div className="col-span-1 lg:col-span-2 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
-      <button
-        type="button"
-        onClick={handleBack}
-        className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md text-sm font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-      >
-        Back
-      </button>
-      <button
-        type="submit"
-        className="w-full sm:w-auto bg-violet-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-      >
-        Update Profile
-      </button>
-    </div>
+  
   </form>
 )}
+</div>
+<div className="sticky bottom-0 bg-white border-t  border-gray-200 p-4 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 z-10">
+    {step === 1 && (
+        <>
+            <button
+                type="button"
+                onClick={handleCancel}
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Cancel
+            </button>
+            <button
+                type="button"
+                onClick={handleNext}
+                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Next
+            </button>
+        </>
+    )}
+    {step === 2 && (
+        <>
+            <button
+                type="button"
+                onClick={handleBack}
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Back
+            </button>
+            <button
+                type="button"
+                onClick={handleNext}
+                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Next
+            </button>
+        </>
+    )}
+    {step === 3 && (
+        <>
+            <button
+                type="button"
+                onClick={handleBack}
+                className="w-full sm:w-auto bg-gray-300 text-gray-700 px-6 py-3 rounded-md font-medium hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Back
+            </button>
+            <button
+                type="submit"
+                onClick={handleSubmit}
+                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+            >
+                Update Profile
+            </button>
+        </>
+    )}
+</div>
         </div>
     );
 }
