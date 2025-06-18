@@ -1587,7 +1587,7 @@ function GetDiscoveredForm({ onClose }) {
         }
     };
     return (
-        <div className="bg-white p-5 sm:pt-10 rounded-2xl w-full flex flex-col h-[90vh] relative">
+        <div className="bg-white p-5  sm:pt-10 rounded-2xl w-full flex flex-col h-[90vh] relative">
             <button
     onClick={handleCancel}
     className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -1613,7 +1613,7 @@ function GetDiscoveredForm({ onClose }) {
                 {step > 0 && step < 4 && (
                     <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                         <div
-                            className="bg-[#a100ff] h-2 rounded-full transition-all duration-500 ease-out"
+                            className="bg-[#A100FF] h-2 rounded-full transition-all duration-500 ease-out"
                             style={{ width: `${((step - 1) / 3) * 100}%` }}
                         ></div>
                     </div>
@@ -1770,7 +1770,7 @@ function GetDiscoveredForm({ onClose }) {
                         />
                     </div>
 
-                    <div className="relative md:col-span-2 lg:col-span-1">
+                    <div className="relative pr-2 md:col-span-2 lg:col-span-1">
                         <label
                             htmlFor="last_name"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -1837,7 +1837,7 @@ function GetDiscoveredForm({ onClose }) {
                         )}
                     </div>
 
-                    <div className="relative md:col-span-2 lg:col-span-1">
+                    <div className="relative pr-2 md:col-span-2 lg:col-span-1">
                         <label
                             htmlFor="district"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -1888,7 +1888,7 @@ function GetDiscoveredForm({ onClose }) {
                         )}
                     </div>
 
-                    <div className="relative md:col-span-1 lg:col-span-2">
+                    <div className="relative pr-2 md:col-span-1 lg:col-span-2">
                         <label
                             htmlFor="email"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -1976,7 +1976,7 @@ function GetDiscoveredForm({ onClose }) {
                     </div>
 
                     {/* About Yourself */}
-                    <div className="relative col-span-full lg:col-span-3">
+                    <div className="relative p-2 col-span-full lg:col-span-3">
                         <label
                             htmlFor="aboutSelf"
                             className="block text-sm font-medium text-gray-700 mb-1"
@@ -2074,7 +2074,7 @@ function GetDiscoveredForm({ onClose }) {
                         )}
 
                         {/* Contact Method Values */}
-                        <div className="mt-4 space-y-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-10">
+                        <div className="mt-4 pr-2 space-y-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2 lg:gap-2">
                             {Object.entries(formData.contact_methods).map(
                                 ([method, { selected, value }]) =>
                                     selected && (
@@ -2109,7 +2109,7 @@ function GetDiscoveredForm({ onClose }) {
                                                                 )
                                                             }
                                                             containerClass="w-full"
-                                                            inputClass={`w-full h-10 sm:h-12 px-3 sm:px-4 text-gray-900 border rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500 text-sm sm:text-base ${
+                                                            inputClass={`w-full h-11 sm:h-12 px-3 sm:px-4 text-gray-900 border rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-purple-200 text-sm sm:text-base ${
                                                                 errors[
                                                                     `${method}Value`
                                                                 ]
@@ -3278,7 +3278,7 @@ function GetDiscoveredForm({ onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full h-11 px-4 py-2.5 lg:py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 transition-all duration-200 hover:border-purple-400 text-sm lg:text-base ${
+                                        className={`w-full h-12 px-4 py-2.5 lg:py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 transition-all duration-200 hover:border-purple-400 text-sm lg:text-base ${
                                             errors.workLocation?.country
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3319,7 +3319,7 @@ function GetDiscoveredForm({ onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full h-11 px-4 py-2.5 lg:py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 transition-all duration-200 hover:border-purple-400 text-sm lg:text-base ${
+                                        className={`w-full h-12 px-4 py-2.5 lg:py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 transition-all duration-200 hover:border-purple-400 text-sm lg:text-base ${
                                             errors.workLocation?.state
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3360,7 +3360,7 @@ function GetDiscoveredForm({ onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full h-11 px-4 py-2.5 lg:py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 transition-all duration-200 hover:border-purple-400 text-sm lg:text-base ${
+                                        className={`w-full h-12 px-4 py-2.5 lg:py-3 border rounded-lg focus:ring-2 focus:ring-purple-100 transition-all duration-200 hover:border-purple-400 text-sm lg:text-base ${
                                             errors.workLocation?.district
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3591,7 +3591,7 @@ function GetDiscoveredForm({ onClose }) {
                             className={`border-2 border-dashed rounded-lg p-6 text-center transition ${
                                 errors.resumeFile
                                     ? "border-red-400"
-                                    : "border-gray-300 hover:border-violet-500"
+                                    : "border-gray-300 hover:border-purple-500"
                             }`}
                         >
                             <UploadCloud
@@ -3599,7 +3599,7 @@ function GetDiscoveredForm({ onClose }) {
                                 className="mx-auto text-gray-400 mb-2"
                             />
 
-                            <label className="relative inline-block cursor-pointer text-violet-600 font-semibold hover:underline">
+                            <label className="relative inline-block cursor-pointer text-purple-600 font-semibold hover:underline">
                                 Choose File
                                 <input
                                     id="resumeFile"
@@ -3644,7 +3644,7 @@ function GetDiscoveredForm({ onClose }) {
                             <button
                                 type="button"
                                 onClick={handleAddProject}
-                                className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+                                className="flex items-center px-3 py-1.5 border border-purple-600 text-purple-600 rounded-md text-sm font-medium hover:bg-purple-50 transition"
                             >
                                 <Plus className="w-4 h-4 mr-1" />
                                 Add Project
@@ -3655,7 +3655,7 @@ function GetDiscoveredForm({ onClose }) {
                         {formData.projects.map((project, index) => (
                             <div
                                 key={index}
-                                className="mb-4 p-3 border rounded-lg bg-gray-50"
+                                className="mb-4 p-3 border border-purple-400 rounded-lg bg-white"
                             >
                                 <div className="flex justify-between items-center mb-2">
                                     <h4 className="text-sm font-semibold text-gray-800">
@@ -3684,7 +3684,7 @@ function GetDiscoveredForm({ onClose }) {
                                             )
                                         }
                                         placeholder="Project Title"
-                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                             errors[`projectTitle${index}`]
                                                 ? "border-red-400"
                                                 : "border-gray-300"
@@ -3700,7 +3700,7 @@ function GetDiscoveredForm({ onClose }) {
                                             )
                                         }
                                         placeholder="Project Description"
-                                        className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[80px] ${
+                                        className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 resize-y min-h-[80px] ${
                                             errors[`projectDescription${index}`]
                                                 ? "border-red-400"
                                                 : "border-gray-300"
@@ -3717,7 +3717,7 @@ function GetDiscoveredForm({ onClose }) {
                                             )
                                         }
                                         placeholder="Project Link (https://)"
-                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                             errors[`projectLink${index}`]
                                                 ? "border-red-400"
                                                 : "border-gray-300"
@@ -3758,7 +3758,7 @@ function GetDiscoveredForm({ onClose }) {
                             <button
                                 type="button"
                                 onClick={handleAddWorkExperience}
-                                className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+                                className="flex items-center px-3 py-1.5 border border-purple-600 text-purple-600 rounded-md text-sm font-medium hover:bg-purple-50 transition"
                             >
                                 <Plus className="w-4 h-4 mr-1" />
                                 Add Work
@@ -3769,7 +3769,7 @@ function GetDiscoveredForm({ onClose }) {
                         {formData.workExperience.map((experience, index) => (
                             <div
                                 key={index}
-                                className="mb-4 p-3 border rounded-lg bg-gray-50"
+                                className="mb-4 p-3 border border-purple-400 rounded-lg bg-gray-50"
                             >
                                 <div className="flex justify-between items-center mb-2">
                                     <h4 className="text-sm font-semibold text-gray-800">
@@ -3799,7 +3799,7 @@ function GetDiscoveredForm({ onClose }) {
                                                 )
                                             }
                                             placeholder="Role"
-                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                                 errors[
                                                     `workExperience${index}Role`
                                                 ]
@@ -3818,7 +3818,7 @@ function GetDiscoveredForm({ onClose }) {
                                                 )
                                             }
                                             placeholder="Company Name"
-                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                                 errors[
                                                     `workExperience${index}Company`
                                                 ]
@@ -3839,7 +3839,7 @@ function GetDiscoveredForm({ onClose }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                                 errors[
                                                     `workExperience${index}StartDate`
                                                 ]
@@ -3857,7 +3857,7 @@ function GetDiscoveredForm({ onClose }) {
                                                     e.target.value
                                                 )
                                             }
-                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                            className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                                 errors[
                                                     `workExperience${index}EndDate`
                                                 ]
@@ -3878,7 +3878,7 @@ function GetDiscoveredForm({ onClose }) {
                                                 )
                                             }
                                             placeholder="Description"
-                                            className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[80px] ${
+                                            className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 resize-y min-h-[80px] ${
                                                 errors[
                                                     `workExperience${index}Description`
                                                 ]
@@ -3901,7 +3901,7 @@ function GetDiscoveredForm({ onClose }) {
                                                     `workExperience${index}`
                                                 ]
                                             }
-                                            className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+                                            className={`absolute bg-white right-2 top-2 text-purple-600 hover:text-purple-800 disabled:text-gray-400 ${
                                                 enhanceLoading[
                                                     `workExperience${index}`
                                                 ]
@@ -3988,7 +3988,7 @@ function GetDiscoveredForm({ onClose }) {
                             <button
                                 type="button"
                                 onClick={handleAddOtherLink}
-                                className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+                                className="flex items-center px-3 py-1.5 border border-purple-600 text-purple-600 rounded-md text-sm font-medium hover:bg-purple-50 transition"
                             >
                                 <Plus className="w-4 h-4 mr-1" />
                                 Add Link
@@ -3999,7 +3999,7 @@ function GetDiscoveredForm({ onClose }) {
                         {formData.otherLinks.map((linkObj, index) => (
                             <div
                                 key={index}
-                                className="mb-4 p-3 border rounded-lg bg-gray-50"
+                                className="mb-4 p-3 border border-purple-400 rounded-lg bg-gray-50"
                             >
                                 <div className="flex justify-between items-center mb-2">
                                     <p className="text-sm font-medium text-gray-800">
@@ -4028,7 +4028,7 @@ function GetDiscoveredForm({ onClose }) {
                                             )
                                         }
                                         placeholder="Enter link title"
-                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                             errors[`titleLink${index}`]
                                                 ? "border-red-400"
                                                 : "border-gray-300"
@@ -4045,7 +4045,7 @@ function GetDiscoveredForm({ onClose }) {
                                             )
                                         }
                                         placeholder="https://example.com"
-                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                                        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                                             errors[`link${index}`]
                                                 ? "border-red-400"
                                                 : "border-gray-300"
@@ -4085,7 +4085,7 @@ function GetDiscoveredForm({ onClose }) {
                                 value={formData.expectations}
                                 onChange={handleChange}
                                 placeholder="Describe what Talent seekers can expect from you"
-                                className="w-full h-11 pr-10 sm:pr-12 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[80px] sm:min-h-[100px]"
+                                className="w-full h-11 pr-10 sm:pr-12 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[80px] sm:min-h-[100px]"
                             />
                             <button
                                 type="button"
@@ -4127,7 +4127,7 @@ function GetDiscoveredForm({ onClose }) {
                                 value={formData.anyOtherInfo}
                                 onChange={handleChange}
                                 placeholder="Additional information"
-                                className="w-full h-11 pr-10 sm:pr-12 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[80px] sm:min-h-[100px]"
+                                className="w-full h-11 pr-10 sm:pr-12 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-200 transition-all duration-200 hover:border-purple-400 resize-y min-h-[80px] sm:min-h-[100px]"
                             />
                             <button
                                 type="button"
@@ -4207,7 +4207,7 @@ function GetDiscoveredForm({ onClose }) {
             <button
                 type="button"
                 onClick={handleNext}
-                className="w-full sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+                className="w-full sm:w-auto bg-[#A100FF] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
             >
                 Next
             </button>
@@ -4226,7 +4226,7 @@ function GetDiscoveredForm({ onClose }) {
             <button
                 type="button"
                 onClick={handleNext}
-                className="w-full sm:w-auto bg-purple-600 text-white px-6 py-2.5 lg:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm lg:text-base"
+                className="w-full sm:w-auto bg-[#A100FF] text-white px-6 py-2.5 lg:py-3 rounded-lg font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm lg:text-base"
             >
                 Next
             </button>
@@ -4243,9 +4243,10 @@ function GetDiscoveredForm({ onClose }) {
                 Back
             </button>
             <button
-                type="submit"
+                type="button"
+              onClick={handleSubmit}
                 disabled={isSubmitting}
-                className={`w-full sm:w-auto bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium 
+                className={`w-full sm:w-auto bg-[#A100FF] text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium 
                 ${
                     isSubmitting
                         ? "opacity-60 cursor-not-allowed"

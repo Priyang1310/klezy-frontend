@@ -24,14 +24,14 @@ input[type="radio"] {
 
 /* Hover state for better interactivity */
 input[type="radio"]:hover {
-  border-color: #7C3AED; /* Tailwind's purple-600 for hover */
+  border-color: #A100FF; /* Tailwind's purple-600 for hover */
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); /* Subtle purple glow */
 }
 
 /* Checked state */
 input[type="radio"]:checked {
-  background-color: #7C3AED; /* Tailwind's purple-600 */
-  border-color: #7C3AED; /* Consistent border color */
+  background-color: #A100FF; /* Tailwind's purple-600 */
+  border-color: #A100FF; /* Consistent border color */
 }
 
 /* Inner dot for checked state */
@@ -84,14 +84,14 @@ input[type="radio"] {
 
 /* Hover state for better interactivity */
 input[type="radio"]:hover {
-  border-color: #7C3AED; /* Tailwind's purple-600 for hover */
+  border-color: #A100FF; /* Tailwind's purple-600 for hover */
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); /* Subtle purple glow */
 }
 
 /* Checked state */
 input[type="radio"]:checked {
-  background-color: #7C3AED; /* Tailwind's purple-600 */
-  border-color: #7C3AED; /* Consistent border color */
+  background-color: #A100FF; /* Tailwind's purple-600 */
+  border-color: #A100FF; /* Consistent border color */
 }
 
 /* Inner dot for checked state */
@@ -144,14 +144,14 @@ input[type="checkbox"] {
 
 /* Hover state for interactivity */
 input[type="checkbox"]:hover {
-  border-color: #7C3AED; /* Tailwind's purple-600 */
+  border-color: #A100FF; /* Tailwind's purple-600 */
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1); /* Subtle purple glow */
 }
 
 /* Checked state */
 input[type="checkbox"]:checked {
-  background-color: #7C3AED; /* Tailwind's purple-600 */
-  border-color: #7C3AED; /* Consistent border color */
+  background-color: #A100FF; /* Tailwind's purple-600 */
+  border-color: #A100FF; /* Consistent border color */
 }
 
 /* Checkmark for checked state */
@@ -187,8 +187,15 @@ input[type="checkbox"]:disabled {
 }
 
 input[type="checkbox"]:disabled:checked::before {
-  color: #D1D5DB; /* Gray checkmark for disabled checked state */
+  color: #6B7280; /* Tailwind's gray-600 or use #4B5563 for even darker */
+  font-weight: 900; /* Makes the checkmark bold */
 }
+input[type="radio"]:disabled:checked::before {
+  background-color: #6B7280; /* Tailwind gray-700 for a darker dot */
+  width: 10px;
+  height: 10px;
+}
+
 input:focus {
   outline: none;
 }
@@ -201,6 +208,6 @@ select:focus{
 input:focus{
 outline: none;
 }
-#expectations, #anyOtherInfo{
+/* #expectations, #anyOtherInfo{
   border: 1px solid gray;
-}
+} */

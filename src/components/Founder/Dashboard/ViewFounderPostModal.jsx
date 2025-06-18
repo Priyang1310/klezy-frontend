@@ -216,7 +216,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                 <div className="flex  gap-3">
                   
                     <button
-                        className="bg-purple-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 transition-all duration-200"
+                        className="bg-[#A100FF] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 transition-all duration-200"
                         onClick={(e) => {
                             e.stopPropagation();
                             onUpdate();
@@ -225,7 +225,7 @@ const ViewFounderPostModal = ({ post, onClose, onUpdate }) => {
                         Update
                     </button>
                     <button
-                        className="text-gray-600 text-xl p-1.5 rounded-full bg-white border border-gray-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 transition-all duration-200"
+                        className="text-gray-600 text-xl p-1.5 rounded-2xl w-8 bg-white border border-gray-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 transition-all duration-200"
                         onClick={(e) => {
                             e.stopPropagation();
                             onClose();

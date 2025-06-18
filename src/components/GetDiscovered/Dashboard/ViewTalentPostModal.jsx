@@ -1415,7 +1415,7 @@ function ViewGetDiscoveredModal({ post, onClose, errors = {} }) {
                 <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
     <button
         onClick={() => onClose({ openUpdate: true, listingId: post._id })}
-        className="w-full h-11 sm:w-auto bg-[#7900BF] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-[#5c0099] focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
+        className="w-full h-11 sm:w-auto bg-[#A100FF] text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-[#5c0099] focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
     >
         Update
     </button>

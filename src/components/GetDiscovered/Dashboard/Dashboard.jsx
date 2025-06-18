@@ -548,34 +548,35 @@ const Dashboard = () => {
             </div>
 
             {/* Modals */}
-            <Modal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                style={{
-                    content: {
-                        top: "50%",
-                        left: "50%",
-                        right: "auto",
-                        bottom: "auto",
-                        marginRight: "-50%",
-                        transform: "translate(-50%, -50%)",
-                        width: "95%",
-                        maxWidth: "800px",
-                        maxHeight: "90vh",
-                        overflowY: "auto",
-                        padding: "0",
-                        borderRadius: "12px",
-                        backgroundColor: "#ffffff",
-                        border: "none",
-                    },
-                    overlay: {
-                        backgroundColor: "rgba(0, 0, 0, 0.75)",
-                        zIndex: 1000,
-                    },
-                }}
-            >
-                <TalentPostForm onClose={closeModal} />
-            </Modal>
+         <Modal
+    isOpen={isModalOpen}
+    onRequestClose={closeModal}
+    shouldCloseOnOverlayClick={false} // Prevents closing on overlay click
+    style={{
+        content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            width: "95%",
+            maxWidth: "800px",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            padding: "0",
+            borderRadius: "12px",
+            backgroundColor: "#ffffff",
+            border: "none",
+        },
+        overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            zIndex: 1000,
+        },
+    }}
+>
+    <TalentPostForm onClose={closeModal} />
+</Modal>
 
             <Modal
                 isOpen={isAccountSettingsModalOpen}

@@ -571,7 +571,7 @@ const Dashboard = () => {
 				<div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4">
 					<div className="bg-white rounded-3xl w-full max-w-[95%] sm:max-w-[800px] h-[90vh] flex flex-col border border-violet-200 shadow-2xl">
 						<div className="flex justify-between items-center p-4 border-b border-gray-200">
-							<h2 className="text-2xl font-bold text-purple-600 tracking-tight">
+							<h2 className="text-2xl font-bold text-[#A100FF] tracking-tight">
 								Create New Listing
 							</h2>
 							<button

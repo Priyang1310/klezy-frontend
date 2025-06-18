@@ -1715,7 +1715,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         name="gender"
         value={formData.gender}
         onChange={handleChange}
-        className="w-full sm:w-1/2 lg:w-1/3 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 border-gray-300 hover:border-violet-500"
+        className="w-full sm:w-1/2 lg:w-1/3 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-purple-200 transition-all duration-200 border-gray-300 hover:border-purple-500"
       >
         <option value="">Select Gender</option>
         <option value="Male">Male</option>
@@ -1738,7 +1738,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               value={type}
               checked={formData.userType === type}
               onChange={handleChange}
-              className="appearance-none h-5 w-5 border-2 border-gray-300 rounded-full checked:bg-violet-600 checked:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+              className="appearance-none h-5 w-5 border-2 border-gray-300 rounded-full checked:bg-purple-600 checked:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all duration-200"
             />
             <span className="text-gray-700 text-sm sm:text-base">{type}</span>
           </label>
@@ -1763,8 +1763,8 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               onChange={handleChange}
               type="text"
               placeholder="Specify your user type"
-              className={`w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
-                errors.otherUserType ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+              className={`w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-purple-200 transition-all duration-200 ${
+                errors.otherUserType ? "border-red-400" : "border-gray-300 hover:border-purple-500"
               }`}
             />
           </div>
@@ -1791,13 +1791,13 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
           onChange={handleChange}
           maxLength={300}
           placeholder="Briefly describe yourself"
-          className="w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 resize-y min-h-[100px] border-gray-300 hover:border-violet-500 transition-all duration-200"
+          className="w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-purple-200 resize-y min-h-[100px] border-gray-300 hover:border-purple-500 transition-all duration-200"
         />
         <button
           type="button"
           onClick={() => enhanceField("aboutSelf", formData.aboutSelf)}
           disabled={enhanceLoading.aboutSelf}
-          className={`absolute bg-white right-3 top-3 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+          className={`absolute bg-white right-3 top-3 text-purple-600 hover:text-purple-800 disabled:text-gray-400 ${
             enhanceLoading.aboutSelf ? "animate-pulse" : ""
           }`}
           title={enhanceLoading.aboutSelf ? "Enhancing..." : "Enhance"}
@@ -1820,7 +1820,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               id={method}
               checked={formData.contact_methods[method].selected}
               onChange={() => handleContactMethodChange(method)}
-              className="appearance-none h-5 w-5 border-2 border-gray-300 rounded-md checked:bg-violet-600 checked:border-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all duration-200"
+              className="appearance-none h-5 w-5 border-2 border-gray-300 rounded-md checked:bg-purple-600 checked:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all duration-200"
             />
             <label htmlFor={method} className="text-gray-700 text-sm sm:text-base">
               {method.charAt(0).toUpperCase() + method.slice(1)}
@@ -1852,8 +1852,8 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                     value={value}
                     onChange={(phone) => handleContactValueChange(method, phone)}
                     containerClass="w-full"
-                    inputClass={`w-full px-3 sm:px-4 py-2 sm:py-3 text-gray-900 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
-                      errors[`${method}Value`] ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+                    inputClass={`w-full px-3 sm:px-4 py-2 sm:py-3 text-gray-900 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-purple-200 transition-all duration-200 ${
+                      errors[`${method}Value`] ? "border-red-400" : "border-gray-300 hover:border-purple-500"
                     }`}
                     buttonClass="border-gray-300 h-12 w-12"
                     dropdownClass="h-28"
@@ -1884,8 +1884,8 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   value={value}
                   onChange={(e) => handleContactValueChange(method, e.target.value)}
                   placeholder={`${method} URL (https://)`}
-                  className={`w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
-                    errors[`${method}Value`] ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+                  className={`w-full bg-white h-10 px-3 sm:px-4 py-2 sm:py-3 border rounded-md text-sm sm:text-base focus:ring-2 focus:ring-purple-200 transition-all duration-200 ${
+                    errors[`${method}Value`] ? "border-red-400" : "border-gray-300 hover:border-purple-500"
                   }`}
                 />
               )}
@@ -2966,7 +2966,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.workLocation?.country
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3006,7 +3006,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.workLocation?.state
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3050,7 +3050,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                                                 e.target.value
                                             )
                                         }
-                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
+                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 transition-all duration-200 hover:border-purple-400 ${
                                             errors.workLocation?.district
                                                 ? "border-red-500"
                                                 : "border-gray-300"
@@ -3252,8 +3252,8 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         onChange={handleChange}
         type="url"
         placeholder="https://yourportfolio.com"
-        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 transition-all duration-200 ${
-          errors.portfolioLink ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+        className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 transition-all duration-200 ${
+          errors.portfolioLink ? "border-red-400" : "border-gray-300 hover:border-purple-500"
         }`}
       />
       {errors.portfolioLink && (
@@ -3274,12 +3274,12 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         className={`border-2 border-dashed rounded-lg p-6 text-center transition ${
           errors.resumeFile || errors.resumeLink
             ? "border-red-400"
-            : "border-gray-300 hover:border-violet-500"
+            : "border-gray-300 hover:border-purple-500"
         }`}
       >
         <FiUploadCloud size={32} className="mx-auto text-gray-400 mb-2" />
 
-        <label className="relative inline-block cursor-pointer text-violet-600 font-semibold hover:underline">
+        <label className="relative inline-block cursor-pointer text-purple-600 font-semibold hover:underline">
           Choose File
           <input
             id="resumeFile"
@@ -3347,7 +3347,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             href={formData.resumeLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-violet-600 hover:underline break-all text-sm"
+            className="text-purple-600 hover:underline break-all text-sm"
           >
             {formData.resumeLink}
           </a>
@@ -3392,7 +3392,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         <button
           type="button"
           onClick={handleAddProject}
-          className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+          className="flex items-center px-3 py-1.5 border border-purple-600 text-purple-600 rounded-md text-sm font-medium hover:bg-purple-50 transition"
         >
           <FaPlus className="w-4 h-4 mr-1" />
           Add Project
@@ -3420,7 +3420,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               value={project.title}
               onChange={(e) => handleProjectChange(index, "title", e.target.value)}
               placeholder="Project Title"
-              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                 errors[`projectTitle${index}`] ? "border-red-400" : "border-gray-300"
               }`}
             />
@@ -3431,7 +3431,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   handleProjectChange(index, "description", e.target.value)
                 }
                 placeholder="Describe the project"
-                className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[80px] ${
+                className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 resize-y min-h-[80px] ${
                   errors[`projectDescription${index}`]
                     ? "border-red-400"
                     : "border-gray-300"
@@ -3443,7 +3443,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   enhanceField("projects", project.description, index, "description")
                 }
                 disabled={enhanceLoading[`projects${index}`]}
-                className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+                className={`absolute bg-white right-2 top-2 text-purple-600 hover:text-purple-800 disabled:text-gray-400 ${
                   enhanceLoading[`projects${index}`] ? "animate-pulse" : ""
                 }`}
                 title={
@@ -3458,7 +3458,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               value={project.link}
               onChange={(e) => handleProjectChange(index, "link", e.target.value)}
               placeholder="https://projectlink.com"
-              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                 errors[`projectLink${index}`] ? "border-red-400" : "border-gray-300"
               }`}
             />
@@ -3488,7 +3488,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         <button
           type="button"
           onClick={handleAddWorkExperience}
-          className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+          className="flex items-center px-3 py-1.5 border border-purple-600 text-purple-600 rounded-md text-sm font-medium hover:bg-purple-50 transition"
         >
           <FaPlus className="w-4 h-4 mr-1" />
           Add Work
@@ -3519,7 +3519,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   handleWorkExperienceChange(index, "role", e.target.value)
                 }
                 placeholder="Role"
-                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                   errors[`workExperienceRole${index}`]
                     ? "border-red-400"
                     : "border-gray-300"
@@ -3532,7 +3532,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   handleWorkExperienceChange(index, "companyName", e.target.value)
                 }
                 placeholder="Company Name"
-                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                   errors[`workExperienceCompany${index}`]
                     ? "border-red-400"
                     : "border-gray-300"
@@ -3547,7 +3547,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                 onChange={(e) =>
                   handleWorkExperienceChange(index, "startDate", e.target.value)
                 }
-                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                   errors[`workExperienceStartDate${index}`]
                     ? "border-red-400"
                     : "border-gray-300"
@@ -3559,7 +3559,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                 onChange={(e) =>
                   handleWorkExperienceChange(index, "endDate", e.target.value)
                 }
-                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+                className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                   errors[`workExperienceEndDate${index}`]
                     ? "border-red-400"
                     : "border-gray-300"
@@ -3574,7 +3574,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   handleWorkExperienceChange(index, "description", e.target.value)
                 }
                 placeholder="Describe your role and responsibilities"
-                className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[80px] ${
+                className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 resize-y min-h-[80px] ${
                   errors[`workExperienceDescription${index}`]
                     ? "border-red-400"
                     : "border-gray-300"
@@ -3586,7 +3586,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
                   enhanceField("workExperience", exp.description, index, "description")
                 }
                 disabled={enhanceLoading[`workExperience${index}`]}
-                className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+                className={`absolute bg-white right-2 top-2 text-purple-600 hover:text-purple-800 disabled:text-gray-400 ${
                   enhanceLoading[`workExperience${index}`] ? "animate-pulse" : ""
                 }`}
                 title={
@@ -3634,7 +3634,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
         <button
           type="button"
           onClick={handleAddOtherLink}
-          className="flex items-center px-3 py-1.5 border border-violet-600 text-violet-600 rounded-md text-sm font-medium hover:bg-violet-50 transition"
+          className="flex items-center px-3 py-1.5 border border-purple-600 text-purple-600 rounded-md text-sm font-medium hover:bg-purple-50 transition"
         >
           <FaPlus className="w-4 h-4 mr-1" />
           Add Link
@@ -3660,7 +3660,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               value={link.title}
               onChange={(e) => handleOtherLinkChange(index, "title", e.target.value)}
               placeholder="Link Title"
-              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                 errors[`otherLinkTitle${index}`] ? "border-red-400" : "border-gray-300"
               }`}
             />
@@ -3669,7 +3669,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
               value={link.url}
               onChange={(e) => handleOtherLinkChange(index, "url", e.target.value)}
               placeholder="https://otherlink.com"
-              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 ${
+              className={`w-full bg-white h-10 px-3 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 ${
                 errors[`otherLink${index}`] ? "border-red-400" : "border-gray-300"
               }`}
             />
@@ -3704,15 +3704,15 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
           value={formData.expectations}
           onChange={handleChange}
           placeholder="Describe your expectations"
-          className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[100px] ${
-            errors.expectations ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+          className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 resize-y min-h-[100px] ${
+            errors.expectations ? "border-red-400" : "border-gray-300 hover:border-purple-500"
           }`}
         />
         <button
           type="button"
           onClick={() => enhanceField("expectations", formData.expectations)}
           disabled={enhanceLoading.expectations}
-          className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+          className={`absolute bg-white right-2 top-2 text-purple-600 hover:text-purple-800 disabled:text-gray-400 ${
             enhanceLoading.expectations ? "animate-pulse" : ""
           }`}
           title={enhanceLoading.expectations ? "Enhancing..." : "Enhance"}
@@ -3737,15 +3737,15 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
           value={formData.anyOtherInfo}
           onChange={handleChange}
           placeholder="Additional information"
-          className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-violet-200 resize-y min-h-[100px] ${
-            errors.anyOtherInfo ? "border-red-400" : "border-gray-300 hover:border-violet-500"
+          className={`w-full bg-white px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-purple-200 resize-y min-h-[100px] ${
+            errors.anyOtherInfo ? "border-red-400" : "border-gray-300 hover:border-purple-500"
           }`}
         />
         <button
           type="button"
           onClick={() => enhanceField("anyOtherInfo", formData.anyOtherInfo)}
           disabled={enhanceLoading.anyOtherInfo}
-          className={`absolute bg-white right-2 top-2 text-violet-600 hover:text-violet-800 disabled:text-gray-400 ${
+          className={`absolute bg-white right-2 top-2 text-purple-600 hover:text-purple-800 disabled:text-gray-400 ${
             enhanceLoading.anyOtherInfo ? "animate-pulse" : ""
           }`}
           title={enhanceLoading.anyOtherInfo ? "Enhancing..." : "Enhance"}
@@ -3778,7 +3778,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             <button
                 type="button"
                 onClick={handleNext}
-                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
             >
                 Next
             </button>
@@ -3814,7 +3814,7 @@ function UpdateGetDiscoveredForm({ listingId, onClose }) {
             <button
                 type="submit"
                 onClick={handleSubmit}
-                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-violet-700 focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+                className="w-full sm:w-auto bg-[#a100ff] text-white px-6 py-3 rounded-md font-medium hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
             >
                 Update Profile
             </button>

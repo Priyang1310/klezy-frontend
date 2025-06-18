@@ -3,6 +3,7 @@ import {
   FaMoneyBills,
   FaUsersViewfinder,
   FaLocationArrow,
+  FaTrash
 } from "react-icons/fa6";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
@@ -17,7 +18,7 @@ const NewCard = ({ post }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [listingId, setListingId] = useState(null);
-
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const statusColor = {
     Pending: "bg-[#FFE167] border-yellow-200",
     Accepted: "bg-[#82FF5F] border-green-200",
@@ -25,61 +26,118 @@ const NewCard = ({ post }) => {
   };
 
   // Destructure fields from the schema
-  const {
-    headline = "Job Title",
-    domainName = "Domain not specified",
-    roleUnderDomain = "Role not specified",
-    skills = [],
-    startUpName = "Anonymous",
-    aboutEntity = "",
-    email: contact_email,
-    workMode = [],
-    workCity = "",
-    workState = "",
-    workCountry = "",
-    workBasis = [],
-    timeCommitment = "",
-    userType,
-    requirementType,
-    otherUserType,
-    otherRequirementType,
-    experienceRange = "Not specified",
-    responsibilities,
-    status = "Pending",
-    userId: userDetails,
-    facebook,
-    instagram,
-    linkedin,
-    whatsapp,
-    email,
-    whyShouldJoin,
-    anyOtherInfo,
-    profile_pic,
-    comment,
-    websiteOfStartupLink,
-    internshipType,
-    internshipTimeType,
-    internshipDuration,
-    internshipStipendRange,
-    internshipPerformanceCriteria,
-    collaborationDescription,
-    jobAmountRange,
-    freelancePaymentRange,
-    projectDescription,
-    percentageBasisValue,
-    equityBasisValue,
-    otherWorkBasis,
-    partnershipCriteria,
-    _id: listingIdFromPost,
-  } = post || {};
-
+const {
+  headline = "Job Title",
+  domainName = "Domain not specified",
+  roleUnderDomain = "Role not specified",
+  skills = [],
+  startUpName = "Anonymous",
+  aboutEntity = "",
+  email: contact_email,
+  workMode = [],
+  workCity = "",
+  workState = "",
+  workCountry = "",
+  workBasis = [],
+  timeCommitment = "",
+  userType,
+  requirementType,
+  otherUserType,
+  otherRequirementType,
+  experienceRange = "Not specified",
+  responsibilities,
+  status = "Pending",
+  userId: userDetails,
+  facebook,
+  instagram,
+  linkedin,
+  whatsapp,
+  email,
+  whyShouldJoin,
+  anyOtherInfo,
+  profile_pic,
+  comment,
+  websiteOfStartupLink,
+  internshipType,
+  internshipTimeType,
+  internshipDuration,
+  internshipStipendRange = {},
+  internshipPerformanceCriteria,
+  collaborationDescription = "",
+  jobAmountRange = {},
+  freelancePaymentRange = {},
+  projectDescription = "",
+  percentageBasisValue = "",
+  equityBasisValue = "",
+  otherWorkBasis = "",
+  partnershipCriteria = "",
+  _id: listingIdFromPost,
+} = post || {};
   console.log("workBasis: ", workBasis);
 
-  // Format work basis
-  const jobType = Array.isArray(workBasis) 
-    ? workBasis.join(", ") || "Not specified"
-    : "Not specified";
-  
+
+const defaultFreelancePaymentRange = "";
+const defaultJobAmountRange = "";
+const defaultInternshipStipendRange = "";
+const defaultPartnershipCriteria = "";
+const defaultPercentageBasisValue = "";
+const defaultProjectDescription = "";
+const defaultEquityBasisValue = "";
+const defaultCollaborationDescription = "";
+const defaultOtherWorkBasis = "";
+
+// Format work basis
+const workBasisOrder = [
+  "Partnership",
+  "Collaboration",
+  "Equity Basis",
+  "Project Basis",
+  "Percentage Basis",
+  "Freelance",
+  "Job",
+  "Internship",
+  "Other"
+];
+
+// Normalize function to handle case and spacing variations
+const normalizeString = (str) => str.toLowerCase().replace(/ /g, "");
+
+// Function to get the properly spaced form from workBasisOrder
+const getSpacedForm = (normalizedStr) => {
+  const matchedItem = workBasisOrder.find((item) => normalizeString(item) === normalizedStr);
+  return matchedItem || normalizedStr; // Return the matched item or original if no match
+};
+
+// Format work basis
+let jobType = "Not specified";
+let remainingWorkBasisCount = 0;
+if (Array.isArray(workBasis) && workBasis.length > 0) {
+  const sortedWorkBasis = [...workBasis].sort((a, b) => {
+    const normalizedA = normalizeString(a);
+    const normalizedB = normalizeString(b);
+    const indexA = workBasisOrder.findIndex((item) => normalizeString(item) === normalizedA);
+    const indexB = workBasisOrder.findIndex((item) => normalizeString(item) === normalizedB);
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    return normalizedA.localeCompare(normalizedB);
+  });
+  let visibleWorkBasis = [];
+  let totalLength = 0;
+  for (let basis of sortedWorkBasis) {
+    const normalizedBasis = normalizeString(basis);
+    if (totalLength + basis.length <= 80) {
+      visibleWorkBasis.push(getSpacedForm(normalizedBasis));
+      totalLength += basis.length + 2; // Account for ", "
+    } else {
+      break;
+    }
+  }
+  jobType = visibleWorkBasis.join(", ") || "Not specified";
+  remainingWorkBasisCount = sortedWorkBasis.length - visibleWorkBasis.length;
+}
   console.log("jobtype: ", jobType);
 
   // Format work mode and location
@@ -140,7 +198,100 @@ const NewCard = ({ post }) => {
       setIsUpdateModalOpen(true);
     }
   };
+const confirmDelete = async () => {
+    try {
+        const response = await fetch(
+            `http://localhost:3333/api/founder/delete-post/${post._id}`,
+            {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+            }
+        );
+        if (!response.ok) throw new Error("Failed to delete post");
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error("Error Deleting post:", error);
+    }
+};
 
+const handleDelete = () => {
+    setIsDeletePopupOpen(true);
+};
+
+// Function to convert number to readable format (e.g., lakhs or crores)
+const formatCurrency = (value) => {
+  if (!value) return "";
+  const num = parseInt(value, 10);
+  if (num >= 10000000) return `${(num / 10000000).toFixed(1)}Cr`; // Crores
+  if (num >= 100000) return `${(num / 100000).toFixed(1)}L`; // Lakhs
+  return num.toString(); // Default to original number
+};
+
+// Function to extract and format range from string (e.g., "233-444 rupees" -> "233-444")
+const extractRange = (rangeStr) => {
+  if (!rangeStr) return "";
+  const match = rangeStr.match(/(\d+)-(\d+)/);
+  if (match) {
+    const min = formatCurrency(match[1]);
+    const max = formatCurrency(match[2]);
+    return `${min}-${max}`;
+  }
+  return "";
+};
+
+// Format payment and description fields with titles
+const paymentAndDescFields = [
+  freelancePaymentRange ? `Freelance Rate: ${extractRange(freelancePaymentRange)} ₹` : "",
+  jobAmountRange ? `Job Payment: ${extractRange(jobAmountRange)} ₹` : "",
+  internshipStipendRange ? `Internship Stipend Range: ${extractRange(internshipStipendRange)} ₹` : "",
+  partnershipCriteria ? `Partnership Criteria: ${partnershipCriteria}` : "",
+  percentageBasisValue ? `Percentage Basis: ${percentageBasisValue}%` : "",
+  projectDescription ? `Project Description: ${projectDescription}` : "",
+  equityBasisValue ? `Equity Basis: ${equityBasisValue}%` : "",
+  collaborationDescription ? `Collaboration Description: ${collaborationDescription}` : "",
+  otherWorkBasis ? `Other Work Basis: ${otherWorkBasis}` : "",
+].filter(Boolean); // Remove any undefined or empty values
+
+let visiblePaymentFields = [];
+let totalPaymentLength = 0;
+let remainingPaymentCount = 0;
+const paymentOrder = [
+  "Freelance Rate",           // freelancePaymentRange
+  "Job Payment",              // jobAmountRange
+  "Internship Stipend Range", // internshipStipendRange
+  "Partnership Criteria",     // partnershipCriteria
+  "Percentage Basis",         // percentageBasisValue
+  "Project Description",      // projectDescription
+  "Equity Basis",             // equityBasisValue
+  "Collaboration Description",// collaborationDescription
+  "Other Work Basis"          // otherWorkBasis
+];
+
+if (paymentAndDescFields.length > 0) {
+  const sortedPaymentFields = [...paymentAndDescFields].sort((a, b) => {
+    const indexA = paymentOrder.findIndex((item) => a.startsWith(item));
+    const indexB = paymentOrder.findIndex((item) => b.startsWith(item));
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    return a.localeCompare(b);
+  });
+  for (let field of sortedPaymentFields) {
+    if (totalPaymentLength + field.length <= 60) { // Adjust limit as needed
+      visiblePaymentFields.push(field);
+      totalPaymentLength += field.length + 2; // Account for ", "
+    } else {
+      break;
+    }
+  }
+  remainingPaymentCount = sortedPaymentFields.length - visiblePaymentFields.length;
+}
+const paymentDisplay = visiblePaymentFields.join(", ") || "";
+console.log("paymentDisplay: ", paymentDisplay);
   return (
     <>
       <div className="relative  text-gray-800 flex shadow-[1px_1px_1px_rgba(0,0,0,0.1)] transition-all duration-300 flex-col h-fit w-full max-w-[700px] bg-white rounded-3xl p-3 sm:p-5 gap-0.5 hover:cursor-pointer">
@@ -183,30 +334,40 @@ const NewCard = ({ post }) => {
           
           {/* Work Basis */}
           <div className="flex flex-col items-start sm:items-center w-full sm:w-auto">
-            <div className="flex items-start gap-1 font-medium">
-              <FaMoneyBills className="text-violet-500 text-base sm:text-lg" />
-              <span className="text-xs sm:text-sm">{jobType}</span>
-            </div>
-          </div>
+  <div className="flex items-start gap-1 font-medium">
+    <FaMoneyBills className="text-violet-500 text-base sm:text-lg" />
+    <span className="text-xs sm:text-sm">{jobType}</span>
+    {remainingWorkBasisCount > 0 && (
+      <span className="text-xs text-gray-500 self-center bg-gray-200 rounded-full px-1.5 py-0.5 ml-1">
+        +{remainingWorkBasisCount}
+      </span>
+    )}
+  </div>
+</div>
         </div>
 
         {/* Time Commitment and Payment Range */}
-        {(timeCommitment || paymentRange) && (
-          <div className="my-1 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-            {timeCommitment && (
-              <div className="flex items-center gap-1 font-medium">
-                <IoMdTime className="text-violet-500" />
-                <span>Time: {timeCommitment}</span>
-              </div>
-            )}
-            {paymentRange && (
-              <div className="flex items-center gap-1 font-medium">
-                <FaMoneyBills className="text-violet-500" />
-                <span>Range: {paymentRange}</span>
-              </div>
-            )}
-          </div>
+        {(timeCommitment || paymentDisplay) && (
+  <div className="my-1 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+    {timeCommitment && (
+      <div className="flex items-center gap-1 font-medium">
+        <IoMdTime className="text-violet-500" />
+        <span>Time: {timeCommitment}</span>
+      </div>
+    )}
+    {paymentDisplay && (
+      <div className="flex items-center gap-1 font-medium">
+        <FaMoneyBills className="text-violet-500" />
+        <span>{paymentDisplay}</span>
+        {remainingPaymentCount > 0 && (
+          <span className="text-xs text-gray-500 self-center bg-gray-200 rounded-full px-1.5 py-0.5 ml-1">
+            +{remainingPaymentCount}
+          </span>
         )}
+      </div>
+    )}
+  </div>
+)}
 
         {/* Skills */}
         <div className="mt-1 flex flex-wrap items-center gap-1.5 w-full text-sm" onClick={() => setIsModalOpen(true)}>
@@ -245,6 +406,13 @@ const NewCard = ({ post }) => {
   
   {/* Action Buttons */}
   <div className="flex justify-space gap-1 sm:gap-3 mt-1 w-full sm:w-auto">
+   <button
+  className="text-red-500 w-10 h-10   rounded-full hover:bg-red-50 transition-colors duration-200 flex items-center justify-center"
+  onClick={handleDelete}
+  title="Delete"
+>
+  <FaTrash className="text-xl" />
+</button>
     {/* Icon Buttons */}
     <div className="flex gap-1 sm:gap-2">
       <button
@@ -364,6 +532,38 @@ const NewCard = ({ post }) => {
       />
     </div>
   </div>
+)}
+{isDeletePopupOpen && (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div
+            className="bg-white rounded-lg p-5 w-full max-w-sm flex flex-col gap-4"
+            onClick={(e) => e.stopPropagation()}
+        >
+            <h3 className="text-lg font-semibold text-gray-800">
+                Are you sure?
+            </h3>
+            <p className="text-sm text-gray-600">
+                This action cannot be recovered. Do you want to delete this post?
+            </p>
+            <div className="flex justify-end gap-3">
+                <button
+                    className="text-gray-600 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    onClick={() => setIsDeletePopupOpen(false)}
+                >
+                    Cancel
+                </button>
+                <button
+                    className="text-white bg-red-500 px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+                    onClick={() => {
+                        confirmDelete();
+                        setIsDeletePopupOpen(false);
+                    }}
+                >
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
 )}
     </>
   );
