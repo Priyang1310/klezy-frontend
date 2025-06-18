@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect, useRef } from "react";
 // import { useNavigate } from "react-router-dom";
 // import PhoneInput from "react-phone-input-2";
@@ -22,7 +21,6 @@
 // import { MdOutlinePhoneIphone } from "react-icons/md";
 // import "../Auth.css";
 // import { Globe } from "lucide-react";
-
 
 // // Ensure Modal is bound to your app element for accessibility
 // Modal.setAppElement("#root");
@@ -629,8 +627,6 @@
 //             toast.error("An error occurred during registration");
 //         }
 //     };
-
-
 
 //     return (
 //         <>
@@ -1779,7 +1775,6 @@
 
 // export default SignUpNew;
 
-
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
@@ -1804,6 +1799,8 @@ import { MdOutlinePhoneIphone } from "react-icons/md";
 import "../Auth.css";
 import { Globe } from "lucide-react";
 import * as EmailValidator from "email-validator";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 // Ensure Modal is bound to your app element for accessibility
 Modal.setAppElement("#root");
@@ -1811,12 +1808,19 @@ Modal.setAppElement("#root");
 // Initialize password validator schema
 const schema = new PasswordValidator();
 schema
-    .is().min(8)
-    .has().uppercase()
-    .has().lowercase()
-    .has().digits()
-    .has().symbols()
-    .has().not().spaces();
+    .is()
+    .min(8)
+    .has()
+    .uppercase()
+    .has()
+    .lowercase()
+    .has()
+    .digits()
+    .has()
+    .symbols()
+    .has()
+    .not()
+    .spaces();
 
 const SignUpNew = () => {
     const navigate = useNavigate();
@@ -1854,6 +1858,7 @@ const SignUpNew = () => {
     const [isEmailOTPLoading, setIsEmailOTPLoading] = useState(false); // New state for email OTP loading
     const [isPhoneOTPLoading, setIsPhoneOTPLoading] = useState(false); // New state for phone OTP loading
 
+    const MySwal = withReactContent(Swal);
     // Functions to control Terms modal
     const openTermsModal = () => {
         console.log("Opening Terms Modal");
@@ -2076,11 +2081,17 @@ const SignUpNew = () => {
     const handleSendPhoneOTP = async (e, isResend = false) => {
         e.preventDefault();
         if (!phoneNumber) {
-            setErrors((prev) => ({ ...prev, phoneNumber: "Phone number is required" }));
+            setErrors((prev) => ({
+                ...prev,
+                phoneNumber: "Phone number is required",
+            }));
             return;
         }
         if (!validatePhone(phoneNumber)) {
-            setErrors((prev) => ({ ...prev, phoneNumber: "Invalid phone number" }));
+            setErrors((prev) => ({
+                ...prev,
+                phoneNumber: "Invalid phone number",
+            }));
             return;
         }
 
@@ -2205,7 +2216,8 @@ const SignUpNew = () => {
         if (validationErrors.length > 0) {
             setErrors((prev) => ({
                 ...prev,
-                password: "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space",
+                password:
+                    "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space",
             }));
             return false;
         }
@@ -2214,7 +2226,10 @@ const SignUpNew = () => {
 
     const validateEmailOTP = async () => {
         if (!EmailOTP) {
-            setErrors((prev) => ({ ...prev, EmailOTP: "Email OTP is required" }));
+            setErrors((prev) => ({
+                ...prev,
+                EmailOTP: "Email OTP is required",
+            }));
             return false;
         }
 
@@ -2246,7 +2261,10 @@ const SignUpNew = () => {
 
     const validatePhoneOTP = async () => {
         if (!PhoneOTP) {
-            setErrors((prev) => ({ ...prev, PhoneOTP: "Phone OTP is required" }));
+            setErrors((prev) => ({
+                ...prev,
+                PhoneOTP: "Phone OTP is required",
+            }));
             return false;
         }
         if (PhoneOTP !== "123456") {
@@ -2351,12 +2369,15 @@ const SignUpNew = () => {
     const handleGetStarted = () => {
         const newErrors = {
             password: !password ? "Password is required" : "",
-            confirmPassword: !confirmPassword ? "Confirm password is required" : "",
+            confirmPassword: !confirmPassword
+                ? "Confirm password is required"
+                : "",
             agreed: !agreed ? "You must agree to the terms and conditions" : "",
         };
 
         if (password && !passwordValidation(password)) {
-            newErrors.password = "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space";
+            newErrors.password =
+                "Password must be at least 8 characters and include: A-Z, a-z, 0-9, and symbols like @, #, $, % with no space";
         }
 
         if (confirmPassword && !passwordValidation(confirmPassword)) {
@@ -2411,8 +2432,21 @@ const SignUpNew = () => {
             const data = await response.json();
             if (data.success) {
                 setUserData(data.result);
+                await MySwal.fire({
+                    title: "🎉 Registration Successful!",
+                    text: "Redirecting you to the login page...",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    backdrop: `rgba(161, 0, 255, 0.1)`,
+                    customClass: {
+                        popup: "rounded-lg shadow-lg",
+                        title: "text-lg font-semibold",
+                        content: "text-gray-700",
+                    },
+                });
                 navigate("/login");
-                toast.success("Registration successful!");
             } else {
                 setErrors((prev) => ({ ...prev, form: data.message }));
                 toast.error(data.message || "Registration failed");
@@ -2443,17 +2477,29 @@ const SignUpNew = () => {
                         <div className="z-10 flex flex-col items-center justify-center">
                             <div className="text-center mb-10">
                                 <div className="inline-flex items-center gap-3 mb-3">
-                                    <img src="./FullLogo.svg" alt="" className="h-12" />
+                                    <img
+                                        src="./FullLogo.svg"
+                                        alt=""
+                                        className="h-12"
+                                    />
                                 </div>
                                 <h2 className="text-5xl font-bold text-[#A100FF] mb-3">
-                                    Sign up <span className="text-gray-900">to get started</span>
+                                    Sign up{" "}
+                                    <span className="text-gray-900">
+                                        to get started
+                                    </span>
                                 </h2>
                                 <p className="text-xl text-gray-600 mb-4 max-w-2xl mx-auto">
-                                    Connect with amazing opportunities and people in just a few steps
+                                    Connect with amazing opportunities and
+                                    people in just a few steps
                                 </p>
                                 <p className="text-gray-500 opacity-[99%] text-xl">
                                     Already have an account?{" "}
-                                    <a href="#" className="text-[#A100FF] font-medium underline" onClick={handleLogin}>
+                                    <a
+                                        href="#"
+                                        className="text-[#A100FF] font-medium underline"
+                                        onClick={handleLogin}
+                                    >
                                         Sign in
                                     </a>
                                 </p>
@@ -2462,63 +2508,115 @@ const SignUpNew = () => {
                                 <div className="flex flex-col h-full gap-2 w-full p-10 rounded-lg justify-center">
                                     <div className="flex flex-col w-full gap-2 mb-4">
                                         <div className="text-left mb-8">
-                                            <label className="flex items-center gap-3 text-xl mb-6 text-gray-700 font-semibold"><MdPeopleOutline className="h-8 w-8 p-1 rounded-lg bg-purple-100 text-[#8d00ec]" /> I want to:</label>
+                                            <label className="flex items-center gap-3 text-xl mb-6 text-gray-700 font-semibold">
+                                                <MdPeopleOutline className="h-8 w-8 p-1 rounded-lg bg-purple-100 text-[#8d00ec]" />{" "}
+                                                I want to:
+                                            </label>
                                             {/* Type of user */}
                                             <div className="flex w-full gap-5 h-44">
                                                 <button
-                                                    className={`flex flex-col hover:scale-102 text-left w-1/2 border-2 ${role === "Founder" ? "bg-[#FAF4FF] border-[#be6df5] shadow shadow-[#be6df5]" : "bg-gray-50 border-gray-300 hover:border-[#A011FF] hover:shadow-md hover:shadow-gray-300"} transition-all duration-200 rounded-xl px-4 py-6`}
-                                                    onClick={(e) => handleRoleChange(e)}
+                                                    className={`flex flex-col hover:scale-102 text-left w-1/2 border-2 ${
+                                                        role === "Founder"
+                                                            ? "bg-[#FAF4FF] border-[#be6df5] shadow shadow-[#be6df5]"
+                                                            : "bg-gray-50 border-gray-300 hover:border-[#A011FF] hover:shadow-md hover:shadow-gray-300"
+                                                    } transition-all duration-200 rounded-xl px-4 py-6`}
+                                                    onClick={(e) =>
+                                                        handleRoleChange(e)
+                                                    }
                                                     value={"Founder"}
                                                 >
                                                     <div className="w-full flex items-center justify-end h-1">
                                                         {role === "Founder" && (
-                                                            <p className="bg-[#9830FF] text-white w-fit px-2 py-0.5 rounded-full text-xs font-semibold">✓ Selected</p>
+                                                            <p className="bg-[#9830FF] text-white w-fit px-2 py-0.5 rounded-full text-xs font-semibold">
+                                                                ✓ Selected
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="flex gap-5 px-5">
-                                                        <div className={` h-14 w-14 text-3xl rounded-xl flex items-center justify-center ${role === "Founder" ? "bg-[#A011FF] text-white shadow-xl shadow-violet-300" : "bg-gray-300"}`}><MdOutlinePerson /></div>
+                                                        <div
+                                                            className={` h-14 w-14 text-3xl rounded-xl flex items-center justify-center ${
+                                                                role ===
+                                                                "Founder"
+                                                                    ? "bg-[#A011FF] text-white shadow-xl shadow-violet-300"
+                                                                    : "bg-gray-300"
+                                                            }`}
+                                                        >
+                                                            <MdOutlinePerson />
+                                                        </div>
                                                         <div className="flex-1">
                                                             <h3 className="text-xl font-semibold text-gray-900 mb-2">
                                                                 Discover Talent
                                                             </h3>
                                                             <p className="text-gray-600 leading-relaxed mb-2 text-base">
-                                                                Find and connect with amazing professionals
-                                                                for your next big project.
+                                                                Find and connect
+                                                                with amazing
+                                                                professionals
+                                                                for your next
+                                                                big project.
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </button>
                                                 <button
-                                                    className={`flex flex-col hover:scale-102 text-left w-1/2 border-2 ${role === "GetDiscovered" ? "bg-[#FAF4FF] border-[#be6df5] shadow shadow-[#be6df5]" : "bg-gray-50 border-gray-300 hover:border-[#A011FF] hover:shadow-md hover:shadow-gray-300"} transition-all duration-200 rounded-xl px-4 py-6`}
-                                                    onClick={(e) => handleRoleChange(e)}
+                                                    className={`flex flex-col hover:scale-102 text-left w-1/2 border-2 ${
+                                                        role === "GetDiscovered"
+                                                            ? "bg-[#FAF4FF] border-[#be6df5] shadow shadow-[#be6df5]"
+                                                            : "bg-gray-50 border-gray-300 hover:border-[#A011FF] hover:shadow-md hover:shadow-gray-300"
+                                                    } transition-all duration-200 rounded-xl px-4 py-6`}
+                                                    onClick={(e) =>
+                                                        handleRoleChange(e)
+                                                    }
                                                     value={"GetDiscovered"}
                                                 >
                                                     <div className="w-full flex items-center justify-end h-1">
-                                                        {role === "GetDiscovered" && (
-                                                            <p className="bg-[#9830FF] text-white w-fit px-2 py-0.5 rounded-full text-xs font-semibold">✓ Selected</p>
+                                                        {role ===
+                                                            "GetDiscovered" && (
+                                                            <p className="bg-[#9830FF] text-white w-fit px-2 py-0.5 rounded-full text-xs font-semibold">
+                                                                ✓ Selected
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="flex gap-5 px-5">
-                                                        <div className={`shadow h-14 w-14 text-3xl rounded-xl flex items-center justify-center ${role === "GetDiscovered" ? "bg-[#A011FF] text-white shadow-xl shadow-violet-300" : "bg-gray-300"}`}><MdPeopleOutline /></div>
+                                                        <div
+                                                            className={`shadow h-14 w-14 text-3xl rounded-xl flex items-center justify-center ${
+                                                                role ===
+                                                                "GetDiscovered"
+                                                                    ? "bg-[#A011FF] text-white shadow-xl shadow-violet-300"
+                                                                    : "bg-gray-300"
+                                                            }`}
+                                                        >
+                                                            <MdPeopleOutline />
+                                                        </div>
                                                         <div className="flex-1">
                                                             <h3 className="text-xl font-semibold text-gray-900 mb-2">
                                                                 Get Discovered
                                                             </h3>
                                                             <p className="text-gray-600 leading-relaxed mb-2 text-md text-base">
-                                                                Showcase your talent and connect with people who are looking for someone exactly like
-                                                                you.
+                                                                Showcase your
+                                                                talent and
+                                                                connect with
+                                                                people who are
+                                                                looking for
+                                                                someone exactly
+                                                                like you.
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </button>
                                             </div>
                                             {errors.role && (
-                                                <p className="text-red-500 text-xs mt-1"> {errors.role} </p>
+                                                <p className="text-red-500 text-xs mt-1">
+                                                    {" "}
+                                                    {errors.role}{" "}
+                                                </p>
                                             )}
                                         </div>
                                         <div className="grid grid-cols-2 gap-10">
                                             <div className="flex flex-col">
-                                                <label className="border-b border-gray-300 pb-3 flex items-center gap-3 text-xl mb-6 text-gray-700 font-semibold"><MdOutlinePerson className="h-8 w-8 p-1 rounded-lg bg-purple-100 text-[#8d00ec]" /> Personal Details</label>
+                                                <label className="border-b border-gray-300 pb-3 flex items-center gap-3 text-xl mb-6 text-gray-700 font-semibold">
+                                                    <MdOutlinePerson className="h-8 w-8 p-1 rounded-lg bg-purple-100 text-[#8d00ec]" />{" "}
+                                                    Personal Details
+                                                </label>
                                                 {/* First Name, Mid name and Last name */}
                                                 <div className="grid grid-cols-2 gap-4 w-full">
                                                     <div className="text-left w-full py-1">
@@ -2527,16 +2625,24 @@ const SignUpNew = () => {
                                                         </label>
                                                         <input
                                                             type="text"
-                                                            className={`w-full h-12 px-2 border ${errors.firstName
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                            className={`w-full h-12 px-2 border ${
+                                                                errors.firstName
+                                                                    ? "border-red-500"
+                                                                    : "border-gray-300"
+                                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                             placeholder="Enter First Name"
                                                             value={firstName}
-                                                            onChange={handleFirstNameChange}
+                                                            onChange={
+                                                                handleFirstNameChange
+                                                            }
                                                         />
                                                         {errors.firstName && (
-                                                            <p className="text-red-500 text-xs mt-1"> {errors.firstName}</p>
+                                                            <p className="text-red-500 text-xs mt-1">
+                                                                {" "}
+                                                                {
+                                                                    errors.firstName
+                                                                }
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="text-left w-full py-1">
@@ -2545,16 +2651,24 @@ const SignUpNew = () => {
                                                         </label>
                                                         <input
                                                             type="text"
-                                                            className={`w-full h-12 px-2 border ${errors.lastName
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                            className={`w-full h-12 px-2 border ${
+                                                                errors.lastName
+                                                                    ? "border-red-500"
+                                                                    : "border-gray-300"
+                                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                             placeholder="Enter Last Name"
                                                             value={lastName}
-                                                            onChange={handleLastNameChange}
+                                                            onChange={
+                                                                handleLastNameChange
+                                                            }
                                                         />
                                                         {errors.lastName && (
-                                                            <p className="text-red-500 text-xs mt-1"> {errors.lastName} </p>
+                                                            <p className="text-red-500 text-xs mt-1">
+                                                                {" "}
+                                                                {
+                                                                    errors.lastName
+                                                                }{" "}
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="col-span-2 text-left w-full py-1">
@@ -2563,10 +2677,11 @@ const SignUpNew = () => {
                                                         </label>
                                                         <input
                                                             type="text"
-                                                            className={`w-full h-12 px-2 border ${errors.middleName
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                            className={`w-full h-12 px-2 border ${
+                                                                errors.middleName
+                                                                    ? "border-red-500"
+                                                                    : "border-gray-300"
+                                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                             placeholder="Enter Middle Name"
                                                             value={middleName}
                                                             onChange={
@@ -2574,26 +2689,40 @@ const SignUpNew = () => {
                                                             }
                                                         />
                                                         {errors.middleName && (
-                                                            <p className="text-red-500 text-xs mt-1"> {errors.middleName} </p>
+                                                            <p className="text-red-500 text-xs mt-1">
+                                                                {" "}
+                                                                {
+                                                                    errors.middleName
+                                                                }{" "}
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="text-left w-full py-1">
                                                         <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
-                                                            <FaRegCalendarAlt className="text-violet-800" /> Date of Birth *
+                                                            <FaRegCalendarAlt className="text-violet-800" />{" "}
+                                                            Date of Birth *
                                                         </label>
                                                         <input
                                                             type="date"
                                                             value={dob}
                                                             max={getFourteenYearsAgoDate()}
-                                                            onChange={handleDobChange}
+                                                            onChange={
+                                                                handleDobChange
+                                                            }
                                                             required
-                                                            className={`w-full h-12 px-2 border ${errors.dob
-                                                                ? "border-red-500"
-                                                                : "border-gray-300"
-                                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                                            className={`w-full h-12 px-2 border ${
+                                                                errors.dob
+                                                                    ? "border-red-500"
+                                                                    : "border-gray-300"
+                                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                                         />
                                                         {errors.dob && (
-                                                            <p className="text-red-500 text-xs mt-1"> {errors.dob} </p>
+                                                            <p className="text-red-500 text-xs mt-1">
+                                                                {" "}
+                                                                {
+                                                                    errors.dob
+                                                                }{" "}
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="text-left w-full py-1">
@@ -2601,36 +2730,52 @@ const SignUpNew = () => {
                                                             Gender *
                                                         </label>
                                                         <Select
-                                                            options={genderOptions}
+                                                            options={
+                                                                genderOptions
+                                                            }
                                                             value={gender}
-                                                            onChange={handleGenderChange}
+                                                            onChange={
+                                                                handleGenderChange
+                                                            }
                                                             placeholder="Gender"
                                                             styles={{
                                                                 ...customStyles,
-                                                                control: (provided) => ({
+                                                                control: (
+                                                                    provided
+                                                                ) => ({
                                                                     ...provided,
                                                                     borderColor:
                                                                         errors.gender
                                                                             ? "#EF4444"
                                                                             : "#D1D5DB",
-                                                                    borderRadius: "0.5rem",
+                                                                    borderRadius:
+                                                                        "0.5rem",
                                                                     height: "3rem",
                                                                     boxShadow:
                                                                         "1px 1px 3px rgba(0, 0, 0, 0.2)",
                                                                     "&:hover": {
-                                                                        borderColor: "none",
+                                                                        borderColor:
+                                                                            "none",
                                                                     },
                                                                 }),
                                                             }}
                                                         />
                                                         {errors.gender && (
-                                                            <p className="text-red-500 text-xs mt-1"> {errors.gender} </p>
+                                                            <p className="text-red-500 text-xs mt-1">
+                                                                {" "}
+                                                                {
+                                                                    errors.gender
+                                                                }{" "}
+                                                            </p>
                                                         )}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="text-left w-full">
-                                                <label className="border-b border-gray-300 pb-3 flex items-center gap-3 text-xl mb-6 text-gray-700 font-semibold"><IoLocationOutline className="h-8 w-8 p-1 rounded-lg bg-purple-100 text-[#8d00ec]" /> Location</label>
+                                                <label className="border-b border-gray-300 pb-3 flex items-center gap-3 text-xl mb-6 text-gray-700 font-semibold">
+                                                    <IoLocationOutline className="h-8 w-8 p-1 rounded-lg bg-purple-100 text-[#8d00ec]" />{" "}
+                                                    Location
+                                                </label>
                                                 <div className="flex flex-col gap-4">
                                                     <div className="w-full py-1">
                                                         <label className="block font-medium mb-1 text-black opacity-[73%]">
@@ -2668,7 +2813,12 @@ const SignUpNew = () => {
                                                             aria-label="Select country"
                                                         />
                                                         {errors.country && (
-                                                            <p className="text-red-500 text-xs mt-1"> {errors.country} </p>
+                                                            <p className="text-red-500 text-xs mt-1">
+                                                                {" "}
+                                                                {
+                                                                    errors.country
+                                                                }{" "}
+                                                            </p>
                                                         )}
                                                     </div>
                                                     <div className="w-full py-1">
@@ -2676,9 +2826,13 @@ const SignUpNew = () => {
                                                             State *
                                                         </label>
                                                         <Select
-                                                            options={availableStates}
+                                                            options={
+                                                                availableStates
+                                                            }
                                                             value={state}
-                                                            onChange={handleStateChange}
+                                                            onChange={
+                                                                handleStateChange
+                                                            }
                                                             placeholder="State"
                                                             styles={{
                                                                 ...customStyles,
@@ -2701,7 +2855,9 @@ const SignUpNew = () => {
                                                                     },
                                                                 }),
                                                             }}
-                                                            isDisabled={!country}
+                                                            isDisabled={
+                                                                !country
+                                                            }
                                                             isSearchable
                                                             aria-label="Select state"
                                                         />
@@ -2716,7 +2872,9 @@ const SignUpNew = () => {
                                                             City *
                                                         </label>
                                                         <Select
-                                                            options={availableDistricts}
+                                                            options={
+                                                                availableDistricts
+                                                            }
                                                             value={district}
                                                             onChange={
                                                                 handleDistrictChange
@@ -2744,13 +2902,19 @@ const SignUpNew = () => {
                                                                 }),
                                                             }}
                                                             isDisabled={
-                                                                !country || !state
+                                                                !country ||
+                                                                !state
                                                             }
                                                             isSearchable
                                                             aria-label="Select district"
                                                         />
                                                         {errors.district && (
-                                                            <p className="text-red-500 text-sm mt-0"> {errors.district} </p>
+                                                            <p className="text-red-500 text-sm mt-0">
+                                                                {" "}
+                                                                {
+                                                                    errors.district
+                                                                }{" "}
+                                                            </p>
                                                         )}
                                                     </div>
                                                 </div>
@@ -2758,7 +2922,9 @@ const SignUpNew = () => {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={handleOnClickNextForFirstSection}
+                                        onClick={
+                                            handleOnClickNextForFirstSection
+                                        }
                                         className="bg-[#A100FF] text-white w-[50%] p-3 rounded-lg shadow-md hover:shadow-purple-400 hover:bg-purple-600 mx-auto transition-all duration-300 text-lg font-semibold"
                                     >
                                         Next →
@@ -2800,7 +2966,9 @@ const SignUpNew = () => {
                         <div className="flex flex-col items-center justify-center w-[400px] h-fit z-10 bg-white px-4 py-4 rounded-xl shadow-lg shadow-purple-200 text-center text-sm">
                             <div className="w-full text-start mb-2">
                                 <button
-                                    onClick={handleOnClickPreviousForSecondSection}
+                                    onClick={
+                                        handleOnClickPreviousForSecondSection
+                                    }
                                     className="text-gray-600 w-fit px-2.5 py-0.5 rounded-full hover:text-violet-800 hover:bg-gray-200 transition-all duration-300"
                                 >
                                     Back
@@ -2815,7 +2983,8 @@ const SignUpNew = () => {
                                         Verify Email Address
                                     </h2>
                                     <p className="text-gray-600">
-                                        Check your email for the verification code
+                                        Check your email for the verification
+                                        code
                                     </p>
                                 </div>
                                 <div className="flex flex-col w-full">
@@ -2823,21 +2992,26 @@ const SignUpNew = () => {
                                         <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
                                             Email Address
                                             {errors.email && (
-                                                <p className="text-red-500 text-sm">{errors.email ? "*" : ""}</p>
+                                                <p className="text-red-500 text-sm">
+                                                    {errors.email ? "*" : ""}
+                                                </p>
                                             )}
                                         </label>
                                         <input
                                             type="email"
-                                            className={`w-full h-11 px-3 border ${errors.email
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            className={`w-full h-11 px-3 border ${
+                                                errors.email
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             placeholder="Enter Email Address"
                                             value={email}
                                             onChange={handleEmailChange}
                                         />
                                         {errors.email && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                                            <p className="text-red-500 text-xs mt-1">
+                                                {errors.email}
+                                            </p>
                                         )}
                                     </div>
                                     {showEmailCodeInput && (
@@ -2845,7 +3019,11 @@ const SignUpNew = () => {
                                             <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
                                                 Email Verification Code
                                                 {errors.EmailOTP && (
-                                                    <p className="text-red-500 text-sm">{errors.EmailOTP ? "*" : ""}</p>
+                                                    <p className="text-red-500 text-sm">
+                                                        {errors.EmailOTP
+                                                            ? "*"
+                                                            : ""}
+                                                    </p>
                                                 )}
                                             </label>
                                             <OtpInput
@@ -2863,7 +3041,8 @@ const SignUpNew = () => {
                                                             border: "1px solid #ccc",
                                                             borderRadius: "8px",
                                                             margin: "auto",
-                                                            transition: "border 0.2s ease",
+                                                            transition:
+                                                                "border 0.2s ease",
                                                             ":focus": {
                                                                 outline: "none",
                                                                 border: "2px solid #7c3aed",
@@ -2873,7 +3052,9 @@ const SignUpNew = () => {
                                                 )}
                                             />
                                             {errors.EmailOTP && (
-                                                <p className="text-red-500 text-xs mt-1">{errors.EmailOTP}</p>
+                                                <p className="text-red-500 text-xs mt-1">
+                                                    {errors.EmailOTP}
+                                                </p>
                                             )}
                                         </div>
                                     )}
@@ -2882,14 +3063,20 @@ const SignUpNew = () => {
                                             <></>
                                         ) : (
                                             <button
-                                                onClick={(e) => handleSendEmailOTP(e, true)}
+                                                onClick={(e) =>
+                                                    handleSendEmailOTP(e, true)
+                                                }
                                                 disabled={resendDisabled}
-                                                className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${resendDisabled
-                                                    ? "text-gray-400 cursor-not-allowed border-gray-300"
-                                                    : "text-[#5E0194] hover:text-violet-800"
-                                                    }`}
+                                                className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${
+                                                    resendDisabled
+                                                        ? "text-gray-400 cursor-not-allowed border-gray-300"
+                                                        : "text-[#5E0194] hover:text-violet-800"
+                                                }`}
                                             >
-                                                Resend OTP {resendDisabled ? `(${timer}s)` : ""}
+                                                Resend OTP{" "}
+                                                {resendDisabled
+                                                    ? `(${timer}s)`
+                                                    : ""}
                                             </button>
                                         )}
                                     </div>
@@ -2913,8 +3100,14 @@ const SignUpNew = () => {
                                         </button>
                                     ) : (
                                         <button
-                                            onClick={handleOnClickNextForSecondSection}
-                                            className={` w-full p-3 rounded-lg shadow-md mx-auto text-lg font-semibold flex items-center justify-center ${EmailOTP.length === 6 ? "bg-[#A100FF] text-white hover:shadow-purple-400 hover:bg-purple-600" : "bg-gray-300 text-gray-700"} transition-all duration-300`}
+                                            onClick={
+                                                handleOnClickNextForSecondSection
+                                            }
+                                            className={` w-full p-3 rounded-lg shadow-md mx-auto text-lg font-semibold flex items-center justify-center ${
+                                                EmailOTP.length === 6
+                                                    ? "bg-[#A100FF] text-white hover:shadow-purple-400 hover:bg-purple-600"
+                                                    : "bg-gray-300 text-gray-700"
+                                            } transition-all duration-300`}
                                             disabled={EmailOTP.length !== 6}
                                         >
                                             Next
@@ -2925,8 +3118,13 @@ const SignUpNew = () => {
                         </div>
                         <p className="text-[#786D7F] opacity-[86%] text-md mt-8 z-10">
                             Already have an account?{" "}
-                            <span className="cursor-pointer" onClick={handleLogin}>
-                                <span className="text-violet-600 font-medium underline">Log in</span>
+                            <span
+                                className="cursor-pointer"
+                                onClick={handleLogin}
+                            >
+                                <span className="text-violet-600 font-medium underline">
+                                    Log in
+                                </span>
                             </span>
                         </p>
                         <p className="text-lg text-gray-500 my-6 text-center z-10">
@@ -2963,7 +3161,9 @@ const SignUpNew = () => {
                         <div className="flex flex-col items-center justify-center w-[400px] h-fit z-10 bg-white px-4 py-4 rounded-xl shadow-lg shadow-purple-200 text-center text-sm">
                             <div className="w-full text-start mb-2">
                                 <button
-                                    onClick={handleOnClickPreviousForThirdSection}
+                                    onClick={
+                                        handleOnClickPreviousForThirdSection
+                                    }
                                     className="text-gray-600 w-fit px-2.5 py-0.5 rounded-full hover:text-violet-800 hover:bg-gray-200 transition-all duration-300"
                                 >
                                     Back
@@ -2978,7 +3178,8 @@ const SignUpNew = () => {
                                         Verify Phone
                                     </h2>
                                     <p className="text-gray-600">
-                                        Enter the code sent to your phone to proceed.
+                                        Enter the code sent to your phone to
+                                        proceed.
                                     </p>
                                 </div>
                                 <div className="flex flex-col w-full">
@@ -2986,7 +3187,11 @@ const SignUpNew = () => {
                                         <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
                                             Phone
                                             {errors.phoneNumber && (
-                                                <p className="text-red-500 text-sm">{errors.phoneNumber ? "*" : ""}</p>
+                                                <p className="text-red-500 text-sm">
+                                                    {errors.phoneNumber
+                                                        ? "*"
+                                                        : ""}
+                                                </p>
                                             )}
                                         </label>
                                         <PhoneInput
@@ -2994,10 +3199,11 @@ const SignUpNew = () => {
                                             value={phoneNumber}
                                             onChange={handlePhoneChange}
                                             containerClass="w-full"
-                                            inputClass={`w-full h-12 px-4 text-gray-900 border ${errors.phoneNumber
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                                } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            inputClass={`w-full h-12 px-4 text-gray-900 border ${
+                                                errors.phoneNumber
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            } rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             buttonClass="border-gray-300 h-14 w-16"
                                             dropdownClass="h-28"
                                             inputStyle={{
@@ -3017,7 +3223,9 @@ const SignUpNew = () => {
                                             }}
                                         />
                                         {errors.phoneNumber && (
-                                            <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
+                                            <p className="text-red-500 text-xs mt-1">
+                                                {errors.phoneNumber}
+                                            </p>
                                         )}
                                     </div>
                                     {showOTPInput && (
@@ -3025,7 +3233,11 @@ const SignUpNew = () => {
                                             <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
                                                 Phone Verification Code
                                                 {errors.PhoneOTP && (
-                                                    <p className="text-red-500 text-sm">{errors.PhoneOTP ? "*" : ""}</p>
+                                                    <p className="text-red-500 text-sm">
+                                                        {errors.PhoneOTP
+                                                            ? "*"
+                                                            : ""}
+                                                    </p>
                                                 )}
                                             </label>
                                             <OtpInput
@@ -3043,7 +3255,8 @@ const SignUpNew = () => {
                                                             border: "1px solid #ccc",
                                                             borderRadius: "8px",
                                                             margin: "auto",
-                                                            transition: "border 0.2s ease",
+                                                            transition:
+                                                                "border 0.2s ease",
                                                             ":focus": {
                                                                 outline: "none",
                                                                 border: "2px solid #7c3aed",
@@ -3053,7 +3266,9 @@ const SignUpNew = () => {
                                                 )}
                                             />
                                             {errors.PhoneOTP && (
-                                                <p className="text-red-500 text-xs mt-1">{errors.PhoneOTP}</p>
+                                                <p className="text-red-500 text-xs mt-1">
+                                                    {errors.PhoneOTP}
+                                                </p>
                                             )}
                                         </div>
                                     )}
@@ -3062,14 +3277,20 @@ const SignUpNew = () => {
                                             <></>
                                         ) : (
                                             <button
-                                                onClick={(e) => handleSendPhoneOTP(e, true)}
+                                                onClick={(e) =>
+                                                    handleSendPhoneOTP(e, true)
+                                                }
                                                 disabled={resendDisabled}
-                                                className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${resendDisabled
-                                                    ? "text-gray-400 cursor-not-allowed border-gray-300"
-                                                    : "text-[#5E0194] hover:text-violet-800"
-                                                    }`}
+                                                className={`w-fit border-b border-[#5E0194] transition-all duration-300 ${
+                                                    resendDisabled
+                                                        ? "text-gray-400 cursor-not-allowed border-gray-300"
+                                                        : "text-[#5E0194] hover:text-violet-800"
+                                                }`}
                                             >
-                                                Resend OTP {resendDisabled ? `(${timer}s)` : ""}
+                                                Resend OTP{" "}
+                                                {resendDisabled
+                                                    ? `(${timer}s)`
+                                                    : ""}
                                             </button>
                                         )}
                                     </div>
@@ -3092,8 +3313,14 @@ const SignUpNew = () => {
                                         </button>
                                     ) : (
                                         <button
-                                            onClick={handleOnClickNextForThirdSection}
-                                            className={` w-full p-3 rounded-lg shadow-md mx-auto text-lg font-semibold flex items-center justify-center ${PhoneOTP.length === 6 ? "bg-[#A100FF] text-white hover:shadow-purple-400 hover:bg-purple-600" : "bg-gray-300 text-gray-700"} transition-all duration-300`}
+                                            onClick={
+                                                handleOnClickNextForThirdSection
+                                            }
+                                            className={` w-full p-3 rounded-lg shadow-md mx-auto text-lg font-semibold flex items-center justify-center ${
+                                                PhoneOTP.length === 6
+                                                    ? "bg-[#A100FF] text-white hover:shadow-purple-400 hover:bg-purple-600"
+                                                    : "bg-gray-300 text-gray-700"
+                                            } transition-all duration-300`}
                                             disabled={PhoneOTP.length !== 6}
                                         >
                                             Next
@@ -3104,8 +3331,13 @@ const SignUpNew = () => {
                         </div>
                         <p className="text-[#786D7F] opacity-[86%] text-md mt-8 z-10">
                             Already have an account?{" "}
-                            <span className="cursor-pointer" onClick={handleLogin}>
-                                <span className="text-violet-600 font-medium underline">Log in</span>
+                            <span
+                                className="cursor-pointer"
+                                onClick={handleLogin}
+                            >
+                                <span className="text-violet-600 font-medium underline">
+                                    Log in
+                                </span>
                             </span>
                         </p>
                         <p className="text-lg text-gray-500 my-6 text-center z-10">
@@ -3142,7 +3374,9 @@ const SignUpNew = () => {
                         <div className="flex flex-col items-center justify-center w-[400px] h-fit z-10 bg-white px-4 py-4 rounded-xl shadow-lg shadow-purple-200 text-center text-sm">
                             <div className="w-full text-start mb-2">
                                 <button
-                                    onClick={handleOnClickPreviousForFourthSection}
+                                    onClick={
+                                        handleOnClickPreviousForFourthSection
+                                    }
                                     className="text-gray-600 w-fit px-2.5 py-0.5 rounded-full hover:text-violet-800 hover:bg-gray-200 transition-all duration-300"
                                 >
                                     Back
@@ -3157,7 +3391,8 @@ const SignUpNew = () => {
                                         Create Password
                                     </h2>
                                     <p className="text-gray-600">
-                                        Create a secure password for your account
+                                        Create a secure password for your
+                                        account
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-3">
@@ -3171,10 +3406,11 @@ const SignUpNew = () => {
                                                     ? "text"
                                                     : "password"
                                             }
-                                            className={`w-full h-12 px-2 pr-10 border ${errors.password
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            className={`w-full h-12 px-2 pr-10 border ${
+                                                errors.password
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            } rounded-lg focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             placeholder="Enter Password"
                                             value={password}
                                             onChange={handlePasswordChange}
@@ -3200,10 +3436,15 @@ const SignUpNew = () => {
                                     </div>
                                     <div className="text-left mb-1 relative">
                                         <label className="flex items-center gap-1 font-medium mb-1 text-black opacity-[73%]">
-                                            Re-Enter Password {errors.confirmPassword && (
+                                            Re-Enter Password{" "}
+                                            {errors.confirmPassword && (
                                                 <p className="text-red-500 text-sm">
-                                                    {errors.confirmPassword === "Confirm password is required" ? "*" : ""}
-                                                </p>)}
+                                                    {errors.confirmPassword ===
+                                                    "Confirm password is required"
+                                                        ? "*"
+                                                        : ""}
+                                                </p>
+                                            )}
                                         </label>
                                         <input
                                             type={
@@ -3211,10 +3452,11 @@ const SignUpNew = () => {
                                                     ? "text"
                                                     : "password"
                                             }
-                                            className={`w-full h-12 px-2 pr-10 border ${errors.confirmPassword
-                                                ? "border-red-500"
-                                                : "border-gray-300"
-                                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-violet-500`}
+                                            className={`w-full h-12 px-2 pr-10 border ${
+                                                errors.confirmPassword
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
+                                            } rounded-lg focus:outline-none focus:ring-1 focus:ring-violet-500`}
                                             placeholder="Re-Enter Password"
                                             value={confirmPassword}
                                             onChange={
@@ -3238,7 +3480,10 @@ const SignUpNew = () => {
                                         </button>
                                         {errors.confirmPassword && (
                                             <p className="text-red-500 text-xs mt-1">
-                                                {errors.confirmPassword === "Confirm password is required" ? "" : errors.confirmPassword}
+                                                {errors.confirmPassword ===
+                                                "Confirm password is required"
+                                                    ? ""
+                                                    : errors.confirmPassword}
                                             </p>
                                         )}
                                     </div>
@@ -3259,8 +3504,13 @@ const SignUpNew = () => {
                         </div>
                         <p className="text-[#786D7F] opacity-[86%] text-md mt-8 z-10">
                             Already have an account?{" "}
-                            <span className="cursor-pointer" onClick={handleLogin}>
-                                <span className="text-violet-600 font-medium underline">Log in</span>
+                            <span
+                                className="cursor-pointer"
+                                onClick={handleLogin}
+                            >
+                                <span className="text-violet-600 font-medium underline">
+                                    Log in
+                                </span>
                             </span>
                         </p>
                         <p className="text-lg text-gray-500 my-6 text-center z-10">
@@ -3296,7 +3546,8 @@ const SignUpNew = () => {
                     style={modalStyles}
                 >
                     <div className="p-6 h-full w-full">
-                        <PrivacyPolicies onClose={closePrivacyModal} /> {/* Fixed typo */}
+                        <PrivacyPolicies onClose={closePrivacyModal} />{" "}
+                        {/* Fixed typo */}
                     </div>
                 </Modal>
             </AnimatePresence>
