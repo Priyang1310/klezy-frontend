@@ -18,7 +18,7 @@ const ContactUs = () => {
 
         try {
             const response = await fetch(
-                "https://script.google.com/macros/s/AKfycbxtZQifqV1lUo771THiWXzeZjWvCEzvoYb4hf_mxloMaPrTFW-NM3uebWIGW2dV3r3fqw/exec",
+                "http://localhost:8001/api/support/submit",
                 {
                     method: "POST",
                     body: JSON.stringify(form),
@@ -29,7 +29,7 @@ const ContactUs = () => {
             );
 
             const result = await response.json();
-            if (result.result === "success") {
+            if (result.success) {
                 alert("✅ Submitted successfully!");
                 setForm({
                     name: "",
@@ -161,6 +161,15 @@ const ContactUs = () => {
                         </button>
                     </div>
                 </form>
+                <p className="text-sm text-center text-gray-600 mt-2">
+                    For more enquiries, please feel free to reach us at{" "}
+                    <a
+                        className="text-[#A100FF] font-medium"
+                        href="mailto:harsh@klezy.com"
+                    >
+                        support@klezy.com
+                    </a>
+                </p>
             </div>
         </div>
     );
