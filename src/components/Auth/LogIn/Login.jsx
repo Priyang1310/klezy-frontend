@@ -325,7 +325,6 @@
 // };
 // export default Login;
 
-
 // import { useState, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 // import { motion, AnimatePresence } from "framer-motion";
@@ -444,7 +443,6 @@
 //     animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
 //     exit: { opacity: 0, x: -50, transition: { duration: 0.4 } },
 //   };
-
 
 //   return (
 //     <>
@@ -724,7 +722,6 @@
 
 // export default Login;
 
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -739,404 +736,496 @@ import { FiSearch } from "react-icons/fi";
 import TermsAndConditions from "../Policies/TermsAndConditions";
 import PrivacyPolicies from "../Policies/PrivacyPolicies";
 import Modal from "react-modal";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 Modal.setAppElement("#root");
 
-
 const Login = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("Founder");
-  const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState("");
-  const navigate = useNavigate();
-  const [loginMethod, setLoginMethod] = useState("email");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+    const [emailOrPhone, setEmailOrPhone] = useState("");
+    const [password, setPassword] = useState("");
+    const [role, setRole] = useState("Founder");
+    const [errors, setErrors] = useState({});
+    const [formError, setFormError] = useState("");
+    const navigate = useNavigate();
+    const [loginMethod, setLoginMethod] = useState("email");
+    const [showPassword, setShowPassword] = useState(false);
+    const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+    const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+    const MySwal = withReactContent(Swal);
 
-  const validatePhone = (phone) => {
-    const cleanedPhone = phone.replace(/[^\d+]/g, '');
-    const phoneRegex = /^\+?\d{10,15}$/;
-    return phoneRegex.test(cleanedPhone);
-  };
-
-  useEffect(() => {
-    if (role) {
-      setErrors((prev) => ({ ...prev, role: "" }));
-    }
-  }, [role]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormError("");
-    const newErrors = {
-      emailOrPhone: !emailOrPhone,
-      password: !password,
-      role: !role,
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     };
-    // console.log(newErrors);
-    if (Object.values(newErrors).some((error) => error)) {
-      setErrors({
-        ...newErrors,
-        emailOrPhone: !emailOrPhone ? "This field is required" : "",
-        password: !password ? "This field is required" : "",
-        role: !role ? "Please select a role" : "",
-      });
-      setFormError("All fields are required!");
-      return;
-    }
 
-    if (loginMethod === "email" && !validateEmail(emailOrPhone)) {
-      setErrors((prev) => ({
-        ...prev,
-        emailOrPhone: "Please enter a valid email address!",
-      }));
-      setFormError("Please enter a valid email address!");
-      return;
-    }
+    const validatePhone = (phone) => {
+        const cleanedPhone = phone.replace(/[^\d+]/g, "");
+        const phoneRegex = /^\+?\d{10,15}$/;
+        return phoneRegex.test(cleanedPhone);
+    };
 
-    if (loginMethod === "phone" && !validatePhone(emailOrPhone)) {
-      setErrors((prev) => ({
-        ...prev,
-        emailOrPhone: "Please enter a valid phone number!",
-      }));
-      setFormError("Please enter a valid phone number!");
-      return;
-    }
+    useEffect(() => {
+        if (role) {
+            setErrors((prev) => ({ ...prev, role: "" }));
+        }
+    }, [role]);
 
-    try {
-      const response = await fetch(`http://localhost:3333/api/auth/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setFormError("");
+        const newErrors = {
+            emailOrPhone: !emailOrPhone,
+            password: !password,
+            role: !role,
+        };
+        // console.log(newErrors);
+        if (Object.values(newErrors).some((error) => error)) {
+            setErrors({
+                ...newErrors,
+                emailOrPhone: !emailOrPhone ? "This field is required" : "",
+                password: !password ? "This field is required" : "",
+                role: !role ? "Please select a role" : "",
+            });
+            setFormError("All fields are required!");
+            return;
+        }
+
+        if (loginMethod === "email" && !validateEmail(emailOrPhone)) {
+            setErrors((prev) => ({
+                ...prev,
+                emailOrPhone: "Please enter a valid email address!",
+            }));
+            setFormError("Please enter a valid email address!");
+            return;
+        }
+
+        if (loginMethod === "phone" && !validatePhone(emailOrPhone)) {
+            setErrors((prev) => ({
+                ...prev,
+                emailOrPhone: "Please enter a valid phone number!",
+            }));
+            setFormError("Please enter a valid phone number!");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `http://localhost:3333/api/auth/signin`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        emailOrPhone,
+                        password,
+                        role,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+            console.log(data);
+            if (data.success) {
+                localStorage.setItem("role", JSON.stringify(data.role));
+                localStorage.setItem("firstName", data.firstName);
+                localStorage.setItem("middleName", data.middleName);
+                localStorage.setItem("lastName", data.lastName);
+                localStorage.setItem("email", data.email);
+
+                if (data.role === "GetDiscovered") {
+                    await MySwal.fire({
+                        title: "🎉 Login Successful!",
+                        text: "Redirecting you to the dashboard...",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        backdrop: `rgba(161, 0, 255, 0.1)`,
+                        customClass: {
+                            popup: "rounded-lg shadow-lg",
+                            title: "text-lg font-semibold",
+                            content: "text-gray-700",
+                        },
+                    });
+                    navigate("/dashboad-getDiscovered");
+                } else if (data.role === "Founder") {
+                    await MySwal.fire({
+                        title: "🎉 Login Successful!",
+                        text: "Redirecting you to the dashboard...",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        backdrop: `rgba(161, 0, 255, 0.1)`,
+                        customClass: {
+                            popup: "rounded-lg shadow-lg",
+                            title: "text-lg font-semibold",
+                            content: "text-gray-700",
+                        },
+                    });
+                    navigate("/dashboard-founder");
+                } else {
+                    setFormError("Unknown role. Access denied.");
+                }
+            } else {
+                if (data.message === "Invalid Password!") {
+                    setErrors((prev) => ({
+                        ...prev,
+                        password: data.message,
+                    }));
+                }
+                setFormError(data.message || "Login failed. Please try again.");
+            }
+        } catch (error) {
+            setFormError(
+                error.message || "An error occurred. Please try again."
+            );
+        }
+    };
+
+    const handleSignUp = () => {
+        navigate("/signupnew");
+    };
+
+    const pageVariants = {
+        initial: { opacity: 0, x: 50 },
+        animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+        exit: { opacity: 0, x: -50, transition: { duration: 0.4 } },
+    };
+
+    // Functions to control Terms modal
+    const openTermsModal = () => {
+        console.log("Opening Terms Modal");
+        setIsTermsModalOpen(true);
+    };
+    const closeTermsModal = () => setIsTermsModalOpen(false);
+
+    // Functions to control Privacy modal
+    const openPrivacyModal = () => {
+        console.log("Opening Privacy Modal");
+        setIsPrivacyModalOpen(true);
+    };
+    const closePrivacyModal = () => setIsPrivacyModalOpen(false);
+
+    const modalStyles = {
+        content: {
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            width: "100%",
+            maxWidth: "800px",
+            maxHeight: "90vh",
+            overflowY: "auto",
+            padding: "4px",
+            borderRadius: "12px",
+            backgroundColor: "#ffffff",
+            border: "none",
         },
-        credentials: "include",
-        body: JSON.stringify({
-          emailOrPhone,
-          password,
-          role,
-        }),
-      });
+        overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            zIndex: 1000,
+        },
+    };
 
-      const data = await response.json();
-      console.log(data);
-      if (data.success) {
-        localStorage.setItem("role", JSON.stringify(data.role));
-        localStorage.setItem("firstName", data.firstName);
-        localStorage.setItem("middleName", data.middleName);
-        localStorage.setItem("lastName", data.lastName);
-        localStorage.setItem("email", data.email);
-
-        if (data.role === "GetDiscovered") {
-          navigate("/dashboad-getDiscovered");
-        } else if (data.role === "Founder") {
-          navigate("/dashboard-founder");
-        } else {
-          setFormError("Unknown role. Access denied.");
-        }
-      } else {
-        if (data.message === "Invalid Password!") {
-          setErrors((prev) => ({
-            ...prev,
-            password: data.message,
-          }));
-        }
-        setFormError(data.message || "Login failed. Please try again.");
-      }
-    } catch (error) {
-      setFormError(error.message || "An error occurred. Please try again.");
-    }
-  };
-
-  const handleSignUp = () => {
-    navigate("/signupnew");
-  };
-
-  const pageVariants = {
-    initial: { opacity: 0, x: 50 },
-    animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-    exit: { opacity: 0, x: -50, transition: { duration: 0.4 } },
-  };
-
-
-  // Functions to control Terms modal
-  const openTermsModal = () => {
-    console.log("Opening Terms Modal");
-    setIsTermsModalOpen(true);
-  };
-  const closeTermsModal = () => setIsTermsModalOpen(false);
-
-  // Functions to control Privacy modal
-  const openPrivacyModal = () => {
-    console.log("Opening Privacy Modal");
-    setIsPrivacyModalOpen(true);
-  };
-  const closePrivacyModal = () => setIsPrivacyModalOpen(false);
-
-  const modalStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      width: "100%",
-      maxWidth: "800px",
-      maxHeight: "90vh",
-      overflowY: "auto",
-      padding: "4px",
-      borderRadius: "12px",
-      backgroundColor: "#ffffff",
-      border: "none",
-    },
-    overlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      zIndex: 1000,
-    },
-  };
-
-
-  // console.log(errors);
-  return (
-    <>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key="step1"
-          className="font-sans min-h-screen bg-violet-100 flex flex-col gap-5 items-center justify-center p-4 bg-cover bg-center"
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          variants={pageVariants}
-        >
-          <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
-            <div className="absolute -right-[50%] top-[120%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-            <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-          </div>
-          <form
-            className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md z-10"
-            onSubmit={handleSubmit}
-            noValidate
-          >
-            <div className="text-sm text-start text-red-500 ">
-              <p className="">{formError !== ("Invalid Password!") ? `${formError}` : ""}</p>
-            </div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2 text-center">
-              Sign In
-            </h2>
-            <p className="text-sm text-gray-500 mb-6 text-center font-sans">
-              Enter your credentials to access your account
-            </p>
-
-            <div className="mb-6 text-start">
-              <p className="text-sm mb-3 text-gray-600 font-semibold">I want to</p>
-              <div className="flex items-center justify-center gap-3 w-full">
-                {["Founder", "GetDiscovered"].map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => {
-                      setRole(option);
-                      setErrors((prev) => ({ ...prev, role: "" }));
-                      setFormError("");
-                    }}
-                    className={`flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold border-2 rounded-xl hover:border-purple-500 transition-all duration-300 ${role === option
-                      ? "border-purple-600 text-white bg-purple-600"
-                      : "border-gray-200 text-gray-600"
-                      } ${errors.role ? "border-red-500" : ""}`}
-                  >
-                    {option === "Founder" ? (
-                      <>
-                        <span className="text-sm font-medium"><FiSearch className="w-4 h-4" /></span> Discover Talent
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-sm font-medium"><MdPeopleOutline className="w-4 h-4" /></span> Get Discovered
-                      </>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-4 text-start">
-              <p className="text-sm mb-2 text-gray-600 font-semibold">Login using</p>
-              <div className="flex justify-center  w-full border border-gray-200 rounded-lg p-0.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginMethod("email");
-                    setEmailOrPhone("");
-                    setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
-                    setFormError("");
-                  }}
-                  className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${loginMethod === "email"
-                    ? "bg-purple-600 text-white rounded-lg"
-                    : "text-gray-500"
-                    } transition-all duration-200`}
+    // console.log(errors);
+    return (
+        <>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key="step1"
+                    className="font-sans min-h-screen bg-violet-100 flex flex-col gap-5 items-center justify-center p-4 bg-cover bg-center"
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={pageVariants}
                 >
-                  <span className="text-lg"><MdOutlineEmail /></span> Email
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginMethod("phone");
-                    setEmailOrPhone("");
-                    setErrors((prev) => ({ ...prev, emailOrPhone: "" }));
-                    setFormError("");
-                  }}
-                  className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${loginMethod === "phone"
-                    ? "bg-purple-600 text-white rounded-lg"
-                    : "text-gray-500"
-                    }`}
+                    <div className="absolute inset-0 overflow-hidden h-full w-full z-0">
+                        <div className="absolute -right-[50%] top-[120%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+                        <div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+                        <div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+                        <div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+                    </div>
+                    <form
+                        className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md z-10"
+                        onSubmit={handleSubmit}
+                        noValidate
+                    >
+                        <div className="text-sm text-start text-red-500 ">
+                            <p className="">
+                                {formError !== "Invalid Password!"
+                                    ? `${formError}`
+                                    : ""}
+                            </p>
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2 text-center">
+                            Sign In
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-6 text-center font-sans">
+                            Enter your credentials to access your account
+                        </p>
+
+                        <div className="mb-6 text-start">
+                            <p className="text-sm mb-3 text-gray-600 font-semibold">
+                                I want to
+                            </p>
+                            <div className="flex items-center justify-center gap-3 w-full">
+                                {["Founder", "GetDiscovered"].map((option) => (
+                                    <button
+                                        key={option}
+                                        type="button"
+                                        onClick={() => {
+                                            setRole(option);
+                                            setErrors((prev) => ({
+                                                ...prev,
+                                                role: "",
+                                            }));
+                                            setFormError("");
+                                        }}
+                                        className={`flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold border-2 rounded-xl hover:border-purple-500 transition-all duration-300 ${
+                                            role === option
+                                                ? "border-purple-600 text-white bg-purple-600"
+                                                : "border-gray-200 text-gray-600"
+                                        } ${
+                                            errors.role ? "border-red-500" : ""
+                                        }`}
+                                    >
+                                        {option === "Founder" ? (
+                                            <>
+                                                <span className="text-sm font-medium">
+                                                    <FiSearch className="w-4 h-4" />
+                                                </span>{" "}
+                                                Discover Talent
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="text-sm font-medium">
+                                                    <MdPeopleOutline className="w-4 h-4" />
+                                                </span>{" "}
+                                                Get Discovered
+                                            </>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="mb-4 text-start">
+                            <p className="text-sm mb-2 text-gray-600 font-semibold">
+                                Login using
+                            </p>
+                            <div className="flex justify-center  w-full border border-gray-200 rounded-lg p-0.5">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setLoginMethod("email");
+                                        setEmailOrPhone("");
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            emailOrPhone: "",
+                                        }));
+                                        setFormError("");
+                                    }}
+                                    className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${
+                                        loginMethod === "email"
+                                            ? "bg-purple-600 text-white rounded-lg"
+                                            : "text-gray-500"
+                                    } transition-all duration-200`}
+                                >
+                                    <span className="text-lg">
+                                        <MdOutlineEmail />
+                                    </span>{" "}
+                                    Email
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setLoginMethod("phone");
+                                        setEmailOrPhone("");
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            emailOrPhone: "",
+                                        }));
+                                        setFormError("");
+                                    }}
+                                    className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${
+                                        loginMethod === "phone"
+                                            ? "bg-purple-600 text-white rounded-lg"
+                                            : "text-gray-500"
+                                    }`}
+                                >
+                                    <span className="text-lg">
+                                        <LuPhone />
+                                    </span>{" "}
+                                    Phone
+                                </button>
+                            </div>
+                        </div>
+
+                        {loginMethod === "phone" ? (
+                            <div className="mb-4">
+                                <PhoneInput
+                                    country={"in"}
+                                    value={emailOrPhone}
+                                    onChange={(value) => {
+                                        setEmailOrPhone(value);
+                                        setFormError("");
+                                    }}
+                                    containerClass="w-full"
+                                    inputClass={`w-full h-12 px-4 text-gray-900 border ${
+                                        errors.emailOrPhone
+                                            ? "border-red-500"
+                                            : "border-gray-300"
+                                    } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+                                    buttonClass="border-gray-300 h-12"
+                                    dropdownClass="h-28"
+                                    containerStyle={{
+                                        height: "48px",
+                                        width: "100%",
+                                    }}
+                                    inputStyle={{
+                                        height: "48px",
+                                        width: "100%",
+                                        border: "1px #e5e7eb solid",
+                                    }}
+                                    buttonStyle={{
+                                        position: "absolute",
+                                        left: "5px",
+                                        top: "5px",
+                                        height: "40px",
+                                        width: "40px",
+                                        backgroundColor: "transparent",
+                                        border: "none",
+                                        outline: "none",
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <div className="mb-4">
+                                <input
+                                    type="email"
+                                    value={emailOrPhone}
+                                    onChange={(e) => {
+                                        setEmailOrPhone(e.target.value);
+                                        setFormError("");
+                                    }}
+                                    className={`w-full h-12 px-4 border ${
+                                        errors.emailOrPhone
+                                            ? "border-red-500"
+                                            : "border-gray-200"
+                                    } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+                                    placeholder="Enter your email address"
+                                />
+                            </div>
+                        )}
+
+                        <div className="mb-4 relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    setFormError("");
+                                }}
+                                className={`w-full h-12 px-4 border ${
+                                    errors.password
+                                        ? "border-red-500"
+                                        : "border-gray-200"
+                                } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+                                placeholder="Enter your password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-4 text-gray-500"
+                            >
+                                {showPassword ? (
+                                    <FaEyeSlash size={18} />
+                                ) : (
+                                    <FaEye size={18} />
+                                )}
+                            </button>
+                        </div>
+
+                        <div className="flex items-center justify-between mb-4 w-full">
+                            {errors.password && (
+                                <p className="text-red-500 text-sm mt-1 w-full text-start">
+                                    {errors.password === "Invalid Password!"
+                                        ? `${errors.password}`
+                                        : ""}
+                                </p>
+                            )}
+                            <a
+                                href="#"
+                                className="text-purple-600 text-sm hover:underline w-full text-end"
+                                onClick={() => navigate("/forgot-password")}
+                            >
+                                Forgot password?
+                            </a>
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="w-full bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition-all duration-300"
+                        >
+                            Sign In →
+                        </button>
+
+                        <p className="text-sm text-gray-600 mt-4 text-center">
+                            Don't have an account?{" "}
+                            <a
+                                href="#"
+                                className="text-purple-600 hover:underline"
+                                onClick={handleSignUp}
+                            >
+                                Sign up for free
+                            </a>
+                        </p>
+                    </form>
+                    <p className="text-lg text-gray-500 my-6 text-center z-10">
+                        By signing up, you agree to our{" "}
+                        <span
+                            className="text-[#A100FF] underline cursor-pointer"
+                            onClick={openTermsModal}
+                        >
+                            terms & conditions
+                        </span>
+                        {" & "}
+                        <span
+                            className="text-[#A100FF] underline cursor-pointer"
+                            onClick={openPrivacyModal}
+                        >
+                            Privacy Policy
+                        </span>
+                    </p>
+                </motion.div>
+                <Modal
+                    isOpen={isTermsModalOpen}
+                    onRequestClose={closeTermsModal}
+                    style={modalStyles}
                 >
-                  <span className="text-lg"><LuPhone /></span> Phone
-                </button>
-              </div>
-            </div>
-
-            {loginMethod === "phone" ? (
-              <div className="mb-4">
-                <PhoneInput
-                  country={"in"}
-                  value={emailOrPhone}
-                  onChange={(value) => {
-                    setEmailOrPhone(value);
-                    setFormError("");
-                  }}
-                  containerClass="w-full"
-                  inputClass={`w-full h-12 px-4 text-gray-900 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
-                  buttonClass="border-gray-300 h-12"
-                  dropdownClass="h-28"
-                  containerStyle={{ height: "48px", width: "100%" }}
-                  inputStyle={{ height: "48px", width: "100%", border: "1px #e5e7eb solid" }}
-                  buttonStyle={{
-                    position: "absolute",
-                    left: "5px",
-                    top: "5px",
-                    height: "40px",
-                    width: "40px",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    outline: "none",
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="mb-4">
-                <input
-                  type="email"
-                  value={emailOrPhone}
-                  onChange={(e) => {
-                    setEmailOrPhone(e.target.value);
-                    setFormError("");
-                  }}
-                  className={`w-full h-12 px-4 border ${errors.emailOrPhone ? "border-red-500" : "border-gray-200"
-                    } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
-                  placeholder="Enter your email address"
-                />
-              </div>
-            )}
-
-            <div className="mb-4 relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setFormError("");
-                }}
-                className={`w-full h-12 px-4 border ${errors.password ? "border-red-500" : "border-gray-200"
-                  } rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-4 text-gray-500"
-              >
-                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between mb-4 w-full">
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1 w-full text-start">{errors.password === "Invalid Password!" ? `${errors.password}` : ""}</p>
-              )}
-              <a
-                href="#"
-                className="text-purple-600 text-sm hover:underline w-full text-end"
-                onClick={() => navigate("/forgot-password")}
-              >
-                Forgot password?
-              </a>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition-all duration-300"
-            >
-              Sign In →
-            </button>
-
-            <p className="text-sm text-gray-600 mt-4 text-center">
-              Don't have an account?{" "}
-              <a
-                href="#"
-                className="text-purple-600 hover:underline"
-                onClick={handleSignUp}
-              >
-                Sign up for free
-              </a>
-            </p>
-
-          </form>
-          <p className="text-lg text-gray-500 my-6 text-center z-10">
-            By signing up, you agree to our{" "}
-            <span
-              className="text-[#A100FF] underline cursor-pointer"
-              onClick={openTermsModal}
-            >
-              terms & conditions
-            </span>
-            {" & "}
-            <span
-              className="text-[#A100FF] underline cursor-pointer"
-              onClick={openPrivacyModal}
-            >
-              Privacy Policy
-            </span>
-          </p>
-        </motion.div>
-        <Modal
-          isOpen={isTermsModalOpen}
-          onRequestClose={closeTermsModal}
-          style={modalStyles}
-        >
-          <div className="p-6">
-            <TermsAndConditions onClose={closeTermsModal} />
-          </div>
-        </Modal>
-        <Modal
-          isOpen={isPrivacyModalOpen}
-          onRequestClose={closePrivacyModal}
-          style={modalStyles}
-        >
-          <div className="p-6 h-full w-full">
-            <PrivacyPolicies onClose={closePrivacyModal} /> {/* Fixed typo */}
-          </div>
-        </Modal>
-      </AnimatePresence>
-    </>
-  );
+                    <div className="p-6">
+                        <TermsAndConditions onClose={closeTermsModal} />
+                    </div>
+                </Modal>
+                <Modal
+                    isOpen={isPrivacyModalOpen}
+                    onRequestClose={closePrivacyModal}
+                    style={modalStyles}
+                >
+                    <div className="p-6 h-full w-full">
+                        <PrivacyPolicies onClose={closePrivacyModal} />{" "}
+                        {/* Fixed typo */}
+                    </div>
+                </Modal>
+            </AnimatePresence>
+        </>
+    );
 };
 
 export default Login;

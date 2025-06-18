@@ -8,6 +8,7 @@ import DashboardFounder from "./components/Founder/Dashboard/Dashboard";
 import DashboardTalent from "./components/GetDiscovered/Dashboard/Dashboard";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import ForgotPass from "./components/Auth/ForgotPass/ForgotPass";
+import ContactUs from "./components/ContactUs";
 
 const App = () => {
     const checkBackend = async () => {
@@ -51,6 +52,7 @@ const App = () => {
             <Route path="/signupnew" element={<SignUpNew />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPass />} />
+            <Route path="/contact-us" element={<ContactUs />} />
             <Route
                 path="/dashboard-founder"
                 element={
