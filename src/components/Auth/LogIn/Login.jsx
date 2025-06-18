@@ -945,314 +945,315 @@ const Login = () => {
 
 	// console.log(errors);
 	return (
-		<>
-			<AnimatePresence mode="wait">
-				<motion.div
-					key="step1"
-					className="font-sans min-h-screen bg-violet-100 flex flex-col gap-5 items-center justify-center p-4 bg-cover bg-center"
-					initial="initial"
-					animate="animate"
-					exit="exit"
-					variants={pageVariants}
+	<>
+		<AnimatePresence mode="wait">
+			<motion.div
+				key="step1"
+				className="font-sans min-h-screen bg-violet-100 flex flex-col gap-3 sm:gap-5 items-center justify-center p-2 sm:p-4 bg-cover bg-center"
+				initial="initial"
+				animate="animate"
+				exit="exit"
+				variants={pageVariants}
+			>
+				<div className="absolute inset-0 overflow-hidden h-full w-full z-0">
+					<div className="absolute -right-[50%] top-[120%] w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] lg:w-[887px] lg:h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[50px] sm:blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+					<div className="absolute -left-[5%] -top-[20%] w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] lg:w-[887px] lg:h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[50px] sm:blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+					<div className="absolute -right-[60%] -top-[10%] rounded-full w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] lg:w-[914px] lg:h-[914px] border-[50px] sm:border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+					<div className="absolute left-[25%] -bottom-[75%] rounded-full w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] lg:w-[814px] lg:h-[814px] border-[50px] sm:border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+				</div>
+				<form
+					className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 h-auto min-h-[85vh] sm:h-[90vh] w-full max-w-sm sm:max-w-md z-10 overflow-y-auto"
+					onSubmit={handleSubmit}
+					noValidate
 				>
-					<div className="absolute inset-0 overflow-hidden h-full w-full z-0">
-						<div className="absolute -right-[50%] top-[120%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
-						<div className="absolute -left-[5%] -top-[20%] w-[887px] h-[887px] opacity-20 bg-violet-500 rounded-full border border-white blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
-						<div className="absolute -right-[60%] -top-[10%] rounded-full w-[914px] h-[914px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
-						<div className="absolute left-[25%] -bottom-[75%] rounded-full w-[814px] h-[814px] border-[100px] opacity-5 border-violet-500 -translate-x-1/2 -translate-y-1/2 z-0"></div>
+					<div className="text-sm text-start text-red-500">
+						<p className="">
+							{formError !== "Invalid Password!"
+								? `${formError}`
+								: ""}
+						</p>
 					</div>
-					<form
-						className="bg-white rounded-2xl shadow-lg p-6 h-[88vh] w-full max-w-md z-10"
-						onSubmit={handleSubmit}
-						noValidate
-					>
-						<div className="text-sm text-start text-red-500 ">
-							<p className="">
-								{formError !== "Invalid Password!"
-									? `${formError}`
-									: ""}
-							</p>
-						</div>
-						<h2 className="text-xl font-semibold text-gray-800 mb-2 text-center">
-							Sign In
-						</h2>
-						{/* <p className="text-sm text-gray-500 mb-6 text-center font-sans">
-							Enter your credentials to access your account
-						</p> */}
+					<h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 text-center">
+						Sign In
+					</h2>
 
-						<div className="mb-6 text-start">
-							<p className="text-sm mb-3 text-gray-600 font-semibold">
-								I want to
-							</p>
-							<div className="flex items-center justify-center gap-3 w-full">
-								{["Founder", "GetDiscovered"].map((option) => (
-									<button
-										key={option}
-										type="button"
-										onClick={() => {
-											setRole(option);
-											setErrors((prev) => ({
-												...prev,
-												role: "",
-											}));
-											setFormError("");
-										}}
-										className={`flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold border-2 rounded-xl hover:border-purple-500 transition-all duration-300 ${
-											role === option
-												? "border-purple-600 text-white bg-purple-600"
-												: "border-gray-200 text-gray-600"
-										} ${
-											errors.role ? "border-red-500" : ""
-										}`}
-									>
-										{option === "Founder" ? (
-											<>
-												<span className="text-sm font-medium">
-													<FiSearch className="w-4 h-4" />
-												</span>{" "}
-												Discover Talent
-											</>
-										) : (
-											<>
-												<span className="text-sm font-medium">
-													<MdPeopleOutline className="w-4 h-4" />
-												</span>{" "}
-												Get Discovered
-											</>
-										)}
-									</button>
-								))}
-							</div>
-						</div>
-
-						<div className="mb-4 text-start">
-							<p className="text-sm mb-2 text-gray-600 font-semibold">
-								Login using
-							</p>
-							<div className="flex justify-center  w-full border border-gray-200 rounded-lg p-0.5">
+					<div className="mb-4 sm:mb-6 text-start">
+						<p className="text-xs sm:text-sm mb-2 sm:mb-3 text-gray-600 font-semibold">
+							I want to
+						</p>
+						<div className="flex items-center justify-center gap-2 sm:gap-3 w-full">
+							{["Founder", "GetDiscovered"].map((option) => (
 								<button
+									key={option}
 									type="button"
 									onClick={() => {
-										setLoginMethod("email");
-										setEmailOrPhone("");
+										setRole(option);
 										setErrors((prev) => ({
 											...prev,
-											emailOrPhone: "",
+											role: "",
 										}));
 										setFormError("");
 									}}
-									className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${
-										loginMethod === "email"
-											? "bg-purple-600 text-white rounded-lg"
-											: "text-gray-500"
-									} transition-all duration-200`}
-								>
-									<span className="text-lg">
-										<MdOutlineEmail />
-									</span>{" "}
-									Email
-								</button>
-								<button
-									type="button"
-									onClick={() => {
-										setLoginMethod("phone");
-										setEmailOrPhone("");
-										setErrors((prev) => ({
-											...prev,
-											emailOrPhone: "",
-										}));
-										setFormError("");
-									}}
-									className={`w-full flex items-center justify-center gap-2 px-4 py-1.5 text-sm font-semibold ${
-										loginMethod === "phone"
-											? "bg-purple-600 text-white rounded-lg"
-											: "text-gray-500"
+									className={`flex w-full items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold border-2 rounded-xl hover:border-purple-500 transition-all duration-300 ${
+										role === option
+											? "border-purple-600 text-white bg-purple-600"
+											: "border-gray-200 text-gray-600"
+									} ${
+										errors.role ? "border-red-500" : ""
 									}`}
 								>
-									<span className="text-lg">
-										<LuPhone />
-									</span>{" "}
-									Phone
+									{option === "Founder" ? (
+										<>
+											<span className="text-xs sm:text-sm font-medium">
+												<FiSearch className="w-3 h-3 sm:w-4 sm:h-4" />
+											</span>{" "}
+											<span className="hidden xs:inline">Discover Talent</span>
+											<span className="xs:hidden">Discover</span>
+										</>
+									) : (
+										<>
+											<span className="text-xs sm:text-sm font-medium">
+												<MdPeopleOutline className="w-3 h-3 sm:w-4 sm:h-4" />
+											</span>{" "}
+											<span className="hidden xs:inline">Get Discovered</span>
+											<span className="xs:hidden">Get Found</span>
+										</>
+									)}
 								</button>
-							</div>
+							))}
 						</div>
+					</div>
 
-						{loginMethod === "phone" ? (
-							<div className="mb-4">
-								<PhoneInput
-									country={"in"}
-									value={emailOrPhone}
-									onChange={(value) => {
-										setEmailOrPhone(value);
-										setFormError("");
-									}}
-									containerClass="w-full"
-									inputClass={`w-full h-12 px-4 text-gray-900 border ${
-										errors.emailOrPhone
-											? "border-red-500"
-											: "border-gray-300"
-									} rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
-									buttonClass="border-gray-300 h-12"
-									dropdownClass="h-28"
-									containerStyle={{
-										height: "48px",
-										width: "100%",
-									}}
-									inputStyle={{
-										height: "48px",
-										width: "100%",
-										border: "1px #e5e7eb solid",
-									}}
-									buttonStyle={{
-										position: "absolute",
-										left: "5px",
-										top: "5px",
-										height: "40px",
-										width: "40px",
-										backgroundColor: "transparent",
-										border: "none",
-										outline: "none",
-									}}
-								/>
-							</div>
-						) : (
-							<div className="mb-4">
-								<input
-									type="email"
-									value={emailOrPhone}
-									onChange={(e) => {
-										setEmailOrPhone(e.target.value);
-										setFormError("");
-									}}
-									className={`w-full h-12 px-4 border ${
-										errors.emailOrPhone
-											? "border-red-500"
-											: "border-gray-200"
-									} rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
-									placeholder="Enter your email address"
-								/>
-							</div>
-						)}
-
-						<div className="mb-4 relative">
-							<input
-								type={showPassword ? "text" : "password"}
-								value={password}
-								onChange={(e) => {
-									setPassword(e.target.value);
+					<div className="mb-3 sm:mb-4 text-start">
+						<p className="text-xs sm:text-sm mb-2 text-gray-600 font-semibold">
+							Login using
+						</p>
+						<div className="flex justify-center w-full border border-gray-200 rounded-lg p-0.5">
+							<button
+								type="button"
+								onClick={() => {
+									setLoginMethod("email");
+									setEmailOrPhone("");
+									setErrors((prev) => ({
+										...prev,
+										emailOrPhone: "",
+									}));
 									setFormError("");
 								}}
-								className={`w-full h-12 px-4 border ${
-									errors.password
+								className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold ${
+									loginMethod === "email"
+										? "bg-purple-600 text-white rounded-lg"
+										: "text-gray-500"
+								} transition-all duration-200`}
+							>
+								<span className="text-sm sm:text-lg">
+									<MdOutlineEmail />
+								</span>{" "}
+								Email
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									setLoginMethod("phone");
+									setEmailOrPhone("");
+									setErrors((prev) => ({
+										...prev,
+										emailOrPhone: "",
+									}));
+									setFormError("");
+								}}
+								className={`w-full flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold ${
+									loginMethod === "phone"
+										? "bg-purple-600 text-white rounded-lg"
+										: "text-gray-500"
+								}`}
+							>
+								<span className="text-sm sm:text-lg">
+									<LuPhone />
+								</span>{" "}
+								Phone
+							</button>
+						</div>
+					</div>
+
+					{loginMethod === "phone" ? (
+						<div className="mb-3 sm:mb-4">
+							<PhoneInput
+								country={"in"}
+								value={emailOrPhone}
+								onChange={(value) => {
+									setEmailOrPhone(value);
+									setFormError("");
+								}}
+								containerClass="w-full"
+								inputClass={`w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base text-gray-900 border ${
+									errors.emailOrPhone
+										? "border-red-500"
+										: "border-gray-300"
+								} rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+								buttonClass="border-gray-300 h-10 sm:h-12"
+								dropdownClass="h-28"
+								containerStyle={{
+									height: window.innerWidth < 640 ? "40px" : "48px",
+									width: "100%",
+								}}
+								inputStyle={{
+									height: window.innerWidth < 640 ? "40px" : "48px",
+									width: "100%",
+									border: "1px #e5e7eb solid",
+									fontSize: window.innerWidth < 640 ? "14px" : "16px",
+								}}
+								buttonStyle={{
+									position: "absolute",
+									left: "5px",
+									top: window.innerWidth < 640 ? "3px" : "5px",
+									height: window.innerWidth < 640 ? "34px" : "40px",
+									width: window.innerWidth < 640 ? "34px" : "40px",
+									backgroundColor: "transparent",
+									border: "none",
+									outline: "none",
+								}}
+							/>
+						</div>
+					) : (
+						<div className="mb-3 sm:mb-4">
+							<input
+								type="email"
+								value={emailOrPhone}
+								onChange={(e) => {
+									setEmailOrPhone(e.target.value);
+									setFormError("");
+								}}
+								className={`w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base border ${
+									errors.emailOrPhone
 										? "border-red-500"
 										: "border-gray-200"
 								} rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
-								placeholder="Enter your password"
+								placeholder="Enter your email address"
 							/>
-							<button
-								type="button"
-								onClick={() => setShowPassword(!showPassword)}
-								className="absolute right-4 top-4 text-gray-500"
-							>
-								{showPassword ? (
-									<FaEyeSlash size={18} />
-								) : (
-									<FaEye size={18} />
-								)}
-							</button>
 						</div>
-						<div className="my-4">
+					)}
+
+					<div className="mb-3 sm:mb-4 relative">
+						<input
+							type={showPassword ? "text" : "password"}
+							value={password}
+							onChange={(e) => {
+								setPassword(e.target.value);
+								setFormError("");
+							}}
+							className={`w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base border ${
+								errors.password
+									? "border-red-500"
+									: "border-gray-200"
+							} rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500`}
+							placeholder="Enter your password"
+						/>
+						<button
+							type="button"
+							onClick={() => setShowPassword(!showPassword)}
+							className="absolute right-3 sm:right-4 top-3 sm:top-4 text-gray-500"
+						>
+							{showPassword ? (
+								<FaEyeSlash size={window.innerWidth < 640 ? 16 : 18} />
+							) : (
+								<FaEye size={window.innerWidth < 640 ? 16 : 18} />
+							)}
+						</button>
+					</div>
+
+					<div className="my-3 sm:my-4 flex justify-center w-full max-w-full overflow-hidden">
+						<div className="scale-[0.75] xs:scale-[0.85] sm:scale-[0.9] md:scale-100 transition-transform duration-300">
 							<Turnstile
 								ref={turnstileRef}
-								sitekey={
-									import.meta.env.VITE_TURNSTILE_SITE_KEY
-								}
+								sitekey="0x4AAAAAABhfEOvQXwvnvpF6"
 								onVerify={(token) => {
 									console.log("Token:", token);
 									setToken(token);
 								}}
 								onExpire={() => setToken("")}
 								options={{
-									theme: "dark",
-									size: "compact", // ⬅️ This reduces the height
+									theme: "light",
+									size: window.innerWidth < 640 ? "compact" : "normal",
 								}}
 							/>
 						</div>
-						<div className="flex items-center justify-between mb-4 w-full">
-							{errors.password && (
-								<p className="text-red-500 text-sm mt-1 w-full text-start">
-									{errors.password === "Invalid Password!"
-										? `${errors.password}`
-										: ""}
-								</p>
-							)}
-							<a
-								href="#"
-								className="text-purple-600 text-sm hover:underline w-full text-end"
-								onClick={() => navigate("/forgot-password")}
-							>
-								Forgot password?
-							</a>
-						</div>
+					</div>
 
-						<button
-							type="submit"
-							className="w-full bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition-all duration-300"
+					<div className="flex items-center justify-between mb-3 sm:mb-4 w-full">
+						{errors.password && (
+							<p className="text-red-500 text-xs sm:text-sm mt-1 w-full text-start">
+								{errors.password === "Invalid Password!"
+									? `${errors.password}`
+									: ""}
+							</p>
+						)}
+						<a
+							href="#"
+							className="text-purple-600 text-xs sm:text-sm hover:underline w-full text-end"
+							onClick={() => navigate("/forgot-password")}
 						>
-							Sign In →
-						</button>
+							Forgot password?
+						</a>
+					</div>
 
-						<p className="text-sm text-gray-600 mt-4 text-center">
-							Don't have an account?{" "}
-							<a
-								href="#"
-								className="text-purple-600 hover:underline"
-								onClick={handleSignUp}
-							>
-								Sign up for free
-							</a>
-						</p>
-					</form>
+					<button
+						type="submit"
+						className="w-full bg-purple-600 text-white p-2.5 sm:p-3 text-sm sm:text-base rounded-lg hover:bg-purple-700 transition-all duration-300"
+					>
+						Sign In →
+					</button>
 
-					<p className="text-lg text-gray-500 mt-[-10px] text-center z-10">
-						By signing up, you agree to our{" "}
-						<span
-							className="text-[#A100FF] underline cursor-pointer"
-							onClick={openTermsModal}
+					<p className="text-xs sm:text-sm text-gray-600 mt-3 sm:mt-4 text-center">
+						Don't have an account?{" "}
+						<a
+							href="#"
+							className="text-purple-600 hover:underline"
+							onClick={handleSignUp}
 						>
-							terms & conditions
-						</span>
-						{" & "}
-						<span
-							className="text-[#A100FF] underline cursor-pointer"
-							onClick={openPrivacyModal}
-						>
-							Privacy Policy
-						</span>
+							Sign up for free
+						</a>
 					</p>
-				</motion.div>
-				<Modal
-					isOpen={isTermsModalOpen}
-					onRequestClose={closeTermsModal}
-					style={modalStyles}
-				>
-					<div className="p-6">
-						<TermsAndConditions onClose={closeTermsModal} />
-					</div>
-				</Modal>
-				<Modal
-					isOpen={isPrivacyModalOpen}
-					onRequestClose={closePrivacyModal}
-					style={modalStyles}
-				>
-					<div className="p-6 h-full w-full">
-						<PrivacyPolicies onClose={closePrivacyModal} />{" "}
-						{/* Fixed typo */}
-					</div>
-				</Modal>
-			</AnimatePresence>
-		</>
-	);
+				</form>
+
+				<p className="text-sm sm:text-lg text-gray-500 mt-[-5px] sm:mt-[-10px] text-center z-10 px-4">
+					By signing up, you agree to our{" "}
+					<span
+						className="text-[#A100FF] underline cursor-pointer"
+						onClick={openTermsModal}
+					>
+						terms & conditions
+					</span>
+					{" & "}
+					<span
+						className="text-[#A100FF] underline cursor-pointer"
+						onClick={openPrivacyModal}
+					>
+						Privacy Policy
+					</span>
+				</p>
+			</motion.div>
+			<Modal
+				isOpen={isTermsModalOpen}
+				onRequestClose={closeTermsModal}
+				style={modalStyles}
+			>
+				<div className="p-4 sm:p-6">
+					<TermsAndConditions onClose={closeTermsModal} />
+				</div>
+			</Modal>
+			<Modal
+				isOpen={isPrivacyModalOpen}
+				onRequestClose={closePrivacyModal}
+				style={modalStyles}
+			>
+				<div className="p-4 sm:p-6 h-full w-full">
+					<PrivacyPolicies onClose={closePrivacyModal} />
+				</div>
+			</Modal>
+		</AnimatePresence>
+	</>
+);
 };
 
 export default Login;
